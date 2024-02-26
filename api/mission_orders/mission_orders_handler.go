@@ -173,7 +173,7 @@ func (db Database) ReadMissionsOrders(ctx *gin.Context) {
 		return
 	} */
 	
-	// Generate a user structure as a response
+	// Generate a mission orders  structure as a response
 	response := MissionsPagination{}
 	dataTableMission := []MissionsTable{}
 	for _, mission := range missions {

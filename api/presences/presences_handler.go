@@ -4,6 +4,7 @@ import (
 	"labs/constants"
 	"labs/domains"
 	"net/http"
+	"strconv"
 
 	"labs/utils"
 
@@ -95,6 +96,27 @@ func (db Database) ReadPresences(ctx *gin.Context) {
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
 
+
+	// Parse and validate the page from the request parameter
+	page, err := strconv.Atoi(ctx.DefaultQuery("page", strconv.Itoa(constants.DEFAULT_PAGE_PAGINATION)))
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid INT format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Parse and validate the limit from the request parameter
+	limit, err := strconv.Atoi(ctx.DefaultQuery("limit", strconv.Itoa(constants.DEFAULT_LIMIT_PAGINATION)))
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid INT format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+
+
+
+
 	// Parse and validate the presence ID from the request parameter
 	userID, err := uuid.Parse(ctx.Param("userID"))
 	if err != nil {
@@ -103,20 +125,84 @@ func (db Database) ReadPresences(ctx *gin.Context) {
 		return
 	}
 
+
+	// Check if the user's value is among the allowed choices
+	validChoices := utils.ResponseLimitPagination()
+	isValidChoice := false
+	for _, choice := range validChoices {
+		if uint(limit) == choice {
+			isValidChoice = true
+			break
+		}
+	}
+
+
+	// If the value is invalid, set it to default DEFAULT_LIMIT_PAGINATION
+	if !isValidChoice {
+		limit = constants.DEFAULT_LIMIT_PAGINATION
+	}
+
+	// Generate offset
+	offset := (page - 1) * limit
+
+	
+
+
+
+
 	// Check if the employee belongs to the specified company
 	if err := domains.CheckEmployeeSession(db.DB, userID, session.UserID, session.CompanyID); err != nil {
 		logrus.Error("Error verifying employee belonging. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
 		return
 	}
+// Retrieve all user data from the database
+presences, err := ReadAllPagination(db.DB, []domains.Presences{}, session.CompanyID, limit, offset)
+if err != nil {
+	logrus.Error("Error occurred while finding all user data. Error: ", err)
+	utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
+	return
+}
+count, err := domains.ReadTotalCount(db.DB, &domains.Presences{}, "company_id", session.CompanyID)
+if err != nil {
+	logrus.Error("Error occurred while finding total count. Error: ", err)
+	utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
+	return
+}
 
-	// Retrieve all presence data from the database
+	/* // Retrieve all presence data from the database
 	presences, err := ReadAll(db.DB, domains.Presences{}, session.UserID)
 	if err != nil {
 		logrus.Error("Error occurred while finding all presences  data. Error: ", err)
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
 		return
-	}
+	} */
+// Generate a mission orders  structure as a response
+response := PresencesPagination{}
+dataTablePresence := []PresencesTable{}
+for _, presence := range presences {
+
+	dataTablePresence = append(dataTablePresence, PresencesTable{
+		ID:        presence.ID,
+		Check:presence.Check ,
+		Matricule:presence.Matricule,
+		UserID:   presence.UserID,
+		
+	})
+}
+response.Items = dataTablePresence
+response.Page = uint(page)
+response.Limit = uint(limit)
+response.TotalCount = count
+
+
+
+
+
+
+
+
+
 
 	// Respond with success
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, presences)

@@ -37,7 +37,7 @@ type PresencesPagination struct {
 // @Description	presences represents a single presence entry in a table.
 type PresencesTable struct {
 	ID      uuid.UUID `json:"id"`         // ID is the unique identifier for the presence.
-	Matricule string    `json:"matricule"` //  matricule is the matricule of the user.
+	Matricule uint    `json:"matricule"` //  matricule is the matricule of the user.
 	Check time.Time    `json:"check"` // presence check.
 	UserID  uuid.UUID   `json:"user_id"`  // user id 
 
