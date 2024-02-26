@@ -113,10 +113,6 @@ func (db Database) ReadPresences(ctx *gin.Context) {
 		return
 	}
 
-
-
-
-
 	// Parse and validate the presence ID from the request parameter
 	userID, err := uuid.Parse(ctx.Param("userID"))
 	if err != nil {
@@ -124,8 +120,6 @@ func (db Database) ReadPresences(ctx *gin.Context) {
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
 		return
 	}
-
-
 	// Check if the user's value is among the allowed choices
 	validChoices := utils.ResponseLimitPagination()
 	isValidChoice := false
@@ -135,8 +129,6 @@ func (db Database) ReadPresences(ctx *gin.Context) {
 			break
 		}
 	}
-
-
 	// If the value is invalid, set it to default DEFAULT_LIMIT_PAGINATION
 	if !isValidChoice {
 		limit = constants.DEFAULT_LIMIT_PAGINATION
@@ -144,12 +136,6 @@ func (db Database) ReadPresences(ctx *gin.Context) {
 
 	// Generate offset
 	offset := (page - 1) * limit
-
-	
-
-
-
-
 	// Check if the employee belongs to the specified company
 	if err := domains.CheckEmployeeSession(db.DB, userID, session.UserID, session.CompanyID); err != nil {
 		logrus.Error("Error verifying employee belonging. Error: ", err.Error())
@@ -163,7 +149,7 @@ if err != nil {
 	utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
 	return
 }
-count, err := domains.ReadTotalCount(db.DB, &domains.Presences{}, "company_id", session.CompanyID)
+count, err := domains.ReadTotalCount(db.DB, &domains.Presences{}, "user_id", session.UserID)
 if err != nil {
 	logrus.Error("Error occurred while finding total count. Error: ", err)
 	utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
@@ -205,7 +191,7 @@ response.TotalCount = count
 
 
 	// Respond with success
-	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, presences)
+	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, response)
 }
 
 // number of alllll presences of a user
@@ -256,6 +242,10 @@ func (db Database) ReadPresencesCount(ctx *gin.Context) {
 
 	// Respond with success
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, count)
+
+
+
+
 }
 
 //oneeeeeeeee presences

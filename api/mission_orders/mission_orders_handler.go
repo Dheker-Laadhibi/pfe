@@ -158,7 +158,7 @@ func (db Database) ReadMissionsOrders(ctx *gin.Context) {
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
 		return
 	}
-	count, err := domains.ReadTotalCount(db.DB, &domains.Users{}, "company_id", session.CompanyID)
+	count, err := domains.ReadTotalCount(db.DB, &domains.MissionOrders{}, "user_id", session.UserID)
 	if err != nil {
 		logrus.Error("Error occurred while finding total count. Error: ", err)
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
