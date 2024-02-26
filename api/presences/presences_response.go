@@ -25,3 +25,27 @@ type PresencesDetails struct {
 	Check     time.Time `json:"check"`           // Check is the time of presences
 	UserID    uuid.UUID  `json:"userID" binding:"required"`  // unique User ID
 } //@name PresencesDetails
+
+// @Description	MissionsOrdersPagination represents the paginated list of missions.
+type PresencesPagination struct {
+	Items      []PresencesTable `json:"items"`      // Items is a slice containing individual missions details.
+	Page       uint            `json:"page"`       // Page is the current page number in the pagination.
+	Limit      uint            `json:"limit"`      // Limit is the maximum number of items per page in the pagination.
+	TotalCount uint            `json:"totalCount"` // TotalCount is the total number of missions orders in the entire list.
+} //@name MissionsPagination
+
+// @Description	presences represents a single presence entry in a table.
+type PresencesTable struct {
+	ID      uuid.UUID `json:"id"`         // ID is the unique identifier for the presence.
+	Matricule string    `json:"matricule"` //  matricule is the matricule of the user.
+	Check time.Time    `json:"check"` // presence check.
+	UserID  uuid.UUID   `json:"user_id"`  // user id 
+
+} //@name MissionsTable
+
+// @Description	UsersList represents a simplified version of the user for listing purposes.
+type PresencesList struct {
+	ID     uuid.UUID `json:"id"`     // ID is the unique identifier for the presence.
+	Matricule string    `json:"matricule"` // matricule is the matricule of the user.
+} //@name UsersList
+// @Description	MissionsOrdersPagination represents the paginated list of missions.
