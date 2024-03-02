@@ -84,6 +84,8 @@ func (db Database) CreatePresence(ctx *gin.Context) {
 // @Tags				Presences
 // @Produce				json
 // @Security 			ApiKeyAuth
+// @Param			page			query		int			false		"Page"
+// @Param			limit			query		int			false		"Limit"
 // @Param				userID				path			string		true		"User ID"
 // @Success				200					{array}			presences.PresencesDetails
 // @Failure				400					{object}		utils.ApiResponses		"Invalid request"
@@ -143,7 +145,7 @@ func (db Database) ReadPresences(ctx *gin.Context) {
 		return
 	}
 // Retrieve all user data from the database
-presences, err := ReadAllPagination(db.DB, []domains.Presences{}, session.CompanyID, limit, offset)
+presences, err := ReadAllPagination(db.DB, []domains.Presences{}, session.UserID, limit, offset)
 if err != nil {
 	logrus.Error("Error occurred while finding all user data. Error: ", err)
 	utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())

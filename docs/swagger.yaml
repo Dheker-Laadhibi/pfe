@@ -1220,6 +1220,14 @@ paths:
     get:
       description: Get all missions Orders.
       parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
       - description: User ID
         in: path
         name: userID
@@ -1687,6 +1695,14 @@ paths:
     get:
       description: Get all presences.
       parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
       - description: User ID
         in: path
         name: userID

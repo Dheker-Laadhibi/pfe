@@ -1,13 +1,11 @@
 package mission_orders
-
 import (
+	
 	"labs/constants"
 	"labs/domains"
 	"net/http"
 	"strconv"
-
 	"labs/utils"
-
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
@@ -85,6 +83,8 @@ func (db Database) CreateMissionOrders(ctx *gin.Context) {
 // @Tags				MissionOrders
 // @Produce				json
 // @Security 			ApiKeyAuth
+// @Param			page			query		int			false		"Page"
+// @Param			limit			query		int			false		"Limit"
 // @Param				userID				path			string		true		"User ID"
 // @Success				200					{array}			mission_orders.MissionOrdersDetails
 // @Failure				400					{object}		utils.ApiResponses		"Invalid request"
@@ -96,7 +96,6 @@ func (db Database) ReadMissionsOrders(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
-
 
 	// Parse and validate the page from the request parameter
 	page, err := strconv.Atoi(ctx.DefaultQuery("page", strconv.Itoa(constants.DEFAULT_PAGE_PAGINATION)))
@@ -122,7 +121,6 @@ func (db Database) ReadMissionsOrders(ctx *gin.Context) {
 		return
 	}
 
-
 	// Check if the user's value is among the allowed choices
 	validChoices := utils.ResponseLimitPagination()
 	isValidChoice := false
@@ -133,7 +131,6 @@ func (db Database) ReadMissionsOrders(ctx *gin.Context) {
 		}
 	}
 
-
 	// If the value is invalid, set it to default DEFAULT_LIMIT_PAGINATION
 	if !isValidChoice {
 		limit = constants.DEFAULT_LIMIT_PAGINATION
@@ -141,8 +138,6 @@ func (db Database) ReadMissionsOrders(ctx *gin.Context) {
 
 	// Generate offset
 	offset := (page - 1) * limit
-
-	
 
 	// Check if the employee belongs to the specified company
 	if err := domains.CheckEmployeeSession(db.DB, userID, session.UserID, session.CompanyID); err != nil {
@@ -152,7 +147,7 @@ func (db Database) ReadMissionsOrders(ctx *gin.Context) {
 	}
 
 	// Retrieve all user data from the database
-	missions, err := ReadAllPagination(db.DB, []domains.MissionOrders{}, session.CompanyID, limit, offset)
+	missions, err := ReadAllPagination(db.DB, []domains.MissionOrders{}, session.UserID, limit, offset)
 	if err != nil {
 		logrus.Error("Error occurred while finding all user data. Error: ", err)
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
@@ -172,27 +167,25 @@ func (db Database) ReadMissionsOrders(ctx *gin.Context) {
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
 		return
 	} */
-	
+
 	// Generate a mission orders  structure as a response
 	response := MissionsPagination{}
 	dataTableMission := []MissionsTable{}
 	for _, mission := range missions {
 
 		dataTableMission = append(dataTableMission, MissionsTable{
-			ID:        mission.ID,
-			Object:mission.Object ,
-			Description:  mission.Description,
-			StartDate:     mission.StartDate,
-			Transport: mission.Transport,
-			EndDate: mission.EndDate,
+			ID:          mission.ID,
+			Object:      mission.Object,
+			Description: mission.Description,
+			StartDate:   mission.StartDate,
+			Transport:   mission.Transport,
+			EndDate:     mission.EndDate,
 		})
 	}
 	response.Items = dataTableMission
 	response.Page = uint(page)
 	response.Limit = uint(limit)
 	response.TotalCount = count
-
-	
 
 	// Respond with success
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, response)

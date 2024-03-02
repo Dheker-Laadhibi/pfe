@@ -870,6 +870,18 @@ const docTemplate = `{
                 "summary": "Get MissionsOrdes",
                 "parameters": [
                     {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
                         "description": "User ID",
                         "name": "userID",
@@ -1593,6 +1605,18 @@ const docTemplate = `{
                 ],
                 "summary": "Get presences",
                 "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
                     {
                         "type": "string",
                         "description": "User ID",
