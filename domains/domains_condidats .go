@@ -45,7 +45,7 @@ type Condidats struct {
 	Password       string    `gorm:"column:password; not null;"`                  // User password
 	University     string    `gorm:"column:university; not null; unique"`         // User's university  address (unique)
 	Status         bool      `gorm:"column:status; not null; default:true;"`      // User's account status (true for active, false for non-active)
-	Adress         string    `gorm:"column:adress; not null; unique"`             // User's email address (unique)
+	Adress         string    `gorm:"column:adress; not null;; unique "`             // User's email address (unique)
 	Educationlevel string    `gorm:"column:education_level; not null; unique"`    // User's email address (unique)
 	CompanyID      uuid.UUID `gorm:"column:company_id; type:uuid; not null;"`     // ID of the company to which the user belongs
 	gorm.Model

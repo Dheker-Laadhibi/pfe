@@ -441,7 +441,75 @@ const docTemplate = `{
                 }
             }
         },
-        "/condidat/{companyID}": {
+        "/condidats/{companyID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all condidats.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Condidats"
+                ],
+                "summary": "Get condidats",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/CondidtasPagination"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -473,7 +541,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/RolesIn"
+                            "$ref": "#/definitions/CondidatIn"
                         }
                     }
                 ],
@@ -539,7 +607,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/RolesCount"
+                            "$ref": "#/definitions/CondidatsCount"
                         }
                     },
                     "400": {
@@ -665,7 +733,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/RolesDetails"
+                            "$ref": "#/definitions/CondidatDetails"
                         }
                     },
                     "400": {
@@ -732,7 +800,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/RolesIn"
+                            "$ref": "#/definitions/CondidatIn"
                         }
                     }
                 ],
@@ -804,76 +872,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/condidtas/{companyID}": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Get all condidats.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Condidats"
-                ],
-                "summary": "Get condidats",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Page",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Limit",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Company ID",
-                        "name": "companyID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/CondidtasPagination"
                         }
                     },
                     "400": {
@@ -3942,26 +3940,126 @@ const docTemplate = `{
                 }
             }
         },
+        "CondidatDetails": {
+            "description": "CondidatDetails represents detailed information about a specific condidat.",
+            "type": "object",
+            "properties": {
+                "companyID": {
+                    "description": "CompanyID is the unique identifier for the company associated with the condidat.",
+                    "type": "string"
+                },
+                "companyName": {
+                    "description": "CompanyName is the name of the company associated with the condidat.",
+                    "type": "string"
+                },
+                "educationLevel": {
+                    "type": "string"
+                },
+                "firstname": {
+                    "description": "Name is the name of the condidat.",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "ID is the unique identifier for the condidat.",
+                    "type": "string"
+                },
+                "lastname": {
+                    "description": "last name of condidat",
+                    "type": "string"
+                },
+                "university": {
+                    "type": "string"
+                }
+            }
+        },
+        "CondidatIn": {
+            "description": "CondidatIn represents the input structure for creating a new condidat.",
+            "type": "object",
+            "required": [
+                "adress",
+                "companyID",
+                "education_level",
+                "email",
+                "firstName",
+                "lastName",
+                "password",
+                "university"
+            ],
+            "properties": {
+                "adress": {
+                    "type": "string",
+                    "maxLength": 35,
+                    "minLength": 3
+                },
+                "companyID": {
+                    "description": "CompanyID is the unique identifier for the company associated with the user. It is required.",
+                    "type": "string"
+                },
+                "education_level": {
+                    "type": "string",
+                    "maxLength": 35,
+                    "minLength": 3
+                },
+                "email": {
+                    "description": "Email is the email address of the user. It is required, should be a valid email, and maximum length is 255 characters.",
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "firstName": {
+                    "description": "Firstname is the first name of the user. It is required and should be between 3 and 30 characters.",
+                    "type": "string",
+                    "maxLength": 30,
+                    "minLength": 3
+                },
+                "lastName": {
+                    "description": "Lastname is the last name of the user. It is required and should be between 3 and 35 characters.",
+                    "type": "string",
+                    "maxLength": 35,
+                    "minLength": 3
+                },
+                "password": {
+                    "description": "Password is the user's password. It is required, and its length should be between 10 and 255 characters.",
+                    "type": "string",
+                    "maxLength": 255,
+                    "minLength": 10
+                },
+                "university": {
+                    "type": "string",
+                    "maxLength": 35,
+                    "minLength": 3
+                }
+            }
+        },
+        "CondidatsCount": {
+            "description": "CondidatsCount represents the count of condidats.",
+            "type": "object",
+            "properties": {
+                "count": {
+                    "description": "Count is the number of condidats.",
+                    "type": "integer"
+                }
+            }
+        },
         "CondidatsList": {
             "description": "CondidatsList represents a simplified version of the Condidats for listing purposes.",
             "type": "object",
             "properties": {
                 "firstname": {
-                    "description": "Name is the name of the role.",
+                    "description": "Name is the name of the condidat.",
                     "type": "string"
                 },
                 "id": {
-                    "description": "ID is the unique identifier for the role.",
+                    "description": "ID is the unique identifier for the condidat.",
                     "type": "string"
                 },
                 "lastname": {
-                    "description": "Name is the name of the role.",
+                    "description": "Name is the name of the condidat.",
                     "type": "string"
                 }
             }
         },
         "CondidatsTable": {
-            "description": "RolesTable represents a single role entry in a table.",
+            "description": "CondidatsTable represents a single condidat entry in a table.",
             "type": "object",
             "properties": {
                 "email": {
@@ -3987,7 +4085,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "items": {
-                    "description": "Items is a slice containing individual role details.",
+                    "description": "Items is a slice containing individual condidat details.",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/CondidatsTable"
@@ -4002,7 +4100,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "totalCount": {
-                    "description": "TotalCount is the total number of roles in the entire list.",
+                    "description": "TotalCount is the total number of condidats in the entire list.",
                     "type": "integer"
                 }
             }

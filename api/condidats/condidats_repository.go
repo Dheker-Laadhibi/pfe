@@ -20,7 +20,7 @@ func NewCondidatRepository(db *gorm.DB) {
 	}
 }
 
-// ReadAllPagination retrieves a paginated list of roles based on company ID, limit, and offset.
+// ReadAllPagination retrieves a paginated list of condidats based on company ID, limit, and offset.
 func ReadAllPagination(db *gorm.DB, model []domains.Condidats, modelID uuid.UUID, limit, offset int) ([]domains.Condidats, error) {
 	err := db.Where("company_id = ? ", modelID).Limit(limit).Offset(offset).Find(&model).Error
 	return model, err

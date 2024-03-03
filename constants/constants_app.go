@@ -26,6 +26,7 @@ const (
 
 // code 
 const (
+	//check pfe project's code 
     DUPLICATE_CODE = "DUPLICATE_CODE"
-    // Ajoutez d'autres constantes ici si nécessaire
+  
 )

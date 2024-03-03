@@ -21,14 +21,14 @@ import (
 // @Accept			json
 // @Produce			json
 // @Security 		ApiKeyAuth
-// @Param			companyID		path			string				true		"Company ID"
+// @Param			companyID		path			string				        true		"Company ID"
 // @Param			request			body			condidats.CondidatIn		true		"condidat query params"
 // @Success			201				{object}		utils.ApiResponses
 // @Failure			400				{object}		utils.ApiResponses	"Invalid request"
 // @Failure			401				{object}		utils.ApiResponses	"Unauthorized"
 // @Failure			403				{object}		utils.ApiResponses	"Forbidden"
 // @Failure			500				{object}		utils.ApiResponses	"Internal Server Error"
-// @Router			/condidat/{companyID}	[post]
+// @Router			/condidats/{companyID}	[post]
 func (db Database) CreateCondidat(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -56,17 +56,19 @@ func (db Database) CreateCondidat(ctx *gin.Context) {
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
 		return
 	}
-// Hash the user's password
-hash, _ := bcrypt.GenerateFromPassword([]byte(condidat.Password), bcrypt.DefaultCost)
+	// Hash the user's password
+	hash, _ := bcrypt.GenerateFromPassword([]byte(condidat.Password), bcrypt.DefaultCost)
 	// Create a new condidat in the database
 	dbCondidat := &domains.Condidats{
-		ID:              uuid.New(),
-		Firstname:       condidat.Firstname,
-		Lastname:        condidat.Lastname,
-		Email:           condidat.Email,
-		Password:        string(hash),
-		Status:          true,
-		CompanyID:       condidat.CompanyID,
+		ID:             uuid.New(),
+		Firstname:      condidat.Firstname,
+		Lastname:       condidat.Lastname,
+		Email:          condidat.Email,
+		Password:       string(hash),
+		Adress:         condidat.Adress,
+		University:     condidat.University,
+		Educationlevel: condidat.Educationlevel,
+		CompanyID:      condidat.CompanyID,
 	}
 	if err := domains.Create(db.DB, dbCondidat); err != nil {
 		logrus.Error("Error saving data to the database. Error: ", err.Error())
@@ -78,7 +80,7 @@ hash, _ := bcrypt.GenerateFromPassword([]byte(condidat.Password), bcrypt.Default
 	utils.BuildResponse(ctx, http.StatusCreated, constants.CREATED, utils.Null())
 }
 
-// ReadCondidats 		Handles the retrieval of all condidats.
+// ReadCondidats 	Handles the retrieval of all Condidats.
 // @Summary        	Get condidats
 // @Description    	Get all condidats.
 // @Tags			Condidats
@@ -92,7 +94,7 @@ hash, _ := bcrypt.GenerateFromPassword([]byte(condidat.Password), bcrypt.Default
 // @Failure			401					{object}	utils.ApiResponses			"Unauthorized"
 // @Failure			403					{object}	utils.ApiResponses			"Forbidden"
 // @Failure			500					{object}	utils.ApiResponses			"Internal Server Error"
-// @Router			/condidtas/{companyID}	[get]
+// @Router			/condidats/{companyID}	[get]
 func (db Database) ReadCondidats(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -170,9 +172,9 @@ func (db Database) ReadCondidats(ctx *gin.Context) {
 
 		dataTableCondidat = append(dataTableCondidat, CondidatsTable{
 			ID:        condidat.ID,
-			Firstname:      condidat.Firstname,
-			Lastname:      condidat.Lastname,
-			Email:      condidat.Email,
+			Firstname: condidat.Firstname,
+			Lastname:  condidat.Lastname,
+			Email:     condidat.Email,
 		})
 	}
 	response.Items = dataTableCondidat
@@ -230,9 +232,9 @@ func (db Database) ReadCondidatsList(ctx *gin.Context) {
 	for _, condidat := range condidats {
 
 		condidatsList = append(condidatsList, CondidatsList{
-			ID:   condidat.ID,
+			ID:        condidat.ID,
 			Firstname: condidat.Firstname,
-			Lastname: condidat.Lastname,
+			Lastname:  condidat.Lastname,
 		})
 	}
 
@@ -289,10 +291,6 @@ func (db Database) ReadCondidatsCount(ctx *gin.Context) {
 	// Respond with success
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, condidatsCount)
 }
-
-
-
-
 
 // ReadCondidat		Handles the retrieval of one condidat.
 // @Summary        	Get condidat
@@ -354,14 +352,13 @@ func (db Database) ReadCondidat(ctx *gin.Context) {
 
 	// Generate a user structure as a response
 	details := CondidatDetails{
-		ID:          condidat.ID,
+		ID:               condidat.ID,
 		Firstname:        condidat.Firstname,
-		Lastname: condidat.Lastname,
+		Lastname:         condidat.Lastname,
 		LevelOfEducation: condidat.Educationlevel,
-		University: condidat.University,
-		CompanyID:   condidat.CompanyID,
-		CompanyName: companyName,
-	
+		University:       condidat.University,
+		CompanyID:        condidat.CompanyID,
+		CompanyName:      companyName,
 	}
 
 	// Respond with success
@@ -429,9 +426,12 @@ func (db Database) UpdateCondidat(ctx *gin.Context) {
 
 	// Update the cpndidat data in the database
 	dbCondidat := &domains.Condidats{
-		Firstname: condidat.Firstname,
-		Lastname: condidat.Lastname,
-		Email: condidat.Email,
+		Firstname:      condidat.Firstname,
+		Lastname:       condidat.Lastname,
+		Email:          condidat.Email,
+		Adress:         condidat.Adress,
+		University:     condidat.University,
+		Educationlevel: condidat.Educationlevel,
 	}
 	if err = domains.Update(db.DB, dbCondidat, objectID); err != nil {
 		logrus.Error("Error updating user data in the database. Error: ", err.Error())
@@ -444,7 +444,7 @@ func (db Database) UpdateCondidat(ctx *gin.Context) {
 }
 
 // DeleteCondidat	 	Handles the deletion of a Condidat	.
-// @Summary        	Delete Condidat	
+// @Summary        	Delete Condidat
 // @Description    	Delete one Condidat	.
 // @Tags			Condidats
 // @Produce			json

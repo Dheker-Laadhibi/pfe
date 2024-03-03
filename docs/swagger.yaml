@@ -75,22 +75,106 @@ definitions:
     required:
     - name
     type: object
+  CondidatDetails:
+    description: CondidatDetails represents detailed information about a specific
+      condidat.
+    properties:
+      companyID:
+        description: CompanyID is the unique identifier for the company associated
+          with the condidat.
+        type: string
+      companyName:
+        description: CompanyName is the name of the company associated with the condidat.
+        type: string
+      educationLevel:
+        type: string
+      firstname:
+        description: Name is the name of the condidat.
+        type: string
+      id:
+        description: ID is the unique identifier for the condidat.
+        type: string
+      lastname:
+        description: last name of condidat
+        type: string
+      university:
+        type: string
+    type: object
+  CondidatIn:
+    description: CondidatIn represents the input structure for creating a new condidat.
+    properties:
+      adress:
+        maxLength: 35
+        minLength: 3
+        type: string
+      companyID:
+        description: CompanyID is the unique identifier for the company associated
+          with the user. It is required.
+        type: string
+      education_level:
+        maxLength: 35
+        minLength: 3
+        type: string
+      email:
+        description: Email is the email address of the user. It is required, should
+          be a valid email, and maximum length is 255 characters.
+        maxLength: 255
+        type: string
+      firstName:
+        description: Firstname is the first name of the user. It is required and should
+          be between 3 and 30 characters.
+        maxLength: 30
+        minLength: 3
+        type: string
+      lastName:
+        description: Lastname is the last name of the user. It is required and should
+          be between 3 and 35 characters.
+        maxLength: 35
+        minLength: 3
+        type: string
+      password:
+        description: Password is the user's password. It is required, and its length
+          should be between 10 and 255 characters.
+        maxLength: 255
+        minLength: 10
+        type: string
+      university:
+        maxLength: 35
+        minLength: 3
+        type: string
+    required:
+    - adress
+    - companyID
+    - education_level
+    - email
+    - firstName
+    - lastName
+    - password
+    - university
+    type: object
+  CondidatsCount:
+    description: CondidatsCount represents the count of condidats.
+    properties:
+      count:
+        description: Count is the number of condidats.
+        type: integer
+    type: object
   CondidatsList:
     description: CondidatsList represents a simplified version of the Condidats for
       listing purposes.
     properties:
       firstname:
-        description: Name is the name of the role.
+        description: Name is the name of the condidat.
         type: string
       id:
-        description: ID is the unique identifier for the role.
+        description: ID is the unique identifier for the condidat.
         type: string
       lastname:
-        description: Name is the name of the role.
+        description: Name is the name of the condidat.
         type: string
     type: object
   CondidatsTable:
-    description: RolesTable represents a single role entry in a table.
+    description: CondidatsTable represents a single condidat entry in a table.
     properties:
       email:
         description: Email is the email address of the condidat.
@@ -109,7 +193,7 @@ definitions:
     description: CondidtasPagination represents the paginated list of Condidats.
     properties:
       items:
-        description: Items is a slice containing individual role details.
+        description: Items is a slice containing individual condidat details.
         items:
           $ref: '#/definitions/CondidatsTable'
         type: array
@@ -120,7 +204,7 @@ definitions:
         description: Page is the current page number in the pagination.
         type: integer
       totalCount:
-        description: TotalCount is the total number of roles in the entire list.
+        description: TotalCount is the total number of condidats in the entire list.
         type: integer
     type: object
   InternsCount:
@@ -1044,7 +1128,51 @@ paths:
       summary: Update company
       tags:
       - Companies
-  /condidat/{companyID}:
+  /condidats/{companyID}:
+    get:
+      description: Get all condidats.
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/CondidtasPagination'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get condidats
+      tags:
+      - Condidats
     post:
       consumes:
       - application/json
@@ -1060,7 +1188,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/RolesIn'
+          $ref: '#/definitions/CondidatIn'
       produces:
       - application/json
       responses:
@@ -1150,7 +1278,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/RolesDetails'
+            $ref: '#/definitions/CondidatDetails'
         "400":
           description: Invalid request
           schema:
@@ -1192,7 +1320,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/RolesIn'
+          $ref: '#/definitions/CondidatIn'
       produces:
       - application/json
       responses:
@@ -1236,7 +1364,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/RolesCount'
+            $ref: '#/definitions/CondidatsCount'
         "400":
           description: Invalid request
           schema:
@@ -1295,51 +1423,6 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Get list of  Condidats
-      tags:
-      - Condidats
-  /condidtas/{companyID}:
-    get:
-      description: Get all condidats.
-      parameters:
-      - description: Page
-        in: query
-        name: page
-        type: integer
-      - description: Limit
-        in: query
-        name: limit
-        type: integer
-      - description: Company ID
-        in: path
-        name: companyID
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/CondidtasPagination'
-        "400":
-          description: Invalid request
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ApiResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: Get condidats
       tags:
       - Condidats
   /interns/{companyID}:
