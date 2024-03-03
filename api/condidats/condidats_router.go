@@ -5,7 +5,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// RoleRouterInit initializes the routes related to roles.
+// RoleRouterInit initializes the routes related to condidats.
 func CondidatRouterInit(router *gin.RouterGroup, db *gorm.DB) {
 
 	// Initialize database instance
@@ -15,28 +15,28 @@ func CondidatRouterInit(router *gin.RouterGroup, db *gorm.DB) {
 	NewCondidatRepository(db)
 
 	// Private
-	roles := router.Group("/condidats/:companyID")
+	condidats := router.Group("/condidats/:companyID")
 	{
 
-		// POST endpoint to create a new role
-		roles.POST("", baseInstance.CreateCondidat)
+		// POST endpoint to create a new condidat
+		condidats.POST("", baseInstance.CreateCondidat)
 
-		// GET endpoint to retrieve all roles for a specific company
-		roles.GET("", baseInstance.ReadCondidats)
+		// GET endpoint to retrieve all condidats for a specific company
+		condidats.GET("", baseInstance.ReadCondidats)
 
-		// GET endpoint to retrieve a list of roles for a specific company
-		roles.GET("/list", baseInstance.ReadCondidatsList)
+		// GET endpoint to retrieve a list of condidats for a specific company
+		condidats.GET("/list", baseInstance.ReadCondidatsList)
 
-		// GET endpoint to retrieve the count of roles for a specific company
-		roles.GET("/count", baseInstance.ReadRolesCount)
+		// GET endpoint to retrieve the count of condidats for a specific company
+		condidats.GET("/count", baseInstance.ReadCondidatsCount)
 
-		// GET endpoint to retrieve details of a specific role
-		roles.GET("/:ID", baseInstance.ReadRole)
+		// GET endpoint to retrieve details of a specific condidat
+		condidats.GET("/:ID", baseInstance.ReadCondidat)
 
-		// PUT endpoint to update a specific role
-		roles.PUT("/:ID", baseInstance.UpdateCondidat)
+		// PUT endpoint to update a specific condidat
+		condidats.PUT("/:ID", baseInstance.UpdateCondidat)
 
-		// DELETE endpoint to delete a specific role
-		roles.DELETE("/:ID", baseInstance.DeleteCondidat)
+		// DELETE endpoint to delete a specific condidat
+		condidats.DELETE("/:ID", baseInstance.DeleteCondidat)
 	}
 }

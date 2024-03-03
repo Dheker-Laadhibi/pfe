@@ -49,7 +49,7 @@ func (db Database) CreateCondidat(ctx *gin.Context) {
 		return
 	}
 
-	// Parse the incoming JSON request into a RoleIn struct
+	// Parse the incoming JSON request into a CondidatIn struct
 	condidat := new(CondidatIn)
 	if err := ctx.ShouldBindJSON(condidat); err != nil {
 		logrus.Error("Error mapping request from frontend. Error: ", err.Error())
@@ -147,7 +147,7 @@ func (db Database) ReadCondidats(ctx *gin.Context) {
 		return
 	}
 
-	// Retrieve all role data from the database
+	// Retrieve all condidat data from the database
 	condidats, err := ReadAllPagination(db.DB, []domains.Condidats{}, session.CompanyID, limit, offset)
 	if err != nil {
 		logrus.Error("Error occurred while finding all user data. Error: ", err)
@@ -217,7 +217,7 @@ func (db Database) ReadCondidatsList(ctx *gin.Context) {
 		return
 	}
 
-	// Retrieve all role data from the database
+	// Retrieve all condidat data from the database
 	condidats, err := ReadAllList(db.DB, []domains.Condidats{}, session.CompanyID)
 	if err != nil {
 		logrus.Error("Error occurred while finding all user data. Error: ", err)
@@ -225,7 +225,7 @@ func (db Database) ReadCondidatsList(ctx *gin.Context) {
 		return
 	}
 
-	// Generate a role structure as a response
+	// Generate a condidat structure as a response
 	condidatsList := []CondidatsList{}
 	for _, condidat := range condidats {
 
@@ -253,7 +253,7 @@ func (db Database) ReadCondidatsList(ctx *gin.Context) {
 // @Failure			403						{object}		utils.ApiResponses		"Forbidden"
 // @Failure			500						{object}		utils.ApiResponses		"Internal Server Error"
 // @Router			/condidats/{companyID}/count	[get]
-func (db Database) ReadRolesCount(ctx *gin.Context) {
+func (db Database) ReadCondidatsCount(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
@@ -273,17 +273,17 @@ func (db Database) ReadRolesCount(ctx *gin.Context) {
 		return
 	}
 
-	// Retrieve all role data from the database
-	roles, err := domains.ReadTotalCount(db.DB, &[]domains.Condidats{}, "company_id", session.CompanyID)
+	// Retrieve all condidat data from the database
+	condidats, err := domains.ReadTotalCount(db.DB, &[]domains.Condidats{}, "company_id", session.CompanyID)
 	if err != nil {
 		logrus.Error("Error occurred while finding all user data. Error: ", err)
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
 		return
 	}
 
-	// Generate a role structure as a response
+	// Generate a condidat structure as a response
 	condidatsCount := CondidatsCount{
-		Count: roles,
+		Count: condidats,
 	}
 
 	// Respond with success
@@ -302,13 +302,13 @@ func (db Database) ReadRolesCount(ctx *gin.Context) {
 // @Security 		ApiKeyAuth
 // @Param			companyID				path			string			true	"Company ID"
 // @Param			ID						path			string			true	"condidats ID"
-// @Success			200						{object}		roles.RolesDetails
+// @Success			200						{object}		condidats.CondidatDetails
 // @Failure			400						{object}		utils.ApiResponses		"Invalid request"
 // @Failure			401						{object}		utils.ApiResponses		"Unauthorized"
 // @Failure			403						{object}		utils.ApiResponses		"Forbidden"
 // @Failure			500						{object}		utils.ApiResponses		"Internal Server Error"
 // @Router			/condidats/{companyID}/{ID}	[get]
-func (db Database) ReadRole(ctx *gin.Context) {
+func (db Database) ReadCondidat(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
@@ -321,7 +321,7 @@ func (db Database) ReadRole(ctx *gin.Context) {
 		return
 	}
 
-	// Parse and validate the user ID from the request parameter
+	// Parse and validate the condidats ID from the request parameter
 	objectID, err := uuid.Parse(ctx.Param("ID"))
 	if err != nil {
 		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
@@ -336,10 +336,10 @@ func (db Database) ReadRole(ctx *gin.Context) {
 		return
 	}
 
-	// Retrieve role data from the database
+	// Retrieve condidat data from the database
 	condidat, err := ReadByID(db.DB, domains.Condidats{}, objectID)
 	if err != nil {
-		logrus.Error("Error retrieving role data from the database. Error: ", err.Error())
+		logrus.Error("Error retrieving condidat data from the database. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.DATA_NOT_FOUND, utils.Null())
 		return
 	}
@@ -422,12 +422,12 @@ func (db Database) UpdateCondidat(ctx *gin.Context) {
 
 	// Check if the condidat with the specified ID exists
 	if err = domains.CheckByID(db.DB, &domains.Condidats{}, objectID); err != nil {
-		logrus.Error("Error checking if the role with the specified ID exists. Error: ", err.Error())
+		logrus.Error("Error checking if the condidats with the specified ID exists. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
 		return
 	}
 
-	// Update the role data in the database
+	// Update the cpndidat data in the database
 	dbCondidat := &domains.Condidats{
 		Firstname: condidat.Firstname,
 		Lastname: condidat.Lastname,
@@ -487,14 +487,14 @@ func (db Database) DeleteCondidat(ctx *gin.Context) {
 
 	// Check if the Condidats with the specified ID exists
 	if err := domains.CheckByID(db.DB, &domains.Condidats{}, objectID); err != nil {
-		logrus.Error("Error checking if the role with the specified ID exists. Error: ", err.Error())
+		logrus.Error("Error checking if the condidat with the specified ID exists. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusNotFound, constants.DATA_NOT_FOUND, utils.Null())
 		return
 	}
 
 	// Delete the Condidats data from the database
 	if err := domains.Delete(db.DB, &domains.Condidats{}, objectID); err != nil {
-		logrus.Error("Error deleting role data from the database. Error: ", err.Error())
+		logrus.Error("Error deleting condidat data from the database. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
 		return
 	}

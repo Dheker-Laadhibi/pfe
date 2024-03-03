@@ -1,35 +1,34 @@
-package users
+package projects
 
 import (
 	"labs/constants"
 	"labs/domains"
+	"labs/utils"
 	"net/http"
 	"strconv"
-
-	"labs/utils"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
-	"golang.org/x/crypto/bcrypt"
 )
 
-// CreateUser 		Handles the creation of a new user.
-// @Summary        	Create user
-// @Description    	Create a new user.
-// @Tags			Users
+// CreateProject		Handles the creation of a new Project.
+// @Summary        	Create Project
+// @Description    	Create a new Project.
+// @Tags			Project
 // @Accept			json
 // @Produce			json
 // @Security 		ApiKeyAuth
 // @Param			companyID		path			string				true		"Company ID"
-// @Param			request			body			users.UsersIn		true		"User query params"
+// @Param			request			body			projects.ProjectIn		true		"project query params"
 // @Success			201				{object}		utils.ApiResponses
 // @Failure			400				{object}		utils.ApiResponses	"Invalid request"
 // @Failure			401				{object}		utils.ApiResponses	"Unauthorized"
 // @Failure			403				{object}		utils.ApiResponses	"Forbidden"
 // @Failure			500				{object}		utils.ApiResponses	"Internal Server Error"
-// @Router			/users/{companyID}	[post]
-func (db Database) CreateUser(ctx *gin.Context) {
+// @Router			/projects/{companyID}	[post]
+func (db Database) CreateProject(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
@@ -49,54 +48,90 @@ func (db Database) CreateUser(ctx *gin.Context) {
 		return
 	}
 
-	// Parse the incoming JSON request into a UserIn struct
-	user := new(UsersIn)
-	if err := ctx.ShouldBindJSON(user); err != nil {
+	// Parse the incoming JSON request into a ProjectIn struct
+	project := new(ProjectIn)
+	if err := ctx.ShouldBindJSON(project); err != nil {
 		logrus.Error("Error mapping request from frontend. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
 		return
 	}
 
-	// Hash the user's password
-	hash, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 
-	// Create a new user in the database
-	dbUser := &domains.Users{
-		ID:              uuid.New(),
-		Firstname:       user.Firstname,
-		Lastname:        user.Lastname,
-		Email:           user.Email,
-		Password:        string(hash),
-		Status:          true,
-		CompanyID:       user.CompanyID,
-		CreatedByUserID: session.UserID,
-	}
-	if err := domains.Create(db.DB, dbUser); err != nil {
-		logrus.Error("Error saving data to the database. Error: ", err.Error())
-		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
-		return
+  
+
+
+
+
+
+
+
+
+	layout := "2006-01-02" // Format de date année-mois-jour
+
+	// Analyser la date ExpDate en tant que time.Time
+	dt, err := time.Parse(layout, project.ExpDate)
+	if err != nil {
+		logrus.Error("Erreur lors de l'analyse de la date : ", err.Error())
+		// Gérer l'erreur ici
 	}
 
-	// Respond with success
-	utils.BuildResponse(ctx, http.StatusCreated, constants.CREATED, utils.Null())
+	// Create a new project in the database
+	dbProject := &domains.Project{
+		ID:           uuid.New(),
+		Code:         project.Code,
+		Projectname:  project.Projectname,
+		Technologies: project.Technologies,
+		Description:  project.Description,
+		ExpDate: dt,
+		CompanyID:  project.CompanyID,
+		// ExpDate: project.,
+	}
+
+
+
+
+
+
+// Vérifier si le code de projet existe déjà dans la base de données
+exists, err := domains.CheckProjectCodeExists(db.DB, project.Code)
+if err != nil {
+    logrus.Error("Erreur lors de la vérification de l'existence du code de projet dans la base de données : ", err.Error())
+    utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
+    return
+} else if exists {
+    logrus.Error("Le code de projet existe déjà dans la base de données.")
+    utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.DUPLICATE_CODE, utils.Null())
+    return
 }
 
-// ReadUsers 		Handles the retrieval of all users.
-// @Summary        	Get users
-// @Description    	Get all users.
-// @Tags			Users
+// Créer le projet uniquement si le code de projet n'existe pas déjà dans la base de données
+if err := domains.Create(db.DB, dbProject); err != nil {
+    logrus.Error("Erreur lors de l'enregistrement des données dans la base de données. Erreur: ", err.Error())
+    utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
+    return
+}
+
+// Répondre avec succès
+utils.BuildResponse(ctx, http.StatusCreated, constants.CREATED, utils.Null())
+
+}
+
+// ReadProjects		Handles the retrieval of all Project.
+// @Summary        	Get projects
+// @Description    	Get all projects.
+// @Tags			Project
 // @Produce			json
 // @Security 		ApiKeyAuth
 // @Param			page			query		int			false		"Page"
 // @Param			limit			query		int			false		"Limit"
 // @Param			companyID		path		string		true		"Company ID"
-// @Success			200				{object}	users.UsersPagination
+// @Success			200				{object}	projects.projectsPagination
 // @Failure			400				{object}	utils.ApiResponses		"Invalid request"
 // @Failure			401				{object}	utils.ApiResponses		"Unauthorized"
 // @Failure			403				{object}	utils.ApiResponses		"Forbidden"
 // @Failure			500				{object}	utils.ApiResponses		"Internal Server Error"
-// @Router			/users/{companyID}	[get]
-func (db Database) ReadUsers(ctx *gin.Context) {
+// @Router			/projects/{companyID}	[get]
+func (db Database) ReadProjects(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
@@ -150,36 +185,41 @@ func (db Database) ReadUsers(ctx *gin.Context) {
 		return
 	}
 
-	// Retrieve all user data from the database
-	users, err := ReadAllPagination(db.DB, []domains.Users{}, session.CompanyID, limit, offset)
+	// Retrieve all project data from the database
+	projects, err := ReadAllPagination(db.DB, []domains.Project{}, session.CompanyID, limit, offset)
 	if err != nil {
-		logrus.Error("Error occurred while finding all user data. Error: ", err)
+		logrus.Error("Error occurred while finding all project data. Error: ", err)
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
 		return
 	}
 
 	// Retrieve total count
-	count, err := domains.ReadTotalCount(db.DB, &domains.Users{}, "company_id", companyID)
+	count, err := domains.ReadTotalCount(db.DB, &domains.Project{}, "company_id", companyID)
 	if err != nil {
 		logrus.Error("Error occurred while finding total count. Error: ", err)
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
 		return
 	}
+	
 
-	// Generate a user structure as a response
-	response := UsersPagination{}
-	dataTableUser := []UsersTable{}
-	for _, user := range users {
+	// Generate a project structure as a response
+	response := projectsPagination{}
+	dataTableProject := []ProjectTable{}
+	for _, project := range projects {
 
-		dataTableUser = append(dataTableUser, UsersTable{
-			ID:        user.ID,
-			Firstname: user.Firstname,
-			Lastname:  user.Lastname,
-			Email:     user.Email,
-			CreatedAt: user.CreatedAt,
+
+
+		
+		dataTableProject = append(dataTableProject, ProjectTable{
+			ID:           project.ID,
+			Code:         project.Code,
+			Projectname:  project.Projectname,
+			CompanyID:    project.CompanyID,
+			Technologies: project.Technologies,
+			ExpDate:      project.ExpDate,
 		})
 	}
-	response.Items = dataTableUser
+	response.Items = dataTableProject
 	response.Page = uint(page)
 	response.Limit = uint(limit)
 	response.TotalCount = count
@@ -188,20 +228,20 @@ func (db Database) ReadUsers(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, response)
 }
 
-// ReadUsersList 	Handles the retrieval the list of all users.
-// @Summary        	Get list of  users
-// @Description    	Get list of all users.
-// @Tags			Users
+// ReadProjectsList 	Handles the retrieval the list of all Projects.
+// @Summary        	Get list of  Projects
+// @Description    	Get list of all Projects.
+// @Tags			Project
 // @Produce			json
 // @Security 		ApiKeyAuth
 // @Param			companyID			path			string			true	"Company ID"
-// @Success			200					{array}			users.UsersList
+// @Success			200					{array}			projects.ProjectsList
 // @Failure			400					{object}		utils.ApiResponses		"Invalid request"
 // @Failure			401					{object}		utils.ApiResponses		"Unauthorized"
 // @Failure			403					{object}		utils.ApiResponses		"Forbidden"
 // @Failure			500					{object}		utils.ApiResponses		"Internal Server Error"
-// @Router			/users/{companyID}/list	[get]
-func (db Database) ReadUsersList(ctx *gin.Context) {
+// @Router			/projects/{companyID}/list	[get]
+func (db Database) ReadProjectsList(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
@@ -221,41 +261,42 @@ func (db Database) ReadUsersList(ctx *gin.Context) {
 		return
 	}
 
-	// Retrieve all user data from the database
-	users, err := ReadAllList(db.DB, []domains.Users{}, session.CompanyID)
+	// Retrieve all project data from the database
+	projects, err := ReadAllList(db.DB, []domains.Project{}, session.CompanyID)
 	if err != nil {
-		logrus.Error("Error occurred while finding all user data. Error: ", err)
+		logrus.Error("Error occurred while finding all project data. Error: ", err)
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
 		return
 	}
 
-	// Generate a user structure as a response
-	usersList := []UsersList{}
-	for _, user := range users {
-		usersList = append(usersList, UsersList{
-			ID:   user.ID,
-			Name: user.Firstname + " " + user.Lastname,
+	// Generate a project structure as a response
+	projectList := []ProjectsList{}
+	for _, project := range projects {
+		projectList = append(projectList, ProjectsList{
+			ID:          project.ID,
+			Code:        project.Code,
+			Projectname: project.Projectname,
 		})
 	}
 
 	// Respond with success
-	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, usersList)
+	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, projectList)
 }
 
-// ReadUsersCount 	Handles the retrieval the number of all users.
-// @Summary        	Get number of  users
-// @Description    	Get number of all users.
-// @Tags			Users
+// ReadProjectsCount 	Handles the retrieval the number of all projects.
+// @Summary        	Get number of  projects
+// @Description    	Get number of all projects.
+// @Tags			Project
 // @Produce			json
 // @Security 		ApiKeyAuth
 // @Param			companyID				path			string		true	"Company ID"
-// @Success			200						{object}		users.UsersCount
+// @Success			200						{object}		projects.ProjectsCount
 // @Failure			400						{object}		utils.ApiResponses	"Invalid request"
 // @Failure			401						{object}		utils.ApiResponses	"Unauthorized"
 // @Failure			403						{object}		utils.ApiResponses	"Forbidden"
 // @Failure			500						{object}		utils.ApiResponses	"Internal Server Error"
-// @Router			/users/{companyID}/count	[get]
-func (db Database) ReadUsersCount(ctx *gin.Context) {
+// @Router			/projects/{companyID}/count	[get]
+func (db Database) ReadProjectsCount(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
@@ -275,38 +316,38 @@ func (db Database) ReadUsersCount(ctx *gin.Context) {
 		return
 	}
 
-	// Retrieve all user data from the database
-	users, err := domains.ReadTotalCount(db.DB, &[]domains.Users{}, "company_id", session.CompanyID)
+	// Retrieve all project data from the database
+	projects, err := domains.ReadTotalCount(db.DB, &[]domains.Project{}, "company_id", session.CompanyID)
 	if err != nil {
-		logrus.Error("Error occurred while finding all user data. Error: ", err)
+		logrus.Error("Error occurred while finding all project data. Error: ", err)
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
 		return
 	}
 
-	// Generate a user structure as a response
-	usersCount := UsersCount{
-		Count: users,
+	// Generate a project structure as a response
+	ProjectsCount := ProjectsCount{
+		Count: projects,
 	}
 
 	// Respond with success
-	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, usersCount)
+	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, ProjectsCount)
 }
 
-// ReadUser 		Handles the retrieval of one user.
-// @Summary        	Get user
-// @Description    	Get one user.
-// @Tags			Users
+// ReadProject		Handles the retrieval of one Project.
+// @Summary        	Get Project
+// @Description    	Get one Project.
+// @Tags			Project
 // @Produce			json
 // @Security 		ApiKeyAuth
 // @Param			companyID			path			string			true	"Company ID"
-// @Param			ID					path			string			true	"User ID"
-// @Success			200					{object}		users.UsersDetails
+// @Param			ID					path			string			true	"Project ID"
+// @Success			200					{object}		projects.projectsDetails
 // @Failure			400					{object}		utils.ApiResponses		"Invalid request"
 // @Failure			401					{object}		utils.ApiResponses		"Unauthorized"
 // @Failure			403					{object}		utils.ApiResponses		"Forbidden"
 // @Failure			500					{object}		utils.ApiResponses		"Internal Server Error"
-// @Router			/users/{companyID}/{ID}	[get]
-func (db Database) ReadUser(ctx *gin.Context) {
+// @Router			/projects/{companyID}/{ID}	[get]
+func (db Database) ReadProject(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
@@ -319,7 +360,7 @@ func (db Database) ReadUser(ctx *gin.Context) {
 		return
 	}
 
-	// Parse and validate the user ID from the request parameter
+	// Parse and validate the project ID from the request parameter
 	objectID, err := uuid.Parse(ctx.Param("ID"))
 	if err != nil {
 		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
@@ -334,46 +375,45 @@ func (db Database) ReadUser(ctx *gin.Context) {
 		return
 	}
 
-	// Retrieve user data from the database
-	user, err := ReadByID(db.DB, domains.Users{}, objectID)
+	// Retrieve project data from the database
+	project, err := ReadByID(db.DB, domains.Project{}, objectID)
 	if err != nil {
-		logrus.Error("Error retrieving user data from the database. Error: ", err.Error())
+		logrus.Error("Error retrieving project data from the database. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.DATA_NOT_FOUND, utils.Null())
 		return
 	}
 
-	// Generate a user structure as a response
-	details := UsersDetails{
-		ID:        user.ID,
-		Firstname: user.Firstname,
-		Lastname:  user.Lastname,
-		Email:     user.Email,
-		Country:   user.Country,
-		Status:    user.Status,
-		CreatedAt: user.CreatedAt,
+	// Generate a project structure as a response
+	details := projectsDetails{
+		ID:           project.ID,
+		Code:         project.Code,
+		Projectname:  project.Projectname,
+		CompanyID:    project.CompanyID,
+		Technologies: project.Technologies,
+		ExpDate:      project.ExpDate,
 	}
 
 	// Respond with success
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, details)
 }
 
-// UpdateUser 		Handles the update of a user.
-// @Summary        	Update user
-// @Description    	Update user.
-// @Tags			Users
+// UpdateProject 		Handles the update of a Project .
+// @Summary        	Update Project
+// @Description    	Update Project .
+// @Tags			Project
 // @Accept			json
 // @Produce			json
 // @Security 		ApiKeyAuth
 // @Param			companyID			path			string				true	"Company ID"
-// @Param			ID					path			string				true	"User ID"
-// @Param			request				body			users.UsersIn		true	"User query params"
+// @Param			ID					path			string				true	"Project  ID"
+// @Param			request				body			projects.ProjectIn		true	"Project query params"
 // @Success			200					{object}		utils.ApiResponses
 // @Failure			400					{object}		utils.ApiResponses			"Invalid request"
 // @Failure			401					{object}		utils.ApiResponses			"Unauthorized"
 // @Failure			403					{object}		utils.ApiResponses			"Forbidden"
 // @Failure			500					{object}		utils.ApiResponses			"Internal Server Error"
-// @Router			/users/{companyID}/{ID}	[put]
-func (db Database) UpdateUser(ctx *gin.Context) {
+// @Router			/projects/{companyID}/{ID}	[put]
+func (db Database) UpdateProject(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
@@ -386,7 +426,7 @@ func (db Database) UpdateUser(ctx *gin.Context) {
 		return
 	}
 
-	// Parse and validate the user ID from the request parameter
+	// Parse and validate the project ID from the request parameter
 	objectID, err := uuid.Parse(ctx.Param("ID"))
 	if err != nil {
 		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
@@ -401,29 +441,29 @@ func (db Database) UpdateUser(ctx *gin.Context) {
 		return
 	}
 
-	// Parse the incoming JSON request into a UserIn struct
-	user := new(UsersIn)
-	if err := ctx.ShouldBindJSON(user); err != nil {
+	// Parse the incoming JSON request into a ProjectIn struct
+	project := new(ProjectIn)
+	if err := ctx.ShouldBindJSON(project); err != nil {
 		logrus.Error("Error mapping request from frontend. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
 		return
 	}
 
-	// Check if the user with the specified ID exists
-	if err = domains.CheckByID(db.DB, &domains.Users{}, objectID); err != nil {
-		logrus.Error("Error checking if the user with the specified ID exists. Error: ", err.Error())
+	// Check if the project with the specified ID exists
+	if err = domains.CheckByID(db.DB, &domains.Project{}, objectID); err != nil {
+		logrus.Error("Error checking if the project with the specified ID exists. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
 		return
 	}
 
-	// Update the user data in the database
-	dbUser := &domains.Users{
-		Firstname: user.Firstname,
-		Lastname:  user.Lastname,
-		Email:     user.Email,
+	// Update the project data in the database
+	dbProject := &domains.Project{
+
+		Projectname:  project.Projectname,
+		Technologies: project.Technologies,
 	}
-	if err = domains.Update(db.DB, dbUser, objectID); err != nil {
-		logrus.Error("Error updating user data in the database. Error: ", err.Error())
+	if err = domains.Update(db.DB, dbProject, objectID); err != nil {
+		logrus.Error("Error updating project data in the database. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
 		return
 	}
@@ -432,21 +472,21 @@ func (db Database) UpdateUser(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, utils.Null())
 }
 
-// DeleteUser	 	Handles the deletion of a user.
-// @Summary        	Delete user
-// @Description    	Delete one user.
-// @Tags			Users
+// DeleteProject	 	Handles the deletion of a Project.
+// @Summary        	Delete Project
+// @Description    	Delete one Project.
+// @Tags			Project
 // @Produce			json
 // @Security 		ApiKeyAuth
 // @Param			companyID			path			string			true	"Company ID"
-// @Param			ID					path			string			true	"User ID"
+// @Param			ID					path			string			true	"Project ID"
 // @Success			200					{object}		utils.ApiResponses
 // @Failure			400					{object}		utils.ApiResponses		"Invalid request"
 // @Failure			401					{object}		utils.ApiResponses		"Unauthorized"
 // @Failure			403					{object}		utils.ApiResponses		"Forbidden"
 // @Failure			500					{object}		utils.ApiResponses		"Internal Server Error"
-// @Router			/users/{companyID}/{ID}	[delete]
-func (db Database) DeleteUser(ctx *gin.Context) {
+// @Router			/projects/{companyID}/{ID}	[delete]
+func (db Database) DeleteProject(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
@@ -459,7 +499,7 @@ func (db Database) DeleteUser(ctx *gin.Context) {
 		return
 	}
 
-	// Parse and validate the user ID from the request parameter
+	// Parse and validate the project ID from the request parameter
 	objectID, err := uuid.Parse(ctx.Param("ID"))
 	if err != nil {
 		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
@@ -474,16 +514,16 @@ func (db Database) DeleteUser(ctx *gin.Context) {
 		return
 	}
 
-	// Check if the user with the specified ID exists
-	if err := domains.CheckByID(db.DB, &domains.Users{}, objectID); err != nil {
-		logrus.Error("Error checking if the user with the specified ID exists. Error: ", err.Error())
+	// Check if the project with the specified ID exists
+	if err := domains.CheckByID(db.DB, &domains.Project{}, objectID); err != nil {
+		logrus.Error("Error checking if the project with the specified ID exists. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusNotFound, constants.DATA_NOT_FOUND, utils.Null())
 		return
 	}
 
-	// Delete the user data from the database
-	if err := domains.Delete(db.DB, &domains.Users{}, objectID); err != nil {
-		logrus.Error("Error deleting user data from the database. Error: ", err.Error())
+	// Delete the project data from the database
+	if err := domains.Delete(db.DB, &domains.Project{}, objectID); err != nil {
+		logrus.Error("Error deleting project data from the database. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
 		return
 	}

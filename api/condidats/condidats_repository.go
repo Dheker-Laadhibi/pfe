@@ -28,8 +28,8 @@ func ReadAllPagination(db *gorm.DB, model []domains.Condidats, modelID uuid.UUID
 
 // ReadAllList retrieves a list of condidats based on company ID.
 func ReadAllList(db *gorm.DB, model []domains.Condidats, modelID uuid.UUID) ([]domains.Condidats, error) {
-	err := db.Where("company_id = ? ", modelID).Find(&model).Error
-	return model, err
+	err := db.Where("company_id= ? ", modelID).Find(&model).Error
+	return model, err        
 }
 
 // ReadByID retrieves a condidat by its unique identifier.

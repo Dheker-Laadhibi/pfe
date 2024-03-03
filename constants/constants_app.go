@@ -23,3 +23,9 @@ const (
 	DEFAULT_PAGE_PAGINATION  = 1
 	DEFAULT_LIMIT_PAGINATION = 10
 )
+
+// code 
+const (
+    DUPLICATE_CODE = "DUPLICATE_CODE"
+    // Ajoutez d'autres constantes ici si nécessaire
+)

@@ -1,7 +1,7 @@
 package condidats
 
 import (
-	"time"
+
 
 	"github.com/google/uuid"
 )
@@ -53,5 +53,5 @@ type CondidatDetails struct {
 	CompanyName string    `json:"companyName"` // CompanyName is the name of the company associated with the role.
 	LevelOfEducation  string    `json:"educationLevel"`        
 	University       string      `json:"university"`
-	CreatedAt   time.Time `json:"createdAt"`   // CreatedAt is the timestamp indicating when the role entry was created.
+	
 } //@name RolesDetails

@@ -60,12 +60,14 @@ import (
 
 // Users represents the user information in the system.
 type Project struct {
-	ID                 uuid.UUID      `gorm:"column:id; primaryKey; type:uuid; not null;"` // Unique identifier for the pfe project
-	Projectname        string         `gorm:"column:first_name; not null;"`                // The project name
-	Projectdescription string         `gorm:"column:project_description; not null;"`       // projects description (mission  )
-	Technologies       pq.StringArray `gorm:"column:technologies;"`                        // project's technologies
-	ExpDate            time.Time      `gorm:"column:exp_date;"`                            // exp date of project
-	CompanyID          uuid.UUID      `gorm:"column:company_id; type:uuid; not null;"`     // ID of the company to which the user belongs
+	ID           uuid.UUID      `gorm:"column:id; primaryKey; type:uuid; not null;"` // Unique identifier for the pfe project
+	Code         string         `gorm:"column:code; not null;"`                      // The project code
+	Projectname  string         `gorm:"column:first_name; not null;"`                // The project name
+	Description  string         `gorm:"column:description; not null;"`               // projects description (mission  )
+	Technologies pq.StringArray `gorm:"column:technologies;type:TEXT[]"` // project's technologies
+	ExpDate      time.Time      `gorm:"column:exp_date;"`                            // exp date of project
+	Condidats    []Condidats     `gorm:"many2many:projects_condidats"`           
+	CompanyID    uuid.UUID      `gorm:"column:company_id; type:uuid; not null;"`     // ID of the company to which the user belongs
 	gorm.Model
 }
 
@@ -81,4 +83,28 @@ func ReadProjectsCondidats(db *gorm.DB, projectID, companyID uuid.UUID) ([]Proje
 	var project []ProjectsCondidats
 	err := db.Where("project_id = ? AND company_id = ?", projectID, companyID).Find(&project).Error
 	return project, err
+}
+/* 
+// ReadUsersRoles reads the roles assigned to a user.
+func ReadUsersRoles(db *gorm.DB, userID, companyID uuid.UUID) ([]UsersRoles, error) {
+	var user []UsersRoles
+	err := db.Where("users_id = ? AND company_id = ?", userID, companyID).Find(&user).Error
+	return user, err
+} */
+
+
+// CheckProjectCodeExists vérifie si un code de projet existe déjà dans la base de données.
+func CheckProjectCodeExists(db *gorm.DB, code string) (bool, error) {
+    // Déclarez une variable pour stocker le nombre de projets avec le code donné.
+    var count int64
+
+    // Exécutez une requête pour compter le nombre de projets avec le code donné.
+    if err := db.Model(&Project{}).Where("code = ?", code).Count(&count).Error; err != nil {
+        // Si une erreur se produit lors de l'exécution de la requête, retournez l'erreur.
+        return false, err
+    }
+
+    // Si le nombre de projets avec le code donné est supérieur à zéro, cela signifie que le code de projet existe déjà.
+    // Sinon, le code de projet n'existe pas encore.
+    return count > 0, nil
 }

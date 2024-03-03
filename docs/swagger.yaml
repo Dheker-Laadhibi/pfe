@@ -75,6 +75,54 @@ definitions:
     required:
     - name
     type: object
+  CondidatsList:
+    description: CondidatsList represents a simplified version of the Condidats for
+      listing purposes.
+    properties:
+      firstname:
+        description: Name is the name of the role.
+        type: string
+      id:
+        description: ID is the unique identifier for the role.
+        type: string
+      lastname:
+        description: Name is the name of the role.
+        type: string
+    type: object
+  CondidatsTable:
+    description: RolesTable represents a single role entry in a table.
+    properties:
+      email:
+        description: Email is the email address of the condidat.
+        type: string
+      firstname:
+        description: Firstname is the first name of the condidat.
+        type: string
+      id:
+        description: ID is the unique identifier for the  condidat.
+        type: string
+      lastname:
+        description: Lastname is the last name of the condidat.
+        type: string
+    type: object
+  CondidtasPagination:
+    description: CondidtasPagination represents the paginated list of Condidats.
+    properties:
+      items:
+        description: Items is a slice containing individual role details.
+        items:
+          $ref: '#/definitions/CondidatsTable'
+        type: array
+      limit:
+        description: Limit is the maximum number of items per page in the pagination.
+        type: integer
+      page:
+        description: Page is the current page number in the pagination.
+        type: integer
+      totalCount:
+        description: TotalCount is the total number of roles in the entire list.
+        type: integer
+    type: object
   InternsCount:
     description: InternsCount represents the count of interns.
     properties:
@@ -365,6 +413,64 @@ definitions:
     - matricule
     - userID
     type: object
+  ProjectIn:
+    description: ProjectIn represents the input structure for creating a new project.
+    properties:
+      code:
+        description: code is the code of pfe project
+        maxLength: 30
+        minLength: 3
+        type: string
+      companyID:
+        description: CompanyID is the unique identifier for the company associated
+          with the project. It is required.
+        type: string
+      description:
+        maxLength: 80
+        minLength: 3
+        type: string
+      exp_date:
+        type: string
+      projectname:
+        description: projectname is the  name of the project. It is required and should
+          be between 3 and 35 characters.
+        maxLength: 35
+        minLength: 3
+        type: string
+      technologies:
+        description: technologies required to develop the project
+        items:
+          type: string
+        type: array
+    required:
+    - code
+    - companyID
+    - description
+    - exp_date
+    - projectname
+    - technologies
+    type: object
+  ProjectList:
+    description: ProjectList represents a simplified version of the project for listing
+      purposes.
+    properties:
+      code:
+        description: code is the code of pfe project
+        type: string
+      id:
+        description: ID is the unique identifier for the project.
+        type: string
+      projectname:
+        description: projectname is the  name of the project.
+        type: string
+    type: object
+  ProjectsCount:
+    description: ProjectsCount represents the count of projects.
+    properties:
+      count:
+        description: Count is the number of projects.
+        type: integer
+    type: object
   RolesCount:
     description: RolesCount represents the count of roles.
     properties:
@@ -605,24 +711,57 @@ definitions:
         type: integer
     type: object
   UsersTable:
-    description: UsersTable represents a single user entry in a table.
+    description: UsersTable represents a single project entry in a table.
     properties:
-      createdAt:
-        description: CreatedAt is the timestamp indicating when the user entry was
-          created.
+      code:
+        description: code is the code of pfe project
         type: string
-      email:
-        description: Email is the email address of the user.
+      companyID:
+        description: CompanyID is the unique identifier for the company associated
+          with the project. It is required.
         type: string
-      firstname:
-        description: Firstname is the first name of the user.
+      expdate:
+        description: expdate is the timestamp indicating when the project entry will
+          ends.
         type: string
       id:
-        description: ID is the unique identifier for the user.
+        description: ID is the unique identifier for the project.
         type: string
-      lastname:
-        description: Lastname is the last name of the user.
+      projectname:
+        description: projectname is the  name of the project. It is required .
         type: string
+      technologies:
+        description: technologies required to develop the project
+        items:
+          type: string
+        type: array
+    type: object
+  projectsDetails:
+    description: projectsDetails represents detailed information about a specific
+      project.
+    properties:
+      code:
+        description: code is the code of pfe project
+        type: string
+      companyID:
+        description: CompanyID is the unique identifier for the company associated
+          with the project. It is required.
+        type: string
+      expdate:
+        description: expdate is the timestamp indicating when the project entry will
+          ends.
+        type: string
+      id:
+        description: ID is the unique identifier for the project.
+        type: string
+      projectname:
+        description: projectname is the  name of the project. It is required .
+        type: string
+      technologies:
+        description: technologies required to develop the project
+        items:
+          type: string
+        type: array
     type: object
 host: localhost:8080
 info:
@@ -905,6 +1044,304 @@ paths:
       summary: Update company
       tags:
       - Companies
+  /condidat/{companyID}:
+    post:
+      consumes:
+      - application/json
+      description: Create a new condidat.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      - description: condidat query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/RolesIn'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create condidat
+      tags:
+      - Condidats
+  /condidats/{companyID}/{ID}:
+    delete:
+      description: "Delete one Condidat\t."
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      - description: Condidats ID
+        in: path
+        name: ID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Condidat
+      tags:
+      - Condidats
+    get:
+      description: Get one condidat.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      - description: condidats ID
+        in: path
+        name: ID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RolesDetails'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get condidat
+      tags:
+      - Condidats
+    put:
+      consumes:
+      - application/json
+      description: Update one condidat.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      - description: Condidat ID
+        in: path
+        name: ID
+        required: true
+        type: string
+      - description: Condidat query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/RolesIn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update condidat
+      tags:
+      - Condidats
+  /condidats/{companyID}/count:
+    get:
+      description: Get number of all condidats.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RolesCount'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get number of  condidats
+      tags:
+      - Condidats
+  /condidats/{companyID}/list:
+    get:
+      description: Get list of all Condidats.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/CondidatsList'
+            type: array
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get list of  Condidats
+      tags:
+      - Condidats
+  /condidtas/{companyID}:
+    get:
+      description: Get all condidats.
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/CondidtasPagination'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get condidats
+      tags:
+      - Condidats
   /interns/{companyID}:
     post:
       consumes:
@@ -1911,6 +2348,303 @@ paths:
       summary: Update presence
       tags:
       - Presences
+  /projects/{companyID}:
+    get:
+      description: Get all projects.
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UsersPagination'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get projects
+      tags:
+      - Project
+    post:
+      consumes:
+      - application/json
+      description: Create a new Project.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      - description: project query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ProjectIn'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Project
+      tags:
+      - Project
+  /projects/{companyID}/{ID}:
+    delete:
+      description: Delete one Project.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      - description: Project ID
+        in: path
+        name: ID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Project
+      tags:
+      - Project
+    get:
+      description: Get one Project.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      - description: Project ID
+        in: path
+        name: ID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/projectsDetails'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Project
+      tags:
+      - Project
+    put:
+      consumes:
+      - application/json
+      description: Update Project .
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      - description: Project  ID
+        in: path
+        name: ID
+        required: true
+        type: string
+      - description: Project query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ProjectIn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Project
+      tags:
+      - Project
+  /projects/{companyID}/count:
+    get:
+      description: Get number of all projects.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ProjectsCount'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get number of  projects
+      tags:
+      - Project
+  /projects/{companyID}/list:
+    get:
+      description: Get list of all Projects.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/ProjectList'
+            type: array
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get list of  Projects
+      tags:
+      - Project
   /roles/{companyID}:
     get:
       description: Get all roles.

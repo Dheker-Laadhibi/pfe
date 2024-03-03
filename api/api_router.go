@@ -8,6 +8,7 @@ import (
 	"labs/api/mission_orders"
 	"labs/api/notifications"
 	"labs/api/presences"
+	"labs/api/projects"
 	"labs/api/roles"
 
 	"labs/api/users"
@@ -47,6 +48,9 @@ func RoutesApiInit(router *gin.Engine, db *gorm.DB) {
 
 		//  Initialize condidats routes
 		condidats.CondidatRouterInit(api, db)
+		    
+		//  Initialize projects routes
+		projects.ProjectRouterInit(api, db)
 
 	}
 }
