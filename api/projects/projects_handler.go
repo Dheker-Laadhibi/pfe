@@ -56,16 +56,6 @@ func (db Database) CreateProject(ctx *gin.Context) {
 		return
 	}
 
-
-  
-
-
-
-
-
-
-
-
 	layout := "2006-01-02" // Format de date année-mois-jour
 
 	// Analyser la date ExpDate en tant que time.Time
@@ -82,37 +72,32 @@ func (db Database) CreateProject(ctx *gin.Context) {
 		Projectname:  project.Projectname,
 		Technologies: project.Technologies,
 		Description:  project.Description,
-		ExpDate: dt,
-		CompanyID:  project.CompanyID,
+		ExpDate:      dt,
+		CompanyID:    project.CompanyID,
 		// ExpDate: project.,
 	}
 
+	// Vérifier si le code de projet existe déjà dans la base de données
+	exists, err := domains.CheckProjectCodeExists(db.DB, project.Code)
+	if err != nil {
+		logrus.Error("Erreur lors de la vérification de l'existence du code de projet dans la base de données : ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
+		return
+	} else if exists {
+		logrus.Error("Le code de projet existe déjà dans la base de données.")
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.DUPLICATE_CODE, utils.Null())
+		return
+	}
 
+	// Créer le projet uniquement si le code de projet n'existe pas déjà dans la base de données
+	if err := domains.Create(db.DB, dbProject); err != nil {
+		logrus.Error("Erreur lors de l'enregistrement des données dans la base de données. Erreur: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
+		return
+	}
 
-
-
-
-// Vérifier si le code de projet existe déjà dans la base de données
-exists, err := domains.CheckProjectCodeExists(db.DB, project.Code)
-if err != nil {
-    logrus.Error("Erreur lors de la vérification de l'existence du code de projet dans la base de données : ", err.Error())
-    utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
-    return
-} else if exists {
-    logrus.Error("Le code de projet existe déjà dans la base de données.")
-    utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.DUPLICATE_CODE, utils.Null())
-    return
-}
-
-// Créer le projet uniquement si le code de projet n'existe pas déjà dans la base de données
-if err := domains.Create(db.DB, dbProject); err != nil {
-    logrus.Error("Erreur lors de l'enregistrement des données dans la base de données. Erreur: ", err.Error())
-    utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
-    return
-}
-
-// Répondre avec succès
-utils.BuildResponse(ctx, http.StatusCreated, constants.CREATED, utils.Null())
+	// Répondre avec succès
+	utils.BuildResponse(ctx, http.StatusCreated, constants.CREATED, utils.Null())
 
 }
 
@@ -200,16 +185,12 @@ func (db Database) ReadProjects(ctx *gin.Context) {
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
 		return
 	}
-	
 
 	// Generate a project structure as a response
 	response := projectsPagination{}
 	dataTableProject := []ProjectTable{}
 	for _, project := range projects {
 
-
-
-		
 		dataTableProject = append(dataTableProject, ProjectTable{
 			ID:           project.ID,
 			Code:         project.Code,
@@ -530,4 +511,93 @@ func (db Database) DeleteProject(ctx *gin.Context) {
 
 	// Respond with success
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, utils.Null())
+}
+
+// AssignProject	AssignProjectToCondidats.
+// @Summary        	assign Project
+// @Description    	assign one Project.
+// @Tags			ProjectsCondidats
+// @Produce			json
+// @Security 		ApiKeyAuth
+// @Param			companyID			path			string			true	"Company ID"
+// @Param			ID					path			string			true	"condidat ID"
+// @Param			request			     body			projects.codeProject		true  "project query params"
+// @Success			200					{object}		utils.ApiResponses
+// @Failure			400					{object}		utils.ApiResponses		"Invalid request"
+// @Failure			401					{object}		utils.ApiResponses		"Unauthorized"
+// @Failure			403					{object}		utils.ApiResponses		"Forbidden"
+// @Failure			500					{object}		utils.ApiResponses		"Internal Server Error"
+// @Router			/projects/{companyID}/{ID}/assign	[post]
+func (db Database) AssignProjectToCondidats(ctx *gin.Context) {
+
+	// Extract JWT values from the context
+	//session := utils.ExtractJWTValues(ctx)
+
+	// Parse and validate the company ID from the request parameter
+	companyID, err := uuid.Parse(ctx.Param("companyID"))
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+	// Check if the condidat with the specified ID exists
+	if err := domains.CheckByID(db.DB, &domains.Companies{}, companyID); err != nil {
+		logrus.Error("Error checking if the condidat with the specified ID exists. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusNotFound, constants.DATA_NOT_FOUND, utils.Null())
+		return
+	}
+
+	// Parse and validate the condidat ID from the request parameter
+	objectID, err := uuid.Parse(ctx.Param("ID"))
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Check if the condidat with the specified ID exists
+	if err := domains.CheckByID(db.DB, &domains.Condidats{}, objectID); err != nil {
+		logrus.Error("Error checking if the condidat with the specified ID exists. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusNotFound, constants.DATA_NOT_FOUND, utils.Null())
+		return
+	}
+
+	/*	// Parse the incoming JSON request into a ProjectIn struct
+		project := new(ProjectIn)
+		if err := ctx.ShouldBindJSON(project); err != nil {
+			logrus.Error("Error mapping request from frontend. Error: ", err.Error())
+			utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+			return
+		}
+	*/
+	projectCode := new(codeProject)
+	if err := ctx.ShouldBindJSON(projectCode); err != nil {
+		logrus.Error("Error parsing request body. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, "Error parsing request body.", nil)
+		return
+	}
+
+	// Query database to find project ID based on project code
+	projectID, err := domains.FindProjectIDByCode(db.DB, projectCode.Code)
+	if err != nil {
+		logrus.Error("Error finding project ID by project code. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusInternalServerError, "Error finding project ID by project code.", nil)
+		return
+	}
+	parsedProjectID, err := uuid.Parse(projectID)
+if err != nil {
+    logrus.Error("Error parsing project ID: ", err.Error())
+    utils.BuildErrorResponse(ctx, http.StatusInternalServerError, "Error parsing project ID.", nil)
+    return
+}
+
+	// Assign candidate to project
+	if err := domains.AssignProjectCondidat(db.DB, parsedProjectID, objectID, companyID); err != nil {
+		logrus.Error("Error assigning candidate to project. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusInternalServerError, "Error assigning candidate to project.", nil)
+		return
+	}
+
+	// Respond with success
+	utils.BuildResponse(ctx, http.StatusOK, "Project assigned to candidate successfully.", nil)
 }

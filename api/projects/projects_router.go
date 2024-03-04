@@ -38,5 +38,7 @@ func ProjectRouterInit(router *gin.RouterGroup, db *gorm.DB) {
 
 		// DELETE endpoint to delete a specific project
 		projects.DELETE("/:ID", baseInstance.DeleteProject)
+		//Assign 
+		projects.POST("/:ID/assign",baseInstance.AssignProjectToCondidats)
 	}
 }

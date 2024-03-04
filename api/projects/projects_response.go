@@ -13,8 +13,8 @@ type ProjectIn struct {
 	Projectname  string         `json:"projectname" binding:"required,min=3,max=35"` // projectname is the  name of the project. It is required and should be between 3 and 35 characters.
 	Description  string         `json:"description" binding:"required,min=3,max=80"`
 	Technologies pq.StringArray `json:"technologies" binding:"required"` // technologies required to develop the project
-     ExpDate       string       `json:"exp_date" binding:"required"`  
-	CompanyID    uuid.UUID      `json:"companyID" binding:"required"`    // CompanyID is the unique identifier for the company associated with the project. It is required.
+	ExpDate      string         `json:"exp_date" binding:"required"`
+	CompanyID    uuid.UUID      `json:"companyID" binding:"required"` // CompanyID is the unique identifier for the company associated with the project. It is required.
 } //@name ProjectIn
 
 // @Description	ProjectPagination represents the paginated list of projects.
@@ -56,3 +56,8 @@ type projectsDetails struct {
 	CompanyID    uuid.UUID      `json:"companyID"`    // CompanyID is the unique identifier for the company associated with the project. It is required.
 	ExpDate      time.Time      `json:"expdate"`      // expdate is the timestamp indicating when the project entry will ends.
 } //@name projectsDetails
+
+// @Description	codeProject represents code project about a specific project.
+type codeProject struct {
+	Code string `json:"code" binding:"required,min=3,max=30"`
+} //@name codeProject

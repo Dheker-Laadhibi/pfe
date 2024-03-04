@@ -424,7 +424,7 @@ func (db Database) UpdateCondidat(ctx *gin.Context) {
 		return
 	}
 
-	// Update the cpndidat data in the database
+	// Update the condidat data in the database
 	dbCondidat := &domains.Condidats{
 		Firstname:      condidat.Firstname,
 		Lastname:       condidat.Lastname,

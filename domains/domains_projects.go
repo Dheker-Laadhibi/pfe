@@ -108,3 +108,33 @@ func CheckProjectCodeExists(db *gorm.DB, code string) (bool, error) {
     // Sinon, le code de projet n'existe pas encore.
     return count > 0, nil
 }
+
+
+//  associe un condidat à un projet dans la table ProjectsCondidats.
+func AssignProjectCondidat(db *gorm.DB, projectID, condidatID, companyID uuid.UUID) error {
+    // Créez une instance de ProjectsCondidats avec les identifiants fournis.
+    projectCondidat := ProjectsCondidats{
+        ProjectID:  projectID,
+        CondidatID: condidatID,
+        CompanyID:  companyID,
+    }
+
+    if err := db.Create(&projectCondidat).Error; err != nil {
+        
+        return err
+    }
+
+    // Retournez nil pour indiquer qu'il n'y a pas eu d'erreur.
+    return nil
+}
+
+// FindProjectIDByCode recherche l'ID du projet basé sur le code du projet dans la base de données.
+func FindProjectIDByCode(db *gorm.DB, projectCode string) (string, error) {
+    var projectID string
+    // Exécutez une requête pour trouver l'ID du projet basé sur le code du projet donné
+    if err := db.Model(&Project{}).Where("code = ?", projectCode).Pluck("id", &projectID).Error; err != nil {
+        // Si une erreur se produit lors de l'exécution de la requête, renvoyez l'erreur.
+        return "", err
+    }
+    return projectID, nil
+}

@@ -820,6 +820,16 @@ definitions:
           type: string
         type: array
     type: object
+  codeProject:
+    description: codeProject represents code project about a specific project.
+    properties:
+      code:
+        maxLength: 30
+        minLength: 3
+        type: string
+    required:
+    - code
+    type: object
   projectsDetails:
     description: projectsDetails represents detailed information about a specific
       project.
@@ -2652,6 +2662,54 @@ paths:
       summary: Update Project
       tags:
       - Project
+  /projects/{companyID}/{ID}/assign:
+    post:
+      description: assign one Project.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      - description: condidat ID
+        in: path
+        name: ID
+        required: true
+        type: string
+      - description: project query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/codeProject'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: assign Project
+      tags:
+      - ProjectsCondidats
   /projects/{companyID}/count:
     get:
       description: Get number of all projects.
