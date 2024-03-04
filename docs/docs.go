@@ -448,14 +448,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Get all condidats.",
+                "description": "Get all Candidats .",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Condidats"
                 ],
-                "summary": "Get condidats",
+                "summary": "Get Candidats",
                 "parameters": [
                     {
                         "type": "integer",
@@ -516,7 +516,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Create a new condidat.",
+                "description": "Create a new candidate.",
                 "consumes": [
                     "application/json"
                 ],
@@ -526,7 +526,7 @@ const docTemplate = `{
                 "tags": [
                     "Condidats"
                 ],
-                "summary": "Create condidat",
+                "summary": "Create candidate",
                 "parameters": [
                     {
                         "type": "string",
@@ -579,6 +579,71 @@ const docTemplate = `{
                 }
             }
         },
+        "/condidats/{companyID}/Signin": {
+            "post": {
+                "description": "Authenticate and log in a uscandidater.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Condidats"
+                ],
+                "summary": "Signin",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "candidat query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Signin"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/LoggedIn"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/condidats/{companyID}/count": {
             "get": {
                 "security": [
@@ -586,14 +651,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Get number of all condidats.",
+                "description": "Get number of all Candidats .",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Condidats"
                 ],
-                "summary": "Get number of  condidats",
+                "summary": "Get number of  Candidats",
                 "parameters": [
                     {
                         "type": "string",
@@ -644,14 +709,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Get list of all Condidats.",
+                "description": "Get list of all Candidats.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Condidats"
                 ],
-                "summary": "Get list of  Condidats",
+                "summary": "Get list of  Candidats",
                 "parameters": [
                     {
                         "type": "string",
@@ -705,14 +770,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Get one condidat.",
+                "description": "Get one candidat.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Condidats"
                 ],
-                "summary": "Get condidat",
+                "summary": "Get candidat",
                 "parameters": [
                     {
                         "type": "string",
@@ -723,7 +788,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "condidats ID",
+                        "description": "candidat ID",
                         "name": "ID",
                         "in": "path",
                         "required": true
@@ -768,7 +833,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Update one condidat.",
+                "description": "Update one candidat.",
                 "consumes": [
                     "application/json"
                 ],
@@ -778,7 +843,7 @@ const docTemplate = `{
                 "tags": [
                     "Condidats"
                 ],
-                "summary": "Update condidat",
+                "summary": "Update candidat",
                 "parameters": [
                     {
                         "type": "string",
@@ -789,13 +854,13 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Condidat ID",
+                        "description": "candidat ID",
                         "name": "ID",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Condidat query params",
+                        "description": "candidat query params",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -843,14 +908,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Delete one Condidat\t.",
+                "description": "Delete one candidat\t.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Condidats"
                 ],
-                "summary": "Delete Condidat",
+                "summary": "Delete candidat",
                 "parameters": [
                     {
                         "type": "string",
@@ -861,7 +926,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Condidats ID",
+                        "description": "candidat ID",
                         "name": "ID",
                         "in": "path",
                         "required": true
@@ -2945,7 +3010,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "condidat ID",
+                        "description": "candidate ID",
                         "name": "ID",
                         "in": "path",
                         "required": true
@@ -4331,27 +4396,27 @@ const docTemplate = `{
             }
         },
         "LoggedIn": {
-            "description": "LoggedIn represents the user details after successful login.",
+            "description": "LoggedIn represents the candidat details after successful login.",
             "type": "object",
             "properties": {
                 "ID": {
-                    "description": "ID is the unique identifier for the user.",
+                    "description": "ID is the unique identifier for the candidat.",
                     "type": "string"
                 },
                 "email": {
-                    "description": "Email is the email address of the user.",
+                    "description": "Email is the email address of the candidat.",
                     "type": "string"
                 },
-                "name": {
-                    "description": "Name is the name of the user.",
+                "first_name": {
+                    "description": "Name is the name of the candidat.",
                     "type": "string"
                 },
-                "profilePicture": {
-                    "description": "ProfilePicture is the URL or path to the user's profile picture.",
+                "last_name": {
+                    "description": "Name is the name of the candidat.",
                     "type": "string"
                 },
                 "workCompanyId": {
-                    "description": "CompanyID is the unique identifier for the user's company.",
+                    "description": "CompanyID is the unique identifier for the candidat company.",
                     "type": "string"
                 }
             }
@@ -4735,7 +4800,7 @@ const docTemplate = `{
             }
         },
         "Signin": {
-            "description": "Signin represents the information required for signing in.",
+            "description": "Signin represents the information required for signing in candidat.",
             "type": "object",
             "required": [
                 "email",

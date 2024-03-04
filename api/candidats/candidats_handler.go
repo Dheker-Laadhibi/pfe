@@ -1,4 +1,4 @@
-package condidats
+package candidats
 
 import (
 	"labs/constants"
@@ -14,9 +14,9 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// CreateCondidat 		Handles the creation of a new condidat.
-// @Summary        	Create condidat
-// @Description    	Create a new condidat.
+// Createcandidate 		Handles the creation of a new candidate.
+// @Summary        	Create candidate
+// @Description    	Create a new candidate.
 // @Tags			Condidats
 // @Accept			json
 // @Produce			json
@@ -29,7 +29,7 @@ import (
 // @Failure			403				{object}		utils.ApiResponses	"Forbidden"
 // @Failure			500				{object}		utils.ApiResponses	"Internal Server Error"
 // @Router			/condidats/{companyID}	[post]
-func (db Database) CreateCondidat(ctx *gin.Context) {
+func (db Database) Createcandidate(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
@@ -49,7 +49,7 @@ func (db Database) CreateCondidat(ctx *gin.Context) {
 		return
 	}
 
-	// Parse the incoming JSON request into a CondidatIn struct
+	// Parse the incoming JSON request into a candidatIn struct
 	condidat := new(CondidatIn)
 	if err := ctx.ShouldBindJSON(condidat); err != nil {
 		logrus.Error("Error mapping request from frontend. Error: ", err.Error())
@@ -58,7 +58,7 @@ func (db Database) CreateCondidat(ctx *gin.Context) {
 	}
 	// Hash the user's password
 	hash, _ := bcrypt.GenerateFromPassword([]byte(condidat.Password), bcrypt.DefaultCost)
-	// Create a new condidat in the database
+	// Create a new candidate in the database
 	dbCondidat := &domains.Condidats{
 		ID:             uuid.New(),
 		Firstname:      condidat.Firstname,
@@ -80,9 +80,9 @@ func (db Database) CreateCondidat(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusCreated, constants.CREATED, utils.Null())
 }
 
-// ReadCondidats 	Handles the retrieval of all Condidats.
-// @Summary        	Get condidats
-// @Description    	Get all condidats.
+// ReadCandidats 	Handles the retrieval of all Candidats .
+// @Summary        	Get Candidats
+// @Description    	Get all Candidats .
 // @Tags			Condidats
 // @Produce			json
 // @Security 		ApiKeyAuth
@@ -95,7 +95,7 @@ func (db Database) CreateCondidat(ctx *gin.Context) {
 // @Failure			403					{object}	utils.ApiResponses			"Forbidden"
 // @Failure			500					{object}	utils.ApiResponses			"Internal Server Error"
 // @Router			/condidats/{companyID}	[get]
-func (db Database) ReadCondidats(ctx *gin.Context) {
+func (db Database) ReadCandidats(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
@@ -149,7 +149,7 @@ func (db Database) ReadCondidats(ctx *gin.Context) {
 		return
 	}
 
-	// Retrieve all condidat data from the database
+	// Retrieve all Candidats  data from the database
 	condidats, err := ReadAllPagination(db.DB, []domains.Condidats{}, session.CompanyID, limit, offset)
 	if err != nil {
 		logrus.Error("Error occurred while finding all user data. Error: ", err)
@@ -186,9 +186,9 @@ func (db Database) ReadCondidats(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, response)
 }
 
-// ReadCondidatsList	Handles the retrieval the list of all Condidats.
-// @Summary        	Get list of  Condidats
-// @Description    	Get list of all Condidats.
+// ReadCandidatsList	Handles the retrieval the list of all Candidats.
+// @Summary        	Get list of  Candidats
+// @Description    	Get list of all Candidats.
 // @Tags			Condidats
 // @Produce			json
 // @Security 		ApiKeyAuth
@@ -227,7 +227,7 @@ func (db Database) ReadCondidatsList(ctx *gin.Context) {
 		return
 	}
 
-	// Generate a condidat structure as a response
+	// Generate a Candidats  structure as a response
 	condidatsList := []CondidatsList{}
 	for _, condidat := range condidats {
 
@@ -242,9 +242,9 @@ func (db Database) ReadCondidatsList(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, condidatsList)
 }
 
-// ReadCondidatsCount	Handles the retrieval the number of all Condidats.
-// @Summary        	Get number of  condidats
-// @Description    	Get number of all condidats.
+// ReadCandidatsCount	Handles the retrieval the number of all Candidats .
+// @Summary        	Get number of  Candidats
+// @Description    	Get number of all Candidats .
 // @Tags			Condidats
 // @Produce			json
 // @Security 		ApiKeyAuth
@@ -255,7 +255,7 @@ func (db Database) ReadCondidatsList(ctx *gin.Context) {
 // @Failure			403						{object}		utils.ApiResponses		"Forbidden"
 // @Failure			500						{object}		utils.ApiResponses		"Internal Server Error"
 // @Router			/condidats/{companyID}/count	[get]
-func (db Database) ReadCondidatsCount(ctx *gin.Context) {
+func (db Database) ReadCandidatsCount(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
@@ -292,21 +292,21 @@ func (db Database) ReadCondidatsCount(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, condidatsCount)
 }
 
-// ReadCondidat		Handles the retrieval of one condidat.
-// @Summary        	Get condidat
-// @Description    	Get one condidat.
+// Readcandidat		Handles the retrieval of one candidat.
+// @Summary        	Get candidat
+// @Description    	Get one candidat.
 // @Tags			Condidats
 // @Produce			json
 // @Security 		ApiKeyAuth
 // @Param			companyID				path			string			true	"Company ID"
-// @Param			ID						path			string			true	"condidats ID"
+// @Param			ID						path			string			true	"candidat ID"
 // @Success			200						{object}		condidats.CondidatDetails
 // @Failure			400						{object}		utils.ApiResponses		"Invalid request"
 // @Failure			401						{object}		utils.ApiResponses		"Unauthorized"
 // @Failure			403						{object}		utils.ApiResponses		"Forbidden"
 // @Failure			500						{object}		utils.ApiResponses		"Internal Server Error"
 // @Router			/condidats/{companyID}/{ID}	[get]
-func (db Database) ReadCondidat(ctx *gin.Context) {
+func (db Database) Readcandidat(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
@@ -334,7 +334,7 @@ func (db Database) ReadCondidat(ctx *gin.Context) {
 		return
 	}
 
-	// Retrieve condidat data from the database
+	// Retrieve candidat data from the database
 	condidat, err := ReadByID(db.DB, domains.Condidats{}, objectID)
 	if err != nil {
 		logrus.Error("Error retrieving condidat data from the database. Error: ", err.Error())
@@ -350,7 +350,7 @@ func (db Database) ReadCondidat(ctx *gin.Context) {
 		return
 	}
 
-	// Generate a user structure as a response
+	// Generate a Candidat structure as a response
 	details := CondidatDetails{
 		ID:               condidat.ID,
 		Firstname:        condidat.Firstname,
@@ -365,23 +365,23 @@ func (db Database) ReadCondidat(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, details)
 }
 
-// UpdateCondidt	Handles the update of a condidat.
-// @Summary        	Update condidat
-// @Description    	Update one condidat.
+// UpdateCandidt	Handles the update of a candidat.
+// @Summary        	Update candidat
+// @Description    	Update one candidat.
 // @Tags			Condidats
 // @Accept			json
 // @Produce			json
 // @Security 		ApiKeyAuth
 // @Param			companyID			path			string				true		"Company ID"
-// @Param			ID					path			string				true		"Condidat ID"
-// @Param			request				body			condidats.CondidatIn		true		"Condidat query params"
+// @Param			ID					path			string				true		"candidat ID"
+// @Param			request				body			condidats.CondidatIn		true		"candidat query params"
 // @Success			200					{object}		utils.ApiResponses
 // @Failure			400					{object}		utils.ApiResponses				"Invalid request"
 // @Failure			401					{object}		utils.ApiResponses				"Unauthorized"
 // @Failure			403					{object}		utils.ApiResponses				"Forbidden"
 // @Failure			500					{object}		utils.ApiResponses				"Internal Server Error"
 // @Router			/condidats/{companyID}/{ID}	[put]
-func (db Database) UpdateCondidat(ctx *gin.Context) {
+func (db Database) Updatecandidat(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
@@ -409,7 +409,7 @@ func (db Database) UpdateCondidat(ctx *gin.Context) {
 		return
 	}
 
-	// Parse the incoming JSON request into a CondidatIn struct
+	// Parse the incoming JSON request into a candidatIn struct
 	condidat := new(CondidatIn)
 	if err := ctx.ShouldBindJSON(condidat); err != nil {
 		logrus.Error("Error mapping request from frontend. Error: ", err.Error())
@@ -417,14 +417,14 @@ func (db Database) UpdateCondidat(ctx *gin.Context) {
 		return
 	}
 
-	// Check if the condidat with the specified ID exists
+	// Check if the candidat with the specified ID exists
 	if err = domains.CheckByID(db.DB, &domains.Condidats{}, objectID); err != nil {
 		logrus.Error("Error checking if the condidats with the specified ID exists. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
 		return
 	}
 
-	// Update the condidat data in the database
+	// Update the candidat data in the database
 	dbCondidat := &domains.Condidats{
 		Firstname:      condidat.Firstname,
 		Lastname:       condidat.Lastname,
@@ -443,14 +443,14 @@ func (db Database) UpdateCondidat(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, utils.Null())
 }
 
-// DeleteCondidat	 	Handles the deletion of a Condidat	.
-// @Summary        	Delete Condidat
-// @Description    	Delete one Condidat	.
+// Deletecandidat 	Handles the deletion of a candidat	.
+// @Summary        	Delete candidat
+// @Description    	Delete one candidat	.
 // @Tags			Condidats
 // @Produce			json
 // @Security 		ApiKeyAuth
 // @Param			companyID			path			string			true		"Company ID"
-// @Param			ID					path			string			true		"Condidats ID"
+// @Param			ID					path			string			true		"candidat ID"
 // @Success			200					{object}		utils.ApiResponses
 // @Failure			400					{object}		utils.ApiResponses			"Invalid request"
 // @Failure			401					{object}		utils.ApiResponses			"Unauthorized"
@@ -485,14 +485,14 @@ func (db Database) DeleteCondidat(ctx *gin.Context) {
 		return
 	}
 
-	// Check if the Condidats with the specified ID exists
+	// Check if the candidat with the specified ID exists
 	if err := domains.CheckByID(db.DB, &domains.Condidats{}, objectID); err != nil {
 		logrus.Error("Error checking if the condidat with the specified ID exists. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusNotFound, constants.DATA_NOT_FOUND, utils.Null())
 		return
 	}
 
-	// Delete the Condidats data from the database
+	// Delete the candidat data from the database
 	if err := domains.Delete(db.DB, &domains.Condidats{}, objectID); err != nil {
 		logrus.Error("Error deleting condidat data from the database. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
@@ -501,4 +501,55 @@ func (db Database) DeleteCondidat(ctx *gin.Context) {
 
 	// Respond with success
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, utils.Null())
+}
+
+// SigninCandidat 	Handles the candidat signin process.
+// @Summary			Signin
+// @Description		Authenticate and log in a uscandidater.
+// @Tags			Condidats
+// @Accept			json
+// @Produce			json
+// @Param			companyID			path			string			true		"Company ID"
+// @Param			request		body		condidats.Signin		true	"candidat query params"
+// @Success			200			{object}	condidats.LoggedIn
+// @Failure			400			{object}	utils.ApiResponses		"Invalid request"
+// @Failure			401			{object}	utils.ApiResponses		"Unauthorized"
+// @Failure			403			{object}	utils.ApiResponses		"Forbidden"
+// @Failure			500			{object}	utils.ApiResponses		"Internal Server Error"
+// @Router			/condidats/{companyID}/Signin	[post]
+func (db Database) SigninCandidat(ctx *gin.Context) {
+
+	// Parse the incoming JSON request into a Signin struct
+	candidat := new(Signin)
+	if err := ctx.ShouldBindJSON(candidat); err != nil {
+		logrus.Error("Error mapping request from frontend. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Retrieve user data by email
+	data, err := ReadByEmailActive(db.DB, candidat.Email)
+	if err != nil {
+		logrus.Error("Error retrieving data from the database. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.DATA_NOT_FOUND, utils.Null())
+		return
+	}
+
+	// Compare the entered password with the stored password
+	if isTrue := utils.ComparePassword(data.Password, candidat.Password); !isTrue {
+		logrus.Error("Password comparison failed.")
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNAUTHORIZED, utils.Null())
+		return
+	}
+
+	// Prepare the response with candidat details
+	response := LoggedIn{
+		ID:        data.ID,
+		Firstname: data.Firstname,
+		Lastname:  data.Lastname,
+		Email:     data.Email,
+		CompanyID: data.CompanyID,
+	}
+	// Respond with success
+	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, response)
 }

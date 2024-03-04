@@ -520,7 +520,7 @@ func (db Database) DeleteProject(ctx *gin.Context) {
 // @Produce			json
 // @Security 		ApiKeyAuth
 // @Param			companyID			path			string			true	"Company ID"
-// @Param			ID					path			string			true	"condidat ID"
+// @Param			ID					path			string			true	"candidate ID"
 // @Param			request			     body			projects.codeProject		true  "project query params"
 // @Success			200					{object}		utils.ApiResponses
 // @Failure			400					{object}		utils.ApiResponses		"Invalid request"
@@ -540,14 +540,14 @@ func (db Database) AssignProjectToCondidats(ctx *gin.Context) {
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
 		return
 	}
-	// Check if the condidat with the specified ID exists
+	// Check if the candidate with the specified ID exists
 	if err := domains.CheckByID(db.DB, &domains.Companies{}, companyID); err != nil {
-		logrus.Error("Error checking if the condidat with the specified ID exists. Error: ", err.Error())
+		logrus.Error("Error checking if the candidate with the specified ID exists. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusNotFound, constants.DATA_NOT_FOUND, utils.Null())
 		return
 	}
 
-	// Parse and validate the condidat ID from the request parameter
+	// Parse and validate the candidate ID from the request parameter
 	objectID, err := uuid.Parse(ctx.Param("ID"))
 	if err != nil {
 		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
@@ -555,9 +555,9 @@ func (db Database) AssignProjectToCondidats(ctx *gin.Context) {
 		return
 	}
 
-	// Check if the condidat with the specified ID exists
+	// Check if the candidate with the specified ID exists
 	if err := domains.CheckByID(db.DB, &domains.Condidats{}, objectID); err != nil {
-		logrus.Error("Error checking if the condidat with the specified ID exists. Error: ", err.Error())
+		logrus.Error("Error checking if the candidate with the specified ID exists. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusNotFound, constants.DATA_NOT_FOUND, utils.Null())
 		return
 	}

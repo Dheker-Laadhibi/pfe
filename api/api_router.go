@@ -2,8 +2,8 @@ package api
 
 import (
 	"labs/api/auth"
+	"labs/api/candidats"
 	"labs/api/companies"
-	"labs/api/condidats"
 	"labs/api/interns"
 	"labs/api/mission_orders"
 	"labs/api/notifications"
@@ -46,11 +46,10 @@ func RoutesApiInit(router *gin.Engine, db *gorm.DB) {
 		// Initialize MissionsOrders routes
 		mission_orders.MissionOrdersRouterInit(api, db)
 
-		//  Initialize condidats routes
-		condidats.CondidatRouterInit(api, db)
-		    
 		//  Initialize projects routes
 		projects.ProjectRouterInit(api, db)
 
+		//  Initialize candidats routes
+		candidats.CandidatRouterInit(api, db)
 	}
 }

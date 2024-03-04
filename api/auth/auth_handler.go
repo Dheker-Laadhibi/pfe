@@ -137,7 +137,7 @@ func (db Database) SigninUser(ctx *gin.Context) {
 	if isTrue := utils.ComparePassword(data.Password, user.Password); !isTrue {
 		logrus.Error("Password comparison failed.")
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNAUTHORIZED, utils.Null())
-		return
+		return	
 	}
 
 	// Retrieve user roles from the database

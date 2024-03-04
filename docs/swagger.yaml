@@ -326,22 +326,22 @@ definitions:
         type: string
     type: object
   LoggedIn:
-    description: LoggedIn represents the user details after successful login.
+    description: LoggedIn represents the candidat details after successful login.
     properties:
       ID:
-        description: ID is the unique identifier for the user.
+        description: ID is the unique identifier for the candidat.
         type: string
       email:
-        description: Email is the email address of the user.
+        description: Email is the email address of the candidat.
         type: string
-      name:
-        description: Name is the name of the user.
+      first_name:
+        description: Name is the name of the candidat.
         type: string
-      profilePicture:
-        description: ProfilePicture is the URL or path to the user's profile picture.
+      last_name:
+        description: Name is the name of the candidat.
         type: string
       workCompanyId:
-        description: CompanyID is the unique identifier for the user's company.
+        description: CompanyID is the unique identifier for the candidat company.
         type: string
     type: object
   LoggedInResponse:
@@ -639,7 +639,7 @@ definitions:
         type: string
     type: object
   Signin:
-    description: Signin represents the information required for signing in.
+    description: Signin represents the information required for signing in candidat.
     properties:
       email:
         description: Email is the email address of the user. It is required, should
@@ -1140,7 +1140,7 @@ paths:
       - Companies
   /condidats/{companyID}:
     get:
-      description: Get all condidats.
+      description: Get all Candidats .
       parameters:
       - description: Page
         in: query
@@ -1180,13 +1180,13 @@ paths:
             $ref: '#/definitions/ApiResponse'
       security:
       - ApiKeyAuth: []
-      summary: Get condidats
+      summary: Get Candidats
       tags:
       - Condidats
     post:
       consumes:
       - application/json
-      description: Create a new condidat.
+      description: Create a new candidate.
       parameters:
       - description: Company ID
         in: path
@@ -1224,19 +1224,19 @@ paths:
             $ref: '#/definitions/ApiResponse'
       security:
       - ApiKeyAuth: []
-      summary: Create condidat
+      summary: Create candidate
       tags:
       - Condidats
   /condidats/{companyID}/{ID}:
     delete:
-      description: "Delete one Condidat\t."
+      description: "Delete one candidat\t."
       parameters:
       - description: Company ID
         in: path
         name: companyID
         required: true
         type: string
-      - description: Condidats ID
+      - description: candidat ID
         in: path
         name: ID
         required: true
@@ -1266,18 +1266,18 @@ paths:
             $ref: '#/definitions/ApiResponse'
       security:
       - ApiKeyAuth: []
-      summary: Delete Condidat
+      summary: Delete candidat
       tags:
       - Condidats
     get:
-      description: Get one condidat.
+      description: Get one candidat.
       parameters:
       - description: Company ID
         in: path
         name: companyID
         required: true
         type: string
-      - description: condidats ID
+      - description: candidat ID
         in: path
         name: ID
         required: true
@@ -1307,25 +1307,25 @@ paths:
             $ref: '#/definitions/ApiResponse'
       security:
       - ApiKeyAuth: []
-      summary: Get condidat
+      summary: Get candidat
       tags:
       - Condidats
     put:
       consumes:
       - application/json
-      description: Update one condidat.
+      description: Update one candidat.
       parameters:
       - description: Company ID
         in: path
         name: companyID
         required: true
         type: string
-      - description: Condidat ID
+      - description: candidat ID
         in: path
         name: ID
         required: true
         type: string
-      - description: Condidat query params
+      - description: candidat query params
         in: body
         name: request
         required: true
@@ -1356,12 +1356,55 @@ paths:
             $ref: '#/definitions/ApiResponse'
       security:
       - ApiKeyAuth: []
-      summary: Update condidat
+      summary: Update candidat
+      tags:
+      - Condidats
+  /condidats/{companyID}/Signin:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate and log in a uscandidater.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      - description: candidat query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/Signin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/LoggedIn'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      summary: Signin
       tags:
       - Condidats
   /condidats/{companyID}/count:
     get:
-      description: Get number of all condidats.
+      description: Get number of all Candidats .
       parameters:
       - description: Company ID
         in: path
@@ -1393,12 +1436,12 @@ paths:
             $ref: '#/definitions/ApiResponse'
       security:
       - ApiKeyAuth: []
-      summary: Get number of  condidats
+      summary: Get number of  Candidats
       tags:
       - Condidats
   /condidats/{companyID}/list:
     get:
-      description: Get list of all Condidats.
+      description: Get list of all Candidats.
       parameters:
       - description: Company ID
         in: path
@@ -1432,7 +1475,7 @@ paths:
             $ref: '#/definitions/ApiResponse'
       security:
       - ApiKeyAuth: []
-      summary: Get list of  Condidats
+      summary: Get list of  Candidats
       tags:
       - Condidats
   /interns/{companyID}:
@@ -2671,7 +2714,7 @@ paths:
         name: companyID
         required: true
         type: string
-      - description: condidat ID
+      - description: candidate ID
         in: path
         name: ID
         required: true
