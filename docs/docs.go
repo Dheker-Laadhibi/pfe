@@ -4597,7 +4597,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "ProjectsCondidats"
+                    "Project"
                 ],
                 "summary": "assign Project",
                 "parameters": [

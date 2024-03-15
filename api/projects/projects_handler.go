@@ -516,7 +516,7 @@ func (db Database) DeleteProject(ctx *gin.Context) {
 // AssignProject	AssignProjectToCondidats.
 // @Summary        	assign Project
 // @Description    	assign one Project.
-// @Tags			ProjectsCondidats
+// @Tags			Project
 // @Produce			json
 // @Security 		ApiKeyAuth
 // @Param			companyID			path			string			true	"Company ID"

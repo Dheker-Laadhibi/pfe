@@ -110,7 +110,7 @@ func GetBoolEnv(name string) (bool, error) {
 	// Return the parsed boolean value and a nil error if parsing is successful
 	return parsedBool, nil
 }
-
+//parse from string  to integer 
 func GetIntEnv(name string) (int, error) {
 
 	// Retrieve the value of the environment variable as a string using GetStringEnv

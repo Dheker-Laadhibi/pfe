@@ -69,9 +69,10 @@ func GenerateToken(id, companyID uuid.UUID, roleID uuid.UUID) string {
 		logrus.Fatal("An error occurred when reading value from env. Error", err.Error())
 	}
 
-	// Set JWT claims including expiration time, issued at time, user ID, company ID, and roles
+	// Set JWT claims including expiration time, issued at time, user ID, company ID, and role
 	claims := jwt.MapClaims{
-		"exp":        time.Now().Add(time.Hour * time.Duration(duration)).Unix(),
+		"exp": time.Now().Add(time.Hour * time.Duration(duration)).Unix(),
+		//creation date of jeton
 		"iat":        time.Now().Unix(),
 		"user_id":    id,
 		"company_id": companyID,

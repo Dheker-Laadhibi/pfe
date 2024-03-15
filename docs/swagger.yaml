@@ -4304,7 +4304,7 @@ paths:
       - ApiKeyAuth: []
       summary: assign Project
       tags:
-      - ProjectsCondidats
+      - Project
   /projects/{companyID}/count:
     get:
       description: Get number of all projects.
