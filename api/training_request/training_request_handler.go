@@ -1,4 +1,4 @@
-package mission_orders
+package training_request
 
 import (
 	"labs/constants"
