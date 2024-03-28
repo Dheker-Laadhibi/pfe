@@ -17,6 +17,7 @@ import (
 	"labs/api/roles"
 	"labs/api/tests"
 	"labs/api/training_request"
+	"labs/api/user_experience"
 	"labs/api/users"
 
 	"github.com/gin-gonic/gin"
@@ -77,6 +78,13 @@ func RoutesApiInit(router *gin.Engine, db *gorm.DB) {
 		projects.ProjectRouterInit(api, db)
 		//initialize TrainingRequest
 		training_request.TrainingRequestRouterInit(api, db)
+	//initialize TrainingRequest
+	user_experience.ExperienceRouterInit(api, db)
+
+
+
+
+
 
 	}
 }

@@ -41,6 +41,7 @@ type LoanRequests struct {
 	ReasonForLoan string    `gorm:"column:reason_for_loan; not null"`            // Reason or explanation for requesting the loan.
 	Status        string    `gorm:"column:status; not null; default:pending"`    // Status of the loan requests request (e.g., pending, approved, rejected).
 	PathDocument  string    `gorm:"column:path_document; not null"`              // The path document for the loan request
+	CompanyID     uuid.UUID `json:"companyID" binding:"required"`                // CompanyID is the unique identifier for the company associated with the loan request. It is required.
 	UserID        uuid.UUID `gorm:"column:user_id;"`                             // User ID associated with the loan request
 	gorm.Model
 }

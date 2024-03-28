@@ -1,4 +1,4 @@
-package projects
+package user_experience
 
 import (
 	"labs/constants"
@@ -6,35 +6,42 @@ import (
 	"labs/utils"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 )
 
-// CreateProject		Handles the creation of a new Project.
-// @Summary        	Create Project
-// @Description    	Create a new Project.
-// @Tags			Project
-// @Accept			json
-// @Produce			json
-// @Security 		ApiKeyAuth
-// @Param			companyID		path			string				true		"Company ID"
-// @Param			request			body			projects.ProjectIn		true		"project query params"
-// @Success			201				{object}		utils.ApiResponses
-// @Failure			400				{object}		utils.ApiResponses	"Invalid request"
-// @Failure			401				{object}		utils.ApiResponses	"Unauthorized"
-// @Failure			403				{object}		utils.ApiResponses	"Forbidden"
-// @Failure			500				{object}		utils.ApiResponses	"Internal Server Error"
-// @Router			/projects/{companyID}	[post]
-func (db Database) CreateProject(ctx *gin.Context) {
+// CreateUserExperience	Handles the creation of a new UserExperience	.
+// @Summary        		Create UserExperience
+// @Description    		Create a new UserExperience.
+// @Tags				UserExperience
+// @Accept				json
+// @Produce				json
+// @Security 			ApiKeyAuth
+// @Param				companyID		path				string				true			"companyID"
+// @Param				userID			path			    string				true		    "userID"
+// @Param				request			body			user_experience.ExperienceIn		true		"project query params"
+// @Success				201				{object}		utils.ApiResponses
+// @Failure				400				{object}		utils.ApiResponses	"Invalid request"
+// @Failure				401				{object}		utils.ApiResponses	"Unauthorized"
+// @Failure				403				{object}		utils.ApiResponses	"Forbidden"
+// @Failure				500				{object}		utils.ApiResponses	"Internal Server Error"
+// @Router				/experience/{companyID}/create/{userID}	[post]
+func (db Database) CreateUserExperience(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
 
 	// Parse and validate the company ID from the request parameter
 	companyID, err := uuid.Parse(ctx.Param("companyID"))
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+	// Parse and validate the company ID from the request parameter
+	userID, err := uuid.Parse(ctx.Param("userID"))
 	if err != nil {
 		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
@@ -47,77 +54,49 @@ func (db Database) CreateProject(ctx *gin.Context) {
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
 		return
 	}
-
-	// Parse the incoming JSON request into a ProjectIn struct
-	project := new(ProjectIn)
-	if err := ctx.ShouldBindJSON(project); err != nil {
+	// Parse the incoming JSON request into a ExperienceIn struct
+	experience := new(ExperienceIn)
+	if err := ctx.ShouldBindJSON(experience); err != nil {
 		logrus.Error("Error mapping request from frontend. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
 		return
 	}
 
-	layout := "2006-01-02" // Format de date année-mois-jour
-
-	// Analyser la date ExpDate en tant que time.Time
-	dt, err := time.Parse(layout, project.ExpDate)
-	if err != nil {
-		logrus.Error("Erreur lors de l'analyse de la date : ", err.Error())
-		// Gérer l'erreur ici
-	}
-
 	// Create a new project in the database
-	dbProject := &domains.Project{
-		ID:           uuid.New(),
-		Code:         project.Code,
-		Projectname:  project.Projectname,
-		Specialty:    project.Specialty,
-		Technologies: project.Technologies,
-		Description:  project.Description,
-		ExpDate:      dt,
-		CompanyID:    project.CompanyID,
-		// ExpDate: project.,
+	dbExperience := &domains.UserExperience{
+		ID:                   uuid.New(),
+		ProfessionalTraining: experience.ProfessionalTraining,
+		UserID:               userID,
+		CompanyID:            companyID,
 	}
-
-	// Vérifier si le code de projet existe déjà dans la base de données
-	exists, err := domains.CheckProjectCodeExists(db.DB, project.Code)
-	if err != nil {
-		logrus.Error("Erreur lors de la vérification de l'existence du code de projet dans la base de données : ", err.Error())
-		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
-		return
-	} else if exists {
-		logrus.Error("Le code de projet existe déjà dans la base de données.")
-		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.DUPLICATE_CODE, utils.Null())
-		return
-	}
-
 	// Créer le projet uniquement si le code de projet n'existe pas déjà dans la base de données
-	if err := domains.Create(db.DB, dbProject); err != nil {
+	if err := domains.Create(db.DB, dbExperience); err != nil {
 		logrus.Error("Erreur lors de l'enregistrement des données dans la base de données. Erreur: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
 		return
 	}
-
 	// Répondre avec succès
 	utils.BuildResponse(ctx, http.StatusCreated, constants.CREATED, utils.Null())
-
 }
 
-// ReadProjects		Handles the retrieval of all Project.
-// @Summary        	Get projects
-// @Description    	Get all projects.
-// @Tags			Project
+// read all and Get   list demand a relation with company id ??!
+
+// ReadUserExperience	Handles the retrieval of all UserExperiences.
+// @Summary        	Get UserExperience
+// @Description    	Get all UserExperience.
+// @Tags			UserExperience
 // @Produce			json
 // @Security 		ApiKeyAuth
 // @Param			page			query		int			false		"Page"
 // @Param			limit			query		int			false		"Limit"
 // @Param			companyID		path		string		true		"Company ID"
-// @Success			200				{object}	projects.projectsPagination
+// @Success			200				{object}	user_experience.ExperiencePagination
 // @Failure			400				{object}	utils.ApiResponses		"Invalid request"
 // @Failure			401				{object}	utils.ApiResponses		"Unauthorized"
 // @Failure			403				{object}	utils.ApiResponses		"Forbidden"
 // @Failure			500				{object}	utils.ApiResponses		"Internal Server Error"
-// @Router			/projects/{companyID}	[get]
-func (db Database) ReadProjects(ctx *gin.Context) {
+// @Router			/experience/{companyID}	[get]
+func (db Database) ReadUserExperience(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
@@ -171,8 +150,8 @@ func (db Database) ReadProjects(ctx *gin.Context) {
 		return
 	}
 
-	// Retrieve all project data from the database
-	projects, err := ReadAllPagination(db.DB, []domains.Project{}, session.CompanyID, limit, offset)
+	// Retrieve all experiences data from the database
+	experiences, err := ReadAllPagination(db.DB, []domains.UserExperience{}, session.CompanyID, limit, offset)
 	if err != nil {
 		logrus.Error("Error occurred while finding all project data. Error: ", err)
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
@@ -180,7 +159,7 @@ func (db Database) ReadProjects(ctx *gin.Context) {
 	}
 
 	// Retrieve total count
-	count, err := domains.ReadTotalCount(db.DB, &domains.Project{}, "company_id", companyID)
+	count, err := domains.ReadTotalCount(db.DB, &domains.UserExperience{}, "company_id", session.CompanyID)
 	if err != nil {
 		logrus.Error("Error occurred while finding total count. Error: ", err)
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
@@ -188,17 +167,13 @@ func (db Database) ReadProjects(ctx *gin.Context) {
 	}
 
 	// Generate a project structure as a response
-	response := projectsPagination{}
-	dataTableProject := []ProjectTable{}
-	for _, project := range projects {
+	response := ExperiencePagination{}
+	dataTableProject := []ExperienceTable{}
+	for _, experience := range experiences {
 
-		dataTableProject = append(dataTableProject, ProjectTable{
-			ID:           project.ID,
-			Code:         project.Code,
-			Projectname:  project.Projectname,
-			CompanyID:    project.CompanyID,
-			Technologies: project.Technologies,
-			ExpDate:      project.ExpDate,
+		dataTableProject = append(dataTableProject, ExperienceTable{
+			ID:                   experience.ID,
+			ProfessionalTraining: experience.ProfessionalTraining,
 		})
 	}
 	response.Items = dataTableProject
@@ -210,20 +185,20 @@ func (db Database) ReadProjects(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, response)
 }
 
-// ReadProjectsList 	Handles the retrieval the list of all Projects.
-// @Summary        	Get list of  Projects
-// @Description    	Get list of all Projects.
-// @Tags			Project
+// ReadExperienceList	Handles the retrieval the list of all Experiences.
+// @Summary        	Get list of  Experiences
+// @Description    	Get list of all Experiences.
+// @Tags			UserExperience
 // @Produce			json
 // @Security 		ApiKeyAuth
 // @Param			companyID			path			string			true	"Company ID"
-// @Success			200					{array}			projects.ProjectsList
-// @Failure			400					{object}		utils.ApiResponses		"Invalid request"
+// @Success			200					{array}			user_experience.ExperienceList
+// @Failure			400			    	{object}		utils.ApiResponses		"Invalid request"
 // @Failure			401					{object}		utils.ApiResponses		"Unauthorized"
 // @Failure			403					{object}		utils.ApiResponses		"Forbidden"
 // @Failure			500					{object}		utils.ApiResponses		"Internal Server Error"
-// @Router			/projects/{companyID}/list	[get]
-func (db Database) ReadProjectsList(ctx *gin.Context) {
+// @Router			/experience/{companyID}/list	[get]
+func (db Database) ReadExperiencesList(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
@@ -243,8 +218,8 @@ func (db Database) ReadProjectsList(ctx *gin.Context) {
 		return
 	}
 
-	// Retrieve all project data from the database
-	projects, err := ReadAllList(db.DB, []domains.Project{}, session.CompanyID)
+	// Retrieve all UserExperiences data from the database
+	experiences, err := ReadAllList(db.DB, []domains.UserExperience{}, session.CompanyID)
 	if err != nil {
 		logrus.Error("Error occurred while finding all project data. Error: ", err)
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
@@ -252,12 +227,12 @@ func (db Database) ReadProjectsList(ctx *gin.Context) {
 	}
 
 	// Generate a project structure as a response
-	projectList := []ProjectsList{}
-	for _, project := range projects {
-		projectList = append(projectList, ProjectsList{
-			ID:          project.ID,
-			Code:        project.Code,
-			Projectname: project.Projectname,
+	projectList := []ExperienceList{}
+	for _, exp := range experiences {
+		projectList = append(projectList, ExperienceList{
+			ID: exp.ID,
+
+			ProfessionalTraining: exp.ProfessionalTraining,
 		})
 	}
 
@@ -265,20 +240,20 @@ func (db Database) ReadProjectsList(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, projectList)
 }
 
-// ReadProjectsCount 	Handles the retrieval the number of all projects.
-// @Summary        	Get number of  projects
-// @Description    	Get number of all projects.
-// @Tags			Project
+// ReadExperienceCount	Handles the retrieval the number of all experiences.
+// @Summary        	Get number of  Experiences
+// @Description    	Get number of all Experiences.
+// @Tags			UserExperience
 // @Produce			json
 // @Security 		ApiKeyAuth
 // @Param			companyID				path			string		true	"Company ID"
-// @Success			200						{object}		projects.ProjectsCount
+// @Success			200						{object}		user_experience.ExperienceCount
 // @Failure			400						{object}		utils.ApiResponses	"Invalid request"
 // @Failure			401						{object}		utils.ApiResponses	"Unauthorized"
 // @Failure			403						{object}		utils.ApiResponses	"Forbidden"
 // @Failure			500						{object}		utils.ApiResponses	"Internal Server Error"
-// @Router			/projects/{companyID}/count	[get]
-func (db Database) ReadProjectsCount(ctx *gin.Context) {
+// @Router			/experience/{companyID}/count	[get]
+func (db Database) ReadUserExperiencesCount(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
@@ -299,7 +274,7 @@ func (db Database) ReadProjectsCount(ctx *gin.Context) {
 	}
 
 	// Retrieve all project data from the database
-	projects, err := domains.ReadTotalCount(db.DB, &[]domains.Project{}, "company_id", session.CompanyID)
+	Usersexperiences, err := domains.ReadTotalCount(db.DB, &[]domains.UserExperience{}, "company_id", session.CompanyID)
 	if err != nil {
 		logrus.Error("Error occurred while finding all project data. Error: ", err)
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
@@ -307,29 +282,29 @@ func (db Database) ReadProjectsCount(ctx *gin.Context) {
 	}
 
 	// Generate a project structure as a response
-	ProjectsCount := ProjectsCount{
-		Count: projects,
+	ExperiencesCount := ExperienceCount{
+		Count: Usersexperiences,
 	}
 
 	// Respond with success
-	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, ProjectsCount)
+	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, ExperiencesCount)
 }
 
-// ReadProject		Handles the retrieval of one Project.
-// @Summary        	Get Project
-// @Description    	Get one Project.
-// @Tags			Project
+// ReadUserExperience	Handles the retrieval of one UserExperience.
+// @Summary        	Get UserExperience
+// @Description    	Get one UserExperience.
+// @Tags			 UserExperience
 // @Produce			json
 // @Security 		ApiKeyAuth
 // @Param			companyID			path			string			true	"Company ID"
-// @Param			ID					path			string			true	"Project ID"
-// @Success			200					{object}		projects.projectsDetails
+// @Param			ID					path			string			true	"Experience ID"
+// @Success			200					{object}		user_experience.ExperienceDetails
 // @Failure			400					{object}		utils.ApiResponses		"Invalid request"
 // @Failure			401					{object}		utils.ApiResponses		"Unauthorized"
 // @Failure			403					{object}		utils.ApiResponses		"Forbidden"
 // @Failure			500					{object}		utils.ApiResponses		"Internal Server Error"
-// @Router			/projects/{companyID}/{ID}	[get]
-func (db Database) ReadProject(ctx *gin.Context) {
+// @Router			/experience/{companyID}/{ID}/Get	[get]
+func (db Database) ReadOneUserExperiences(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
@@ -342,8 +317,8 @@ func (db Database) ReadProject(ctx *gin.Context) {
 		return
 	}
 
-	// Parse and validate the project ID from the request parameter
-	objectID, err := uuid.Parse(ctx.Param("ID"))
+	// Parse and validate the user ID from the request parameter
+	ExperienceID, err := uuid.Parse(ctx.Param("ID"))
 	if err != nil {
 		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
@@ -358,7 +333,7 @@ func (db Database) ReadProject(ctx *gin.Context) {
 	}
 
 	// Retrieve project data from the database
-	project, err := ReadByID(db.DB, domains.Project{}, objectID)
+	exp, err := 	ReadByID(db.DB, domains.UserExperience{}, ExperienceID)
 	if err != nil {
 		logrus.Error("Error retrieving project data from the database. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.DATA_NOT_FOUND, utils.Null())
@@ -366,36 +341,33 @@ func (db Database) ReadProject(ctx *gin.Context) {
 	}
 
 	// Generate a project structure as a response
-	details := projectsDetails{
-		ID:           project.ID,
-		Code:         project.Code,
-		Projectname:  project.Projectname,
-		CompanyID:    project.CompanyID,
-		Technologies: project.Technologies,
-		ExpDate:      project.ExpDate,
+	details := ExperienceDetails{
+		ID:                   exp.ID,
+		ProfessionalTraining: exp.ProfessionalTraining,
+		CompanyID:            exp.CompanyID,
 	}
 
 	// Respond with success
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, details)
 }
 
-// UpdateProject 		Handles the update of a Project .
-// @Summary        	Update Project
-// @Description    	Update Project .
-// @Tags			Project
+// UpdateUserExperience		Handles the update of a  UserExperience .
+// @Summary        	Update  UserExperience
+// @Description    	Update  UserExperience .
+// @Tags			 UserExperience
 // @Accept			json
 // @Produce			json
 // @Security 		ApiKeyAuth
 // @Param			companyID			path			string				true	"Company ID"
-// @Param			ID					path			string				true	"Project  ID"
-// @Param			request				body			projects.ProjectIn		true	"Project query params"
+// @Param			ID					path			string				true	"experience  ID"
+// @Param			request				body			user_experience.ExperienceIn		true	"Project query params"
 // @Success			200					{object}		utils.ApiResponses
 // @Failure			400					{object}		utils.ApiResponses			"Invalid request"
 // @Failure			401					{object}		utils.ApiResponses			"Unauthorized"
 // @Failure			403					{object}		utils.ApiResponses			"Forbidden"
 // @Failure			500					{object}		utils.ApiResponses			"Internal Server Error"
-// @Router			/projects/{companyID}/{ID}	[put]
-func (db Database) UpdateProject(ctx *gin.Context) {
+// @Router			/experience/{companyID}/{ID}/update	[put]
+func (db Database) UpdateUserExperience(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
@@ -424,52 +396,54 @@ func (db Database) UpdateProject(ctx *gin.Context) {
 	}
 
 	// Parse the incoming JSON request into a ProjectIn struct
-	project := new(ProjectIn)
-	if err := ctx.ShouldBindJSON(project); err != nil {
+	experience := new(ExperienceIn)
+	if err := ctx.ShouldBindJSON(experience); err != nil {
 		logrus.Error("Error mapping request from frontend. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
 		return
 	}
 
 	// Check if the project with the specified ID exists
-	if err = domains.CheckByID(db.DB, &domains.Project{}, objectID); err != nil {
+	if err = domains.CheckByID(db.DB, &domains.UserExperience{}, objectID); err != nil {
 		logrus.Error("Error checking if the project with the specified ID exists. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
 		return
 	}
-
 	// Update the project data in the database
-	dbProject := &domains.Project{
+	dbExperience := &domains.UserExperience{
 
-		Projectname:  project.Projectname,
-		Technologies: project.Technologies,
+		ProfessionalTraining:  experience.ProfessionalTraining,
+
 	}
+
+
 	
-	if err = domains.Update(db.DB, dbProject, objectID); err != nil {
+	
+	if err = domains.Update(db.DB, dbExperience, objectID); err != nil {
 		logrus.Error("Error updating project data in the database. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
 		return
 	}
-
 	// Respond with success
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, utils.Null())
+
 }
 
-// DeleteProject	 	Handles the deletion of a Project.
-// @Summary        	Delete Project
-// @Description    	Delete one Project.
-// @Tags			Project
+// DeleteUserExperience	 	Handles the deletion of a UserExperience.
+// @Summary        	Delete  UserExperience
+// @Description    	Delete one UserExperience.
+// @Tags			UserExperience
 // @Produce			json
 // @Security 		ApiKeyAuth
 // @Param			companyID			path			string			true	"Company ID"
-// @Param			ID					path			string			true	"Project ID"
+// @Param			ID					path			string			true	"Experience ID"
 // @Success			200					{object}		utils.ApiResponses
 // @Failure			400					{object}		utils.ApiResponses		"Invalid request"
 // @Failure			401					{object}		utils.ApiResponses		"Unauthorized"
 // @Failure			403					{object}		utils.ApiResponses		"Forbidden"
 // @Failure			500					{object}		utils.ApiResponses		"Internal Server Error"
-// @Router			/projects/{companyID}/{ID}	[delete]
-func (db Database) DeleteProject(ctx *gin.Context) {
+// @Router			/experience/{companyID}/{ID}	[delete]
+func (db Database) DeleteExperience(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
@@ -483,7 +457,7 @@ func (db Database) DeleteProject(ctx *gin.Context) {
 	}
 
 	// Parse and validate the project ID from the request parameter
-	objectID, err := uuid.Parse(ctx.Param("ID"))
+	ExperienceID, err := uuid.Parse(ctx.Param("ID"))
 	if err != nil {
 		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
@@ -497,15 +471,15 @@ func (db Database) DeleteProject(ctx *gin.Context) {
 		return
 	}
 
-	// Check if the project with the specified ID exists
-	if err := domains.CheckByID(db.DB, &domains.Project{}, objectID); err != nil {
+	// Check if the user experience  with the specified ID exists
+	if err := domains.CheckByID(db.DB, &domains.UserExperience{}, ExperienceID); err != nil {
 		logrus.Error("Error checking if the project with the specified ID exists. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusNotFound, constants.DATA_NOT_FOUND, utils.Null())
 		return
 	}
 
-	// Delete the project data from the database
-	if err := domains.Delete(db.DB, &domains.Project{}, objectID); err != nil {
+	// Delete the experience  data from the database
+	if err := domains.Delete(db.DB, &domains.UserExperience{}, ExperienceID); err != nil {
 		logrus.Error("Error deleting project data from the database. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
 		return
@@ -513,93 +487,4 @@ func (db Database) DeleteProject(ctx *gin.Context) {
 
 	// Respond with success
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, utils.Null())
-}
-
-// AssignProject	AssignProjectToCondidats.
-// @Summary        	assign Project
-// @Description    	assign one Project.
-// @Tags			ProjectsCondidats
-// @Produce			json
-// @Security 		ApiKeyAuth
-// @Param			companyID			path			string			true	"Company ID"
-// @Param			ID					path			string			true	"candidate ID"
-// @Param			request			     body			projects.codeProject		true  "project query params"
-// @Success			200					{object}		utils.ApiResponses
-// @Failure			400					{object}		utils.ApiResponses		"Invalid request"
-// @Failure			401					{object}		utils.ApiResponses		"Unauthorized"
-// @Failure			403					{object}		utils.ApiResponses		"Forbidden"
-// @Failure			500					{object}		utils.ApiResponses		"Internal Server Error"
-// @Router			/projects/{companyID}/{ID}/assign	[post]
-func (db Database) AssignProjectToCondidats(ctx *gin.Context) {
-
-	// Extract JWT values from the context
-	//session := utils.ExtractJWTValues(ctx)
-
-	// Parse and validate the company ID from the request parameter
-	companyID, err := uuid.Parse(ctx.Param("companyID"))
-	if err != nil {
-		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
-		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
-		return
-	}
-	// Check if the candidate with the specified ID exists
-	if err := domains.CheckByID(db.DB, &domains.Companies{}, companyID); err != nil {
-		logrus.Error("Error checking if the candidate with the specified ID exists. Error: ", err.Error())
-		utils.BuildErrorResponse(ctx, http.StatusNotFound, constants.DATA_NOT_FOUND, utils.Null())
-		return
-	}
-
-	// Parse and validate the candidate ID from the request parameter
-	objectID, err := uuid.Parse(ctx.Param("ID"))
-	if err != nil {
-		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
-		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
-		return
-	}
-
-	// Check if the candidate with the specified ID exists
-	if err := domains.CheckByID(db.DB, &domains.Condidats{}, objectID); err != nil {
-		logrus.Error("Error checking if the candidate with the specified ID exists. Error: ", err.Error())
-		utils.BuildErrorResponse(ctx, http.StatusNotFound, constants.DATA_NOT_FOUND, utils.Null())
-		return
-	}
-
-	/*	// Parse the incoming JSON request into a ProjectIn struct
-		project := new(ProjectIn)
-		if err := ctx.ShouldBindJSON(project); err != nil {
-			logrus.Error("Error mapping request from frontend. Error: ", err.Error())
-			utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
-			return
-		}
-	*/
-	projectCode := new(codeProject)
-	if err := ctx.ShouldBindJSON(projectCode); err != nil {
-		logrus.Error("Error parsing request body. Error: ", err.Error())
-		utils.BuildErrorResponse(ctx, http.StatusBadRequest, "Error parsing request body.", nil)
-		return
-	}
-
-	// Query database to find project ID based on project code
-	projectID, err := domains.FindProjectIDByCode(db.DB, projectCode.Code)
-	if err != nil {
-		logrus.Error("Error finding project ID by project code. Error: ", err.Error())
-		utils.BuildErrorResponse(ctx, http.StatusInternalServerError, "Error finding project ID by project code.", nil)
-		return
-	}
-	parsedProjectID, err := uuid.Parse(projectID)
-	if err != nil {
-		logrus.Error("Error parsing project ID: ", err.Error())
-		utils.BuildErrorResponse(ctx, http.StatusInternalServerError, "Error parsing project ID.", nil)
-		return
-	}
-
-	// Assign candidate to project
-	if err := domains.AssignProjectCondidat(db.DB, parsedProjectID, objectID, companyID); err != nil {
-		logrus.Error("Error assigning candidate to project. Error: ", err.Error())
-		utils.BuildErrorResponse(ctx, http.StatusInternalServerError, "Error assigning candidate to project.", nil)
-		return
-	}
-
-	// Respond with success
-	utils.BuildResponse(ctx, http.StatusOK, "Project assigned to candidate successfully.", nil)
 }

@@ -40,5 +40,6 @@ type LeaveRequests struct {
 	Status    string    `gorm:"column:status; not null; default:pending"`    // Status of the Leave requests request (pending, approved, rejected)
 	Reason    string    `gorm:"column:reason; not null; default:false"`      // Reason of the Leave requests
 	UserID    uuid.UUID `gorm:"column:user_id;"`                             // User ID associated with the Leave requests
+	CompanyID uuid.UUID `json:"companyID" binding:"required"`                // CompanyID is the unique identifier for the company associated with the leave request. It is required.
 	gorm.Model
 }

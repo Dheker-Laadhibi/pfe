@@ -19,18 +19,34 @@ import (
 // @Accept			json
 // @Produce			json
 // @Security 		ApiKeyAuth
+// @Param				companyID				path			string		true		"Company ID"
 // @Param			request			body			leaveRequests.LeaveRequestDemande		true		"LeaveRequests query params"
 // @Success			201				{object}		utils.ApiResponses
 // @Failure			400				{object}		utils.ApiResponses	"Invalid request"
 // @Failure			401				{object}		utils.ApiResponses	"Unauthorized"
 // @Failure			403				{object}		utils.ApiResponses	"Forbidden"
 // @Failure			500				{object}		utils.ApiResponses	"Internal Server Error"
-// @Router			/LeaveRequests	[post]
+// @Router			/leave_requests/{companyID}	[post]
 func (db Database) AddLeave(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
 	logrus.Error("userUd from session", session.UserID)
+
+	// Parse and validate the company ID from the request parameter
+	companyID, err := uuid.Parse(ctx.Param("companyID"))
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Check if the employee belongs to the specified company
+	if err := domains.CheckEmployeeBelonging(db.DB, companyID, session.UserID, session.CompanyID); err != nil {
+		logrus.Error("Error verifying employee belonging. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
 
 	// Parse the incoming JSON request into a UserIn struct
 	LeaveRequests := new(LeaveRequestDemande)
@@ -47,6 +63,7 @@ func (db Database) AddLeave(ctx *gin.Context) {
 		EndDate:   LeaveRequests.EndDate,
 		Type:      LeaveRequests.Type,
 		Reason:    LeaveRequests.Reason,
+		CompanyID: companyID,
 		UserID:    session.UserID,
 	}
 	if err := domains.Create(db.DB, dbLeave); err != nil {
@@ -73,7 +90,7 @@ func (db Database) AddLeave(ctx *gin.Context) {
 // @Failure				401					{object}		utils.ApiResponses		"Unauthorized"
 // @Failure				403					{object}		utils.ApiResponses		"Forbidden"
 // @Failure				500					{object}		utils.ApiResponses		"Internal Server Error"
-// @Router				/LeaveRequests/{userID}	[get]
+// @Router				/leave_requests/user/{userID}	[get]
 func (db Database) ReadLeave(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -129,7 +146,7 @@ func (db Database) ReadLeave(ctx *gin.Context) {
 	offset := (page - 1) * limit
 
 	// Retrieve all company data from the database
-	LeaveRequests, err := ReadAllPagination(db.DB, []domains.LeaveRequests{}, userID, limit, offset)
+	LeaveRequests, err := ReadAllPagination(db.DB, []domains.LeaveRequests{}, "user_id", userID, limit, offset)
 	if err != nil {
 		logrus.Error("Error occurred while finding all company data. Error: ", err)
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
@@ -169,6 +186,117 @@ func (db Database) ReadLeave(ctx *gin.Context) {
 
 }
 
+// ReadLeaveRequestsByCompany			Handles the retrieval of all LeaveRequests for a specific company .
+// @Summary        		Get LeaveRequests
+// @Description    		Get all LeaveRequests by companyID.
+// @Tags				LeaveRequests
+// @Produce				json
+// @Security 			ApiKeyAuth
+// @Param				companyID				path			string		true		"Company ID"
+// @Param				page			query		int					false       "Page"
+// @Param				limit			query		int					false	    "Limit"
+// @Success				200					{array}			leaveRequests.LeaveRequestDetails
+// @Failure				400					{object}		utils.ApiResponses		"Invalid request"
+// @Failure				401					{object}		utils.ApiResponses		"Unauthorized"
+// @Failure				403					{object}		utils.ApiResponses		"Forbidden"
+// @Failure				500					{object}		utils.ApiResponses		"Internal Server Error"
+// @Router				/leave_requests/company/{companyID}	[get]
+func (db Database) ReadLeaveByCompany(ctx *gin.Context) {
+
+	// Extract JWT values from the context
+	session := utils.ExtractJWTValues(ctx)
+
+	// Parse and validate the LeaveRequests ID from the request parameter
+	companyID, err := uuid.Parse(ctx.Param("companyID"))
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Check if the employee belongs to the specified company
+	if err := domains.CheckEmployeeBelonging(db.DB, companyID, session.UserID, session.CompanyID); err != nil {
+		logrus.Error("Error verifying employee belonging. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Parse and validate the page from the request parameter
+	page, err := strconv.Atoi(ctx.DefaultQuery("page", strconv.Itoa(constants.DEFAULT_PAGE_PAGINATION)))
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid INT format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Parse and validate the limit from the request parameter
+	limit, err := strconv.Atoi(ctx.DefaultQuery("limit", strconv.Itoa(constants.DEFAULT_LIMIT_PAGINATION)))
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid INT format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Check if the LeaveRequest's value is among the allowed choices
+	validChoices := utils.ResponseLimitPagination()
+	isValidChoice := false
+	for _, choice := range validChoices {
+		if uint(limit) == choice {
+			isValidChoice = true
+			break
+		}
+	}
+
+	// If the value is invalid, set it to default DEFAULT_LIMIT_PAGINATION
+	if !isValidChoice {
+		limit = constants.DEFAULT_LIMIT_PAGINATION
+	}
+
+	// Generate offset
+	offset := (page - 1) * limit
+
+	// Retrieve all company data from the database
+	LeaveRequests, err := ReadAllPagination(db.DB, []domains.LeaveRequests{}, "company_id", companyID, limit, offset)
+	if err != nil {
+		logrus.Error("Error occurred while finding all company data. Error: ", err)
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
+		return
+	}
+
+	// Retriece total count
+	count, err := domains.ReadTotalCount(db.DB, &domains.LeaveRequests{}, "company_id", companyID)
+	if err != nil {
+		logrus.Error("Error occurred while finding total count. Error: ", err)
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
+		return
+	}
+
+	// Generate a LeaveRequests structure as a response
+	response := LeavePagination{}
+	listLeave := []LeaveRequestDetails{}
+	for _, LeaveRequests := range LeaveRequests {
+
+		listLeave = append(listLeave, LeaveRequestDetails{
+			ID:        LeaveRequests.ID,
+			StartDate: LeaveRequests.StartDate,
+			EndDate:   LeaveRequests.EndDate,
+			Status:    LeaveRequests.Status,
+			Reason:    LeaveRequests.Reason,
+			UserID:    LeaveRequests.UserID,
+			CreatedAt: LeaveRequests.CreatedAt,
+		})
+	}
+
+	response.Items = listLeave
+	response.Page = uint(page)
+	response.Limit = uint(limit)
+	response.TotalCount = count
+
+	// Respond with success
+	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, response)
+
+}
+
 // ReadLeaveRequestsCount	Handles the retrieval the number of all LeaveRequests.
 // @Summary        			Get LeaveRequests count
 // @Description    			Get all LeaveRequests count.
@@ -181,7 +309,7 @@ func (db Database) ReadLeave(ctx *gin.Context) {
 // @Failure					401					{object}		utils.ApiResponses		"Unauthorized"
 // @Failure					403					{object}		utils.ApiResponses		"Forbidden"
 // @Failure					500					{object}		utils.ApiResponses		"Internal Server Error"
-// @Router					/LeaveRequests/{userID}/count	[get]
+// @Router					/leave_requests/{userID}/count	[get]
 func (db Database) ReadLeaveCount(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -218,6 +346,59 @@ func (db Database) ReadLeaveCount(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, count)
 }
 
+//*************************
+
+// ReadLeaveRequestsCountByCompany	Handles the retrieval the number of all LeaveRequests for a specific companyID.
+// @Summary        			Get LeaveRequests count
+// @Description    			Get all LeaveRequests count for a specific companyID.
+// @Tags					LeaveRequests
+// @Produce					json
+// @Security 				ApiKeyAuth
+// @Param					companyID				path			string		true		"Company ID"
+// @Success					200					{object}		leaveRequests.LeaveRequestCount
+// @Failure					400					{object}		utils.ApiResponses		"Invalid request"
+// @Failure					401					{object}		utils.ApiResponses		"Unauthorized"
+// @Failure					403					{object}		utils.ApiResponses		"Forbidden"
+// @Failure					500					{object}		utils.ApiResponses		"Internal Server Error"
+// @Router					/leave_requests/count/{companyID}	[get]
+func (db Database) ReadLeaveCountByCompany(ctx *gin.Context) {
+
+	// Extract JWT values from the context
+	session := utils.ExtractJWTValues(ctx)
+
+	// Parse and validate the LeaveRequests ID from the request parameter
+	companyID, err := uuid.Parse(ctx.Param("companyID"))
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Check if the employee belongs to the specified company
+	if err := domains.CheckEmployeeBelonging(db.DB, companyID, session.UserID, session.CompanyID); err != nil {
+		logrus.Error("Error verifying employee belonging. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Retrieve all LeaveRequests data from the database
+	LeaveRequests, err := domains.ReadTotalCount(db.DB, &domains.LeaveRequests{}, "company_id", companyID)
+	if err != nil {
+		logrus.Error("Error occurred while finding all leave requests data. Error: ", err)
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
+		return
+	}
+
+	count := LeaveRequestCount{
+		Count: LeaveRequests,
+	}
+
+	// Respond with success
+	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, count)
+}
+
+//*************************
+
 // ReadLeaveRequests		Handles the retrieval of one LeaveRequests.
 // @Summary        		Get LeaveRequests
 // @Description    		Get one LeaveRequests.
@@ -231,7 +412,7 @@ func (db Database) ReadLeaveCount(ctx *gin.Context) {
 // @Failure				401						{object}		utils.ApiResponses		"Unauthorized"
 // @Failure				403						{object}		utils.ApiResponses		"Forbidden"
 // @Failure				500						{object}		utils.ApiResponses		"Internal Server Error"
-// @Router				/LeaveRequests/{userID}/{ID}	[get]
+// @Router				/leave_requests/{userID}/{ID}	[get]
 func (db Database) ReadOneLeave(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -297,7 +478,7 @@ func (db Database) ReadOneLeave(ctx *gin.Context) {
 // @Failure				401						{object}		utils.ApiResponses		"Unauthorized"
 // @Failure				403						{object}		utils.ApiResponses		"Forbidden"
 // @Failure				500						{object}		utils.ApiResponses		"Internal Server Error"
-// @Router				/LeaveRequests/{userID}/{ID}	[put]
+// @Router				/leave_requests/{userID}/{ID}	[put]
 func (db Database) UpdateLeave(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -369,7 +550,7 @@ func (db Database) UpdateLeave(ctx *gin.Context) {
 // @Failure				401						{object}		utils.ApiResponses			"Unauthorized"
 // @Failure				403						{object}		utils.ApiResponses			"Forbidden"
 // @Failure				500						{object}		utils.ApiResponses			"Internal Server Error"
-// @Router				/LeaveRequests/{userID}/{ID}	[delete]
+// @Router				/leave_requests/{userID}/{ID}	[delete]
 func (db Database) DeleteLeave(ctx *gin.Context) {
 
 	// Extract JWT values from the context

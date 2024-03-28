@@ -19,40 +19,50 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/AdvanceSalaryRequests": {
-            "post": {
+        "/advance_salaryRequests/company/{companyID}": {
+            "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Create a new AdvanceSalaryRequests.",
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "Get all AdvanceSalaryRequests by companyID.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "AdvanceSalaryRequests"
                 ],
-                "summary": "Create AdvanceSalaryRequestsdemande",
+                "summary": "Get AdvanceSalaryRequests",
                 "parameters": [
                     {
-                        "description": "AdvanceSalaryRequestsquery params",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/AdvanceSalaryRequestDemande"
-                        }
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ApiResponse"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/AdvanceSalaryRequestDetails"
+                            }
                         }
                     },
                     "400": {
@@ -82,7 +92,65 @@ const docTemplate = `{
                 }
             }
         },
-        "/AdvanceSalaryRequests/{userID}": {
+        "/advance_salaryRequests/count/{companyID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all AdvanceSalaryRequestscount by company.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AdvanceSalaryRequests"
+                ],
+                "summary": "Get AdvanceSalaryRequestscount",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/AdvanceSalaryRequestCount"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/advance_salaryRequests/user/{userID}": {
             "get": {
                 "security": [
                     {
@@ -155,14 +223,84 @@ const docTemplate = `{
                 }
             }
         },
-        "/AdvanceSalaryRequests/{userID}/count": {
+        "/advance_salaryRequests/{companyID}": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create a new AdvanceSalaryRequests.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AdvanceSalaryRequests"
+                ],
+                "summary": "Create AdvanceSalaryRequestsdemande",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "AdvanceSalaryRequestsquery params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/AdvanceSalaryRequestDemande"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/advance_salaryRequests/{userID}/count": {
             "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Get all AdvanceSalaryRequestscount.",
+                "description": "Get all AdvanceSalaryRequestscount by user.",
                 "produces": [
                     "application/json"
                 ],
@@ -213,7 +351,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/AdvanceSalaryRequests/{userID}/{ID}": {
+        "/advance_salaryRequests/{userID}/{ID}": {
             "get": {
                 "security": [
                     {
@@ -419,406 +557,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/LeaveRequests": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Create a new LeaveRequests.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "LeaveRequests"
-                ],
-                "summary": "Create LeaveRequests demande",
-                "parameters": [
-                    {
-                        "description": "LeaveRequests query params",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/LeaveDemande"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/LeaveRequests/{userID}": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Get all LeaveRequests.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "LeaveRequests"
-                ],
-                "summary": "Get LeaveRequests",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "userID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Page",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Limit",
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/LeaveDetails"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/LeaveRequests/{userID}/count": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Get all LeaveRequests count.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "LeaveRequests"
-                ],
-                "summary": "Get LeaveRequests count",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "userID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/LeaveCount"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/LeaveRequests/{userID}/{ID}": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Get one LeaveRequests.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "LeaveRequests"
-                ],
-                "summary": "Get LeaveRequests",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "userID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "LeaveRequests ID",
-                        "name": "ID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/LeaveDetails"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Update one LeaveRequests.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "LeaveRequests"
-                ],
-                "summary": "Update LeaveRequests",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "userID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "LeaveRequests ID",
-                        "name": "ID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "LeaveRequests query params",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/LeaveIn"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Delete one LeaveRequests.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "LeaveRequests"
-                ],
-                "summary": "Delete LeaveRequests",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "userID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "LeaveRequests ID",
-                        "name": "ID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/auth/signin": {
             "post": {
                 "description": "Authenticate and log in a user.",
@@ -898,6 +636,76 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/Signup"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/candidats/{companyID}": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create a new candidate.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Condidats"
+                ],
+                "summary": "Create candidate",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "condidat query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/CondidatIn"
                         }
                     }
                 ],
@@ -1309,139 +1117,6 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Create a new candidate.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Condidats"
-                ],
-                "summary": "Create candidate",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Company ID",
-                        "name": "companyID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "condidat query params",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/CondidatIn"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/condidats/{companyID}/Signin": {
-            "post": {
-                "description": "Authenticate and log in a uscandidater.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Condidats"
-                ],
-                "summary": "Signin",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Company ID",
-                        "name": "companyID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "candidat query params",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/Signin"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/LoggedIn"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    }
-                }
             }
         },
         "/condidats/{companyID}/count": {
@@ -1534,6 +1209,71 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/CondidatsList"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/condidats/{companyID}/signin": {
+            "post": {
+                "description": "Authenticate and log in a uscandidater.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Condidats"
+                ],
+                "summary": "Signin",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "candidat query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Signin"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/LoggedIn"
                         }
                     },
                     "400": {
@@ -1766,7 +1506,211 @@ const docTemplate = `{
                 }
             }
         },
-        "/exitPermission": {
+        "/exit_permission/company/{companyID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all exit permission for a specific company .",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ExitPermission"
+                ],
+                "summary": "Get exit permission",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ExitPermissionPagination"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/exit_permission/count/{companyID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all exitPermission count for a specific companyID.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ExitPermission"
+                ],
+                "summary": "Get exitPermission count",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ExitPermissionCount"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/exit_permission/user/{userID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all exit permission for a specific user .",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ExitPermission"
+                ],
+                "summary": "Get exit permission",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ExitPermissionPagination"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/exit_permission/{companyID}": {
             "post": {
                 "security": [
                     {
@@ -1785,6 +1729,13 @@ const docTemplate = `{
                 ],
                 "summary": "Create an exitPermission demande",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
                     {
                         "description": "ExitPermission query params",
                         "name": "request",
@@ -1829,7 +1780,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/exitPermission/user/{userID}/count": {
+        "/exit_permission/{userID}/count": {
             "get": {
                 "security": [
                     {
@@ -1887,7 +1838,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/exitPermission/user/{userID}/{ID}": {
+        "/exit_permission/{userID}/{ID}": {
             "get": {
                 "security": [
                     {
@@ -2093,29 +2044,22 @@ const docTemplate = `{
                 }
             }
         },
-        "/exitPermission/{userID}": {
+        "/experience/{companyID}": {
             "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Get all exit permission for a specific user .",
+                "description": "Get all UserExperience.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "ExitPermission"
+                    "UserExperience"
                 ],
-                "summary": "Get exit permission",
+                "summary": "Get UserExperience",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "userID",
-                        "in": "path",
-                        "required": true
-                    },
                     {
                         "type": "integer",
                         "description": "Page",
@@ -2127,6 +2071,206 @@ const docTemplate = `{
                         "description": "Limit",
                         "name": "limit",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ExperiencePagination"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/experience/{companyID}/count": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get number of all Experiences.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UserExperience"
+                ],
+                "summary": "Get number of  Experiences",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ExperienceCount"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/experience/{companyID}/create/{userID}": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create a new UserExperience.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UserExperience"
+                ],
+                "summary": "Create UserExperience",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "companyID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "userID",
+                        "name": "userID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "project query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ExperienceIn"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/experience/{companyID}/list": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get list of all Experiences.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UserExperience"
+                ],
+                "summary": "Get list of  Experiences",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -2135,8 +2279,215 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/ExitPermissionPagination"
+                                "$ref": "#/definitions/ExperienceList"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/experience/{companyID}/{ID}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete one UserExperience.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UserExperience"
+                ],
+                "summary": "Delete  UserExperience",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Experience ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/experience/{companyID}/{ID}/Get": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get one UserExperience.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UserExperience"
+                ],
+                "summary": "Get UserExperience",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Experience ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ExperienceDetails"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/experience/{companyID}/{ID}/update": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update  UserExperience .",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UserExperience"
+                ],
+                "summary": "Update  UserExperience",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "experience  ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Project query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ExperienceIn"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
                         }
                     },
                     "400": {
@@ -2578,14 +2929,218 @@ const docTemplate = `{
                 }
             }
         },
-        "/loanRequests": {
+        "/leave_requests/company/{companyID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all LeaveRequests by companyID.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LeaveRequests"
+                ],
+                "summary": "Get LeaveRequests",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/LeaveDetails"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/leave_requests/count/{companyID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all LeaveRequests count for a specific companyID.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LeaveRequests"
+                ],
+                "summary": "Get LeaveRequests count",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/LeaveCount"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/leave_requests/user/{userID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all LeaveRequests.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LeaveRequests"
+                ],
+                "summary": "Get LeaveRequests",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/LeaveDetails"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/leave_requests/{companyID}": {
             "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Create a new loanRequests.",
+                "description": "Create a new LeaveRequests.",
                 "consumes": [
                     "application/json"
                 ],
@@ -2593,17 +3148,24 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "LoanRequests"
+                    "LeaveRequests"
                 ],
-                "summary": "Create an loanRequests demande",
+                "summary": "Create LeaveRequests demande",
                 "parameters": [
                     {
-                        "description": "LoanRequests query params",
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "LeaveRequests query params",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/LoanRequestDemande"
+                            "$ref": "#/definitions/LeaveDemande"
                         }
                     }
                 ],
@@ -2641,7 +3203,475 @@ const docTemplate = `{
                 }
             }
         },
-        "/loanRequests/user/{userID}/count": {
+        "/leave_requests/{userID}/count": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all LeaveRequests count.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LeaveRequests"
+                ],
+                "summary": "Get LeaveRequests count",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/LeaveCount"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/leave_requests/{userID}/{ID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get one LeaveRequests.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LeaveRequests"
+                ],
+                "summary": "Get LeaveRequests",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "LeaveRequests ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/LeaveDetails"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update one LeaveRequests.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LeaveRequests"
+                ],
+                "summary": "Update LeaveRequests",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "LeaveRequests ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "LeaveRequests query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/LeaveIn"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete one LeaveRequests.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LeaveRequests"
+                ],
+                "summary": "Delete LeaveRequests",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "LeaveRequests ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/loan_requests/company/{companyID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all LoanRequest for a specific companyID .",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoanRequests"
+                ],
+                "summary": "Get LoanRequests",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/LoanRequestPagination"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/loan_requests/company/{companyID}/count": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all loanRequests count by compnayID.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoanRequests"
+                ],
+                "summary": "Get loanRequests count",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/LoanRequestCount"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/loan_requests/user/{userID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all LoanRequest for a specific user .",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoanRequests"
+                ],
+                "summary": "Get LoanRequests",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/LoanRequestPagination"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/loan_requests/user/{userID}/count": {
             "get": {
                 "security": [
                     {
@@ -2699,7 +3729,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/loanRequests/user/{userID}/{ID}": {
+        "/loan_requests/user/{userID}/{ID}": {
             "get": {
                 "security": [
                     {
@@ -2905,50 +3935,47 @@ const docTemplate = `{
                 }
             }
         },
-        "/loanRequests/{userID}": {
-            "get": {
+        "/loan_requests/{companyID}": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Get all LoanRequest for a specific user .",
+                "description": "Create a new loanRequests.",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "LoanRequests"
                 ],
-                "summary": "Get LoanRequests",
+                "summary": "Create an loanRequests demande",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User ID",
-                        "name": "userID",
+                        "description": "Company ID",
+                        "name": "companyID",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "type": "integer",
-                        "description": "Page",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Limit",
-                        "name": "limit",
-                        "in": "query"
+                        "description": "LoanRequests query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/LoanRequestDemande"
+                        }
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/LoanRequestPagination"
-                            }
+                            "$ref": "#/definitions/ApiResponse"
                         }
                     },
                     "400": {
@@ -4597,7 +5624,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Project"
+                    "ProjectsCondidats"
                 ],
                 "summary": "assign Project",
                 "parameters": [
@@ -5647,172 +6674,39 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Create a new test.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Tests"
-                ],
-                "summary": "Create test",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Company ID",
-                        "name": "companyID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Test query params",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/TestsIn"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    }
-                }
             }
         },
-        "/tests/{companyID}/Assign/{candidatID}": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Assign an existant test to a candidat.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Tests"
-                ],
-                "summary": "Assign test",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Company ID",
-                        "name": "companyID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Candidat ID",
-                        "name": "candidatID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Test query params",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/AssignTestIn"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/tests/{companyID}/Candidats/{testID}": {
+        "/tests/{companyID}/TQuestions/{testID}": {
             "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Get all candidats that belongs to a specific test.",
+                "description": "Get all Questions by testID.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Tests"
                 ],
-                "summary": "Get candidats",
+                "summary": "Get Questions",
                 "parameters": [
                     {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
-                        "description": "Company ID",
+                        "description": "Test ID",
                         "name": "companyID",
                         "in": "path",
                         "required": true
@@ -5830,83 +6724,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/TestsPagination"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/tests/{companyID}/Questions/{testID}": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Get all tests.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Tests"
-                ],
-                "summary": "Get tests",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Page",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Limit",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Company ID",
-                        "name": "companyID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Test ID",
-                        "name": "testID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/TestsQuestionsPagination"
                         }
                     },
                     "400": {
@@ -5965,6 +6782,80 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/TestsCount"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/tests/{companyID}/create/{candidatID}": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create a new test.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tests"
+                ],
+                "summary": "Create test",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Candidat ID",
+                        "name": "candidatID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "NbrQuestions",
+                        "name": "nbrQuestions",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
                         }
                     },
                     "400": {
@@ -6055,167 +6946,32 @@ const docTemplate = `{
                 }
             }
         },
-        "/tests/{companyID}/{ID}": {
+        "/tests/{companyID}/scores": {
             "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Get one test.",
+                "description": "Get all scores.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Tests"
                 ],
-                "summary": "Get test",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Company ID",
-                        "name": "companyID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Test ID",
-                        "name": "ID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/TestsDetails"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Update test.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Tests"
-                ],
-                "summary": "Update test",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Company ID",
-                        "name": "companyID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Test ID",
-                        "name": "ID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Test query params",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/TestsIn"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Generate a list of questions for a specific Test.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Tests"
-                ],
-                "summary": "Generate a list of questions.",
+                "summary": "Get candidats scores",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "nombre de questions",
-                        "name": "nbrQuestions",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
                         "in": "query"
                     },
                     {
@@ -6224,20 +6980,13 @@ const docTemplate = `{
                         "name": "companyID",
                         "in": "path",
                         "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Test ID",
-                        "name": "ID",
-                        "in": "path",
-                        "required": true
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ApiResponse"
+                            "$ref": "#/definitions/ScosPagination"
                         }
                     },
                     "400": {
@@ -6265,7 +7014,9 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/tests/{companyID}/{ID}": {
             "delete": {
                 "security": [
                     {
@@ -6323,6 +7074,599 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/tests/{companyID}/{candidatID}/{testID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get  all the answers of a test by candidatID.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tests"
+                ],
+                "summary": "Get candidat Responses",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Candidat ID",
+                        "name": "candidatID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Test ID",
+                        "name": "testID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/TestsDetails"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/tests/{companyID}/{candidatID}/{testID}/{questionID}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update the candidat response for a specific question.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tests"
+                ],
+                "summary": "Update the candidat response",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Candidat ID",
+                        "name": "candidatID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Test ID",
+                        "name": "testID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Question ID",
+                        "name": "questionID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "CandidatAnswerIn query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/CandidatAnswerIn"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/training_request/All/{userID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all  training request .",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "TrainingRequest"
+                ],
+                "summary": "Get TrainingRequests",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/TrainingRequestPagination"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Presenceal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/training_request/count/{userID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all TrainingRequest count.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "TrainingRequest"
+                ],
+                "summary": "Get TrainingRequest count",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/MissionOrdersCount"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Presenceal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/training_request/delete/{ID}/{userID}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete one TrainingRequest.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "TrainingRequest"
+                ],
+                "summary": "Delete TrainingRequest",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Id",
+                        "name": "userID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "TrainingRequest ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "MissionOrderseal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/training_request/get/{ID}/{userID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get one TrainingRequests.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "TrainingRequest"
+                ],
+                "summary": "Get TrainingRequests",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "training_request ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/TrainingRequestDetails"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Presenceal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/training_request/update/{ID}/{userID}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update one TrainingRequest.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "TrainingRequest"
+                ],
+                "summary": "Update TrainingRequest",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "userID ",
+                        "name": "userID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "TrainingRequestIn ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "TrainingRequestIn query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/TrainingRequestDescision"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Presenceal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/training_request/{userID}/{companyID}": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create a new TrainingRequest.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "TrainingRequest"
+                ],
+                "summary": "Create TrainingRequest",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "companyID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "userID",
+                        "name": "userID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "TrainingRequestIn query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/TrainingRequestIn"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Training request  Server Error",
                         "schema": {
                             "$ref": "#/definitions/ApiResponse"
                         }
@@ -6839,6 +8183,10 @@ const docTemplate = `{
                 "status": {
                     "description": "Status of the advanceSalaryRequest request.(pending, approved, rejected)",
                     "type": "string"
+                },
+                "userID": {
+                    "description": "User ID associated with the advance salary request",
+                    "type": "string"
                 }
             }
         },
@@ -6865,12 +8213,12 @@ const docTemplate = `{
                 }
             }
         },
-        "AssignTestIn": {
-            "description": "AssignTestIn represents the input structure for creating a new test.",
+        "CandidatAnswerIn": {
+            "description": "CandidatAnswerIn represents the input structure for updating the CandidatAnswer.",
             "type": "object",
             "properties": {
-                "testID": {
-                    "description": "The testID associated with the candidat",
+                "candidatAnswer": {
+                    "description": "The candidat answer to the question",
                     "type": "string"
                 }
             }
@@ -7214,6 +8562,99 @@ const docTemplate = `{
                 }
             }
         },
+        "ExperienceCount": {
+            "description": "ProjectsCount represents the count of projects.",
+            "type": "object",
+            "properties": {
+                "count": {
+                    "description": "Count is the number of projects.",
+                    "type": "integer"
+                }
+            }
+        },
+        "ExperienceDetails": {
+            "description": "ExperienceDetails represents detailed information about a specific user exp.",
+            "type": "object",
+            "properties": {
+                "CompanyID": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "ID is the unique identifier for the exp.",
+                    "type": "string"
+                },
+                "professional_training": {
+                    "description": "the user exp",
+                    "type": "string"
+                }
+            }
+        },
+        "ExperienceIn": {
+            "description": "ExperienceIn represents the input structure for creating a new experiences for one user .",
+            "type": "object",
+            "required": [
+                "professional_training"
+            ],
+            "properties": {
+                "professional_training": {
+                    "description": "experiences that wil be added to the specified user",
+                    "type": "string"
+                }
+            }
+        },
+        "ExperienceList": {
+            "description": "ExperienceList represents a simplified version of the project for listing purposes.",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "ID is the unique identifier for the project.",
+                    "type": "string"
+                },
+                "professional_trainings": {
+                    "description": "technologies required to develop the project",
+                    "type": "string"
+                }
+            }
+        },
+        "ExperiencePagination": {
+            "description": "ExperiencePagination represents the paginated list of projects.",
+            "type": "object",
+            "properties": {
+                "items": {
+                    "description": "Items is a slice containing individual project details.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ExperienceTable"
+                    }
+                },
+                "limit": {
+                    "description": "Limit is the maximum number of items per page in the pagination.",
+                    "type": "integer"
+                },
+                "page": {
+                    "description": "Page is the current page number in the pagination.",
+                    "type": "integer"
+                },
+                "totalCount": {
+                    "description": "TotalCount is the total number of project in the entire list.",
+                    "type": "integer"
+                }
+            }
+        },
+        "ExperienceTable": {
+            "description": "ExperienceTable represents a single project entry in a table.",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "ID is the unique identifier for the project.",
+                    "type": "string"
+                },
+                "professional_training": {
+                    "description": "ProfessionalTrainings pq.StringArray ` + "`" + `json:\"professional_trainings\" binding:\"required\"` + "`" + `",
+                    "type": "string"
+                }
+            }
+        },
         "InternsCount": {
             "description": "InternsCount represents the count of interns.",
             "type": "object",
@@ -7427,6 +8868,10 @@ const docTemplate = `{
                 },
                 "type": {
                     "description": "Type of LeaveRequests (e.g., annual, sick, maternity, unpaid)",
+                    "type": "string"
+                },
+                "userID": {
+                    "description": "User ID associated with the Leave requests",
                     "type": "string"
                 }
             }
@@ -7796,11 +9241,13 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "description": {
+                    "description": "The description of the project",
                     "type": "string",
                     "maxLength": 80,
                     "minLength": 3
                 },
                 "exp_date": {
+                    "description": "the expiration date of the project",
                     "type": "string"
                 },
                 "projectname": {
@@ -7808,6 +9255,10 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 35,
                     "minLength": 3
+                },
+                "specialty": {
+                    "description": "The specialty of the project",
+                    "type": "string"
                 },
                 "technologies": {
                     "description": "technologies required to develop the project",
@@ -8113,6 +9564,61 @@ const docTemplate = `{
                 }
             }
         },
+        "ScoresTable": {
+            "description": "ScoresTable represents a single Scores entry in a table.",
+            "type": "object",
+            "properties": {
+                "firstname": {
+                    "description": "The user's first name",
+                    "type": "string"
+                },
+                "id_candidat": {
+                    "description": "ID is the unique identifier for the candidat.",
+                    "type": "string"
+                },
+                "id_test": {
+                    "description": "ID is the unique identifier for the test.",
+                    "type": "string"
+                },
+                "lastname": {
+                    "description": "The user's last name",
+                    "type": "string"
+                },
+                "score": {
+                    "description": "The score associated with the test and the candidat",
+                    "type": "integer"
+                },
+                "title": {
+                    "description": "The title of the test",
+                    "type": "string"
+                }
+            }
+        },
+        "ScosPagination": {
+            "description": "ScoresPagination represents the paginated list of Scores.",
+            "type": "object",
+            "properties": {
+                "items": {
+                    "description": "Items is a slice containing individual test details.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ScoresTable"
+                    }
+                },
+                "limit": {
+                    "description": "Limit is the maximum number of items per page in the pagination.",
+                    "type": "integer"
+                },
+                "page": {
+                    "description": "Page is the current page number in the pagination.",
+                    "type": "integer"
+                },
+                "totalCount": {
+                    "description": "TotalCount is the total number of tests in the entire list.",
+                    "type": "integer"
+                }
+            }
+        },
         "Signin": {
             "description": "Signin represents the information required for signing in candidat.",
             "type": "object",
@@ -8215,23 +9721,6 @@ const docTemplate = `{
                 }
             }
         },
-        "TestsIn": {
-            "description": "TestsIn represents the input structure for creating a new test.",
-            "type": "object",
-            "properties": {
-                "specialty": {
-                    "description": "The specialty of the test",
-                    "type": "string"
-                },
-                "technologies": {
-                    "description": "The technologies assigned to the test",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                }
-            }
-        },
         "TestsList": {
             "description": "TestsList represents a simplified version of the test for listing purposes.",
             "type": "object",
@@ -8253,14 +9742,14 @@ const docTemplate = `{
             }
         },
         "TestsPagination": {
-            "description": "TestsPagination represents the paginated list of tests.",
+            "description": "QuestionsPagination represents the paginated list of questions by testID.",
             "type": "object",
             "properties": {
                 "items": {
                     "description": "Items is a slice containing individual test details.",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/TestsTable"
+                        "$ref": "#/definitions/QuestionsTable"
                     }
                 },
                 "limit": {
@@ -8274,48 +9763,6 @@ const docTemplate = `{
                 "totalCount": {
                     "description": "TotalCount is the total number of tests in the entire list.",
                     "type": "integer"
-                }
-            }
-        },
-        "TestsQuestionsPagination": {
-            "description": "TestsQuestionsPagination represents the paginated list of tests.",
-            "type": "object",
-            "properties": {
-                "items": {
-                    "description": "Items is a slice containing individual test details.",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/TestsQuestionsTable"
-                    }
-                },
-                "limit": {
-                    "description": "Limit is the maximum number of items per page in the pagination.",
-                    "type": "integer"
-                },
-                "page": {
-                    "description": "Page is the current page number in the pagination.",
-                    "type": "integer"
-                },
-                "totalCount": {
-                    "description": "TotalCount is the total number of tests in the entire list.",
-                    "type": "integer"
-                }
-            }
-        },
-        "TestsQuestionsTable": {
-            "description": "TestsQuestionsTable represents a single test entry in a table.",
-            "type": "object",
-            "properties": {
-                "id": {
-                    "description": "ID is the unique identifier for the test.",
-                    "type": "string"
-                },
-                "randomQuestions": {
-                    "description": "The questions associated with the test",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
                 }
             }
         },
@@ -8340,6 +9787,144 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                },
+                "title": {
+                    "description": "The title of the test",
+                    "type": "string"
+                }
+            }
+        },
+        "TrainingRequestDescision": {
+            "description": "TrainingRequestDescision represents the descision of training request .",
+            "type": "object",
+            "properties": {
+                "decision_company": {
+                    "type": "string"
+                }
+            }
+        },
+        "TrainingRequestDetails": {
+            "description": "TrainingRequestDetails represents detailed information about a specific MissionOrders.",
+            "type": "object",
+            "properties": {
+                "decision_company": {
+                    "type": "string"
+                },
+                "description": {
+                    "description": "Description of   the missionOrders",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "reason": {
+                    "description": "Adress client for the Missi",
+                    "type": "string"
+                },
+                "request_date": {
+                    "description": "RequestDate",
+                    "type": "string"
+                },
+                "training_title": {
+                    "description": "Object   of the missionOrders",
+                    "type": "string"
+                },
+                "userID": {
+                    "description": "ID is the unique identifier for the Missi",
+                    "type": "string"
+                }
+            }
+        },
+        "TrainingRequestIn": {
+            "description": "TrainingRequestIn represents the input structure for updating the attributes  of MissionOrders.",
+            "type": "object",
+            "required": [
+                "description",
+                "reason",
+                "request_date",
+                "training_title",
+                "userID"
+            ],
+            "properties": {
+                "decision_company": {
+                    "type": "string"
+                },
+                "description": {
+                    "description": "Description of   the missionOrders",
+                    "type": "string"
+                },
+                "reason": {
+                    "description": "Adress client for the Missi",
+                    "type": "string"
+                },
+                "request_date": {
+                    "description": "RequestDate",
+                    "type": "string"
+                },
+                "training_title": {
+                    "description": "Object   of the missionOrders",
+                    "type": "string"
+                },
+                "userID": {
+                    "description": "ID is the unique identifier for the Missi",
+                    "type": "string"
+                }
+            }
+        },
+        "TrainingRequestPagination": {
+            "description": "TrainingRequestPagination represents the paginated list of missions.",
+            "type": "object",
+            "properties": {
+                "items": {
+                    "description": "Items is a slice containing individual missions details.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/TrainingRequestTable"
+                    }
+                },
+                "limit": {
+                    "description": "Limit is the maximum number of items per page in the pagination.",
+                    "type": "integer"
+                },
+                "page": {
+                    "description": "Page is the current page number in the pagination.",
+                    "type": "integer"
+                },
+                "totalCount": {
+                    "description": "TotalCount is the total number of missions orders in the entire list.",
+                    "type": "integer"
+                }
+            }
+        },
+        "TrainingRequestTable": {
+            "description": "TrainingRequestTable represents a single TrainingRequest entry in a table.",
+            "type": "object",
+            "properties": {
+                "decision_company": {
+                    "type": "string"
+                },
+                "description": {
+                    "description": "Description of   the missionOrders",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "reason": {
+                    "description": "Adress client for the Missi",
+                    "type": "string"
+                },
+                "request_date": {
+                    "description": "RequestDate",
+                    "type": "string"
+                },
+                "training_title": {
+                    "description": "Object   of the missionOrders",
+                    "type": "string"
+                },
+                "userID": {
+                    "description": "ID is the unique identifier for the Missi",
+                    "type": "string"
                 }
             }
         },
@@ -8471,28 +10056,35 @@ const docTemplate = `{
             }
         },
         "UsersTable": {
-            "description": "UsersTable represents a single user entry in a table.",
+            "description": "UsersTable represents a single project entry in a table.",
             "type": "object",
             "properties": {
-                "createdAt": {
-                    "description": "CreatedAt is the timestamp indicating when the user entry was created.",
+                "code": {
+                    "description": "code is the code of pfe project",
                     "type": "string"
                 },
-                "email": {
-                    "description": "Email is the email address of the user.",
+                "companyID": {
+                    "description": "CompanyID is the unique identifier for the company associated with the project. It is required.",
                     "type": "string"
                 },
-                "firstname": {
-                    "description": "Firstname is the first name of the user.",
+                "expdate": {
+                    "description": "expdate is the timestamp indicating when the project entry will ends.",
                     "type": "string"
                 },
                 "id": {
-                    "description": "ID is the unique identifier for the user.",
+                    "description": "ID is the unique identifier for the project.",
                     "type": "string"
                 },
-                "lastname": {
-                    "description": "Lastname is the last name of the user.",
+                "projectname": {
+                    "description": "projectname is the  name of the project. It is required .",
                     "type": "string"
+                },
+                "technologies": {
+                    "description": "technologies required to develop the project",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },

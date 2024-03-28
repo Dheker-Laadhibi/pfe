@@ -31,10 +31,11 @@ import (
 
 // advance salary requests represents information about leave_requests in the system.
 type AdvanceSalaryRequests struct {
-	ID     uuid.UUID `gorm:"column:id; primaryKey; type:uuid; not null;"` // Unique identifier for the advance salary request
-	Amount float64   `gorm:"column:amount; not null"`                     // The amount of the advance
-	Reason string    `gorm:"column:reason; not null; default:false"`      // Reason of the advance salary request
-	Status string    `gorm:"column:status; not null; default:pending"`    // Status of the advance salary requests (pending, approved, rejected)
-	UserID uuid.UUID `gorm:"column:user_id;"`                             // User ID associated with the advance salary request
+	ID        uuid.UUID `gorm:"column:id; primaryKey; type:uuid; not null;"` // Unique identifier for the advance salary request
+	Amount    float64   `gorm:"column:amount; not null"`                     // The amount of the advance
+	Reason    string    `gorm:"column:reason; not null; default:false"`      // Reason of the advance salary request
+	Status    string    `gorm:"column:status; not null; default:pending"`    // Status of the advance salary requests (pending, approved, rejected)
+	CompanyID uuid.UUID `gorm:"column:company_id; type:uuid; not null;"`     // ID of the company to which the AdvanceSalaryRequests belongs
+	UserID    uuid.UUID `gorm:"column:user_id;"`                             // User ID associated with the advance salary request
 	gorm.Model
 }

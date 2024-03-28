@@ -11,10 +11,11 @@ import (
 type ProjectIn struct {
 	Code         string         `json:"code" binding:"required,min=3,max=30"`        // code is the code of pfe project
 	Projectname  string         `json:"projectname" binding:"required,min=3,max=35"` // projectname is the  name of the project. It is required and should be between 3 and 35 characters.
-	Description  string         `json:"description" binding:"required,min=3,max=80"`
-	Technologies pq.StringArray `json:"technologies" binding:"required"` // technologies required to develop the project
-	ExpDate      string         `json:"exp_date" binding:"required"`
-	CompanyID    uuid.UUID      `json:"companyID" binding:"required"` // CompanyID is the unique identifier for the company associated with the project. It is required.
+	Description  string         `json:"description" binding:"required,min=3,max=80"` // The description of the project
+	Specialty    string         `gorm:"column:specialty; not null;"`                 // The specialty of the project
+	Technologies pq.StringArray `json:"technologies" binding:"required"`             // technologies required to develop the project
+	ExpDate      string         `json:"exp_date" binding:"required"`                 // the expiration date of the project
+	CompanyID    uuid.UUID      `json:"companyID" binding:"required"`                // CompanyID is the unique identifier for the company associated with the project. It is required.
 } //@name ProjectIn
 
 // @Description	ProjectPagination represents the paginated list of projects.

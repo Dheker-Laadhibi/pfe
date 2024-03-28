@@ -31,15 +31,33 @@ func ReadAllPagination(db *gorm.DB, model []domains.Tests, modelID uuid.UUID, li
 	return model, err
 }
 
+// ReadAllPagination retrieves a paginated list of tests based on company ID, limit, and offset.
+func ReadAllPaginationS(db *gorm.DB, model []domains.TestCandidats, modelID uuid.UUID, limit, offset int) ([]domains.TestCandidats, error) {
+	err := db.Where("company_id = ? ", modelID).Limit(limit).Offset(offset).Find(&model).Error
+	return model, err
+}
+
 // ReadAllPaginationQ retrieves a paginated list of Questions based on test ID, limit, and offset.
 func ReadAllPaginationQ(db *gorm.DB, model []domains.TestQuestions, modelID uuid.UUID, limit, offset int) ([]domains.TestQuestions, error) {
-	err := db.Where("tests_id = ? ", modelID).Limit(limit).Offset(offset).Find(&model).Error
+	err := db.Where("candidat_id = ? ", modelID).Limit(limit).Offset(offset).Find(&model).Error
 	return model, err
 }
 
 // ReadAllPagination retrieves a paginated list of tests based on company ID, limit, and offset.
 func ReadAllPaginationC(db *gorm.DB, model []domains.Condidats, modelID uuid.UUID, limit, offset int) ([]domains.Condidats, error) {
 	err := db.Where("id = ? ", modelID).Limit(limit).Offset(offset).Find(&model).Error
+	return model, err
+}
+
+// ReadAllPagination retrieves a paginated list of questions based on test ID, limit, and offset.
+func ReadAllPaginationQT(db *gorm.DB, model []domains.TestQuestions, modelID uuid.UUID, limit, offset int) ([]domains.TestQuestions, error) {
+	err := db.Where("tests_id = ? ", modelID).Limit(limit).Offset(offset).Find(&model).Error
+	return model, err
+}
+
+// ReadAllPagination retrieves a paginated list of questions based on test ID, limit, and offset.
+func ReadAllPaginationAnswers(db *gorm.DB, model []domains.TestQuestions, testID uuid.UUID, candidatID uuid.UUID, limit, offset int) ([]domains.TestQuestions, error) {
+	err := db.Where("tests_id = ? and candidat_id = ? ", testID, candidatID).Limit(limit).Offset(offset).Find(&model).Error
 	return model, err
 }
 
@@ -109,6 +127,8 @@ func GetAllCandidates(testID uuid.UUID, db *gorm.DB) ([]string, error) {
 	return candidateIDs, nil
 }
 
+
+
 // GetRandomQuestions retrieves a random selection of question IDs from the provided list.
 func GetRandomQuestions(questionIDs pq.StringArray, numQuestions int) (selectedQuestions pq.StringArray, err error) {
 	// Seed the random number generator
@@ -122,26 +142,15 @@ func GetRandomQuestions(questionIDs pq.StringArray, numQuestions int) (selectedQ
 		return nil, fmt.Errorf("number of requested questions (%d) exceeds available IDs (%d)", numQuestions, numIDs)
 	}
 
-	// Create a map to track selected indices
-	selectedIndices := make(map[int]bool)
+	// Shuffle the questionIDs slice
+	shuffledIDs := make(pq.StringArray, len(questionIDs))
+	copy(shuffledIDs, questionIDs)
+	rand.Shuffle(len(shuffledIDs), func(i, j int) {
+		shuffledIDs[i], shuffledIDs[j] = shuffledIDs[j], shuffledIDs[i]
+	})
 
-	// Create a slice to hold the selected question IDs
-	selectedQuestions = make(pq.StringArray, 0, numQuestions)
-
-	// Loop until we have selected the desired number of questions
-	for len(selectedQuestions) < numQuestions {
-		// Generate a random index
-		randIndex := rand.Intn(numIDs)
-
-		// Check if the index is already selected
-		if _, ok := selectedIndices[randIndex]; !ok {
-			// Add the index to the map of selected indices
-			selectedIndices[randIndex] = true
-
-			// Append the corresponding question ID to the selected questions slice
-			selectedQuestions = append(selectedQuestions, questionIDs[randIndex])
-		}
-	}
+	// Select the first numQuestions IDs from the shuffled slice
+	selectedQuestions = shuffledIDs[:numQuestions]
 
 	return selectedQuestions, nil
 }
@@ -152,33 +161,34 @@ func ReadByID(db *gorm.DB, model domains.Tests, id uuid.UUID) (domains.Tests, er
 	return model, err
 }
 
-/*func GetAllQuestionsDetails(db *gorm.DB, questionIDs pq.StringArray) ([]domains.Questions, error) {
-	// Define a slice to hold the details of the questions
-	var questions []domains.Questions
+// ReadCandidatByID retrieves a Candidat by their unique identifier.
+func ReadCandidatByID(db *gorm.DB, model domains.Condidats, id uuid.UUID) (domains.Condidats, error) {
+	err := db.First(&model, id).Error
+	return model, err
+}
 
-	// Iterate over each string containing question IDs
-	for _, idQString := range questionIDs {
-		// Split the idQString into separate question IDs
-		ids := strings.Split(strings.Trim(idQString, "{}"), ",")
 
-		// Iterate over each individual question ID
-		for _, id := range ids {
-			// Trim any extra spaces from the question ID string
-			id = strings.TrimSpace(id)
 
-			// Define a variable to hold the details of the current question
-			var question domains.Questions
+// ReadProjectDetails retrive a project based on projectID.
+func ReadProjectDetails(db *gorm.DB, model domains.Project, modelID uuid.UUID) (domains.Project, error) {
+	err := db.Where("id = ? ", modelID).First(&model).Error
+	return model, err
+}
 
-			// Query the database to find details of the question with the current ID
-			err := db.Where("id = ?", id).Find(&question).Error
-			if err != nil {
-				return nil, err
-			}
 
-			// Append the details of the current question to the main list
-			questions = append(questions, question)
-		}
+
+// ReadProjectIDByCandidatID retrieves the last projectID based on the candidatID.
+func ReadProjectIDByCandidatID(db *gorm.DB, candidatID uuid.UUID) (uuid.UUID, error) {
+	var projectsCondidats domains.ProjectsCondidats // Assuming ProjectsCondidats is your model struct
+	err := db.Where("condidat_id = ?", candidatID).Last(&projectsCondidats).Error
+	if err != nil {
+		return uuid.Nil, err
 	}
+	return projectsCondidats.ProjectID, nil
+}
 
-	return questions, nil
-}*/
+// ReadQuestionDetails retrive a question based on questionID.
+func ReadQuestionDetails(db *gorm.DB, model domains.Questions, modelID uuid.UUID) (domains.Questions, error) {
+	err := db.Where("id = ? ", modelID).First(&model).Error
+	return model, err
+}

@@ -28,7 +28,7 @@ import (
 // @Failure			401				{object}		utils.ApiResponses	"Unauthorized"
 // @Failure			403				{object}		utils.ApiResponses	"Forbidden"
 // @Failure			500				{object}		utils.ApiResponses	"Internal Server Error"
-// @Router			/condidats/{companyID}	[post]
+// @Router			/candidats/{companyID}	[post]
 func (db Database) Createcandidate(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -516,7 +516,7 @@ func (db Database) DeleteCondidat(ctx *gin.Context) {
 // @Failure			401			{object}	utils.ApiResponses		"Unauthorized"
 // @Failure			403			{object}	utils.ApiResponses		"Forbidden"
 // @Failure			500			{object}	utils.ApiResponses		"Internal Server Error"
-// @Router			/condidats/{companyID}/Signin	[post]
+// @Router			/condidats/{companyID}/signin	[post]
 func (db Database) SigninCandidat(ctx *gin.Context) {
 
 	// Parse the incoming JSON request into a Signin struct

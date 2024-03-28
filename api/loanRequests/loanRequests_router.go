@@ -15,17 +15,23 @@ func LoanRequestRouterInit(router *gin.RouterGroup, db *gorm.DB) {
 	NewLoanRequestRepository(db)
 
 	// Private
-	loanRequests := router.Group("/loanRequests")
+	loanRequests := router.Group("/loan_requests")
 	{
 
 		//Create a new loanRequests demande
-		loanRequests.POST("", baseInstance.AddLoanRequests)
+		loanRequests.POST("/:companyID", baseInstance.AddLoanRequests)
+
+		// GET endpoint to retrieve all loanRequests for a specific user
+		loanRequests.GET("/user/:userID", baseInstance.ReadAllLoanRequests)
 
 		// GET endpoint to retrieve all loanRequests for a specific company
-		loanRequests.GET("/:userID", baseInstance.ReadAllLoanRequests)
+		loanRequests.GET("/company/:companyID", baseInstance.ReadAllLoanRequestsByCompany)
 
 		// GET endpoint to retrieve the count of loanRequests for a specific user
 		loanRequests.GET("/user/:userID/count", baseInstance.ReadLoanRequestsCount)
+
+		// GET endpoint to retrieve the count of loanRequests for a specific company
+		loanRequests.GET("/company/:companyID/count", baseInstance.ReadLoanRequestsCountByCompany)
 
 		// GET endpoint to retrieve details of a specific loanRequests for a specific user
 		loanRequests.GET("/user/:userID/:ID", baseInstance.ReadOneLoanRequests)

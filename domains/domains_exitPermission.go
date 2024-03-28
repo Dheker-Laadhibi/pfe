@@ -43,6 +43,7 @@ type ExitPermission struct {
 	Type        string    `gorm:"column:type; not null"`                       // The type of the exit permission
 	Reason      string    `gorm:"column:reason; not null"`                     // Reason or explanation for requesting the exit permission.
 	Status      string    `gorm:"column:status; not null; default:pending"`    // Status of the exitPermission request (e.g., pending, approved, rejected).
+	CompanyID   uuid.UUID `json:"companyID" binding:"required"`                // CompanyID is the unique identifier for the company associated with the exit Permission. It is required.
 	UserID      uuid.UUID `gorm:"column:user_id;"`                             // User ID associated with the exitPermission
 	gorm.Model
 }

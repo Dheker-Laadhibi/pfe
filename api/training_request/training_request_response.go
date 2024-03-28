@@ -37,7 +37,7 @@ type TrainingRequestDetails struct {
 	//RequestDate
 	RequestDate   time.Time     `json:"request_date"`
 	DecisionCompany string  `json:"decision_company"`
-	UserID uuid.UUID `json:"userID" ` // ID is the unique identifier for the Missi
+	UserID uuid.UUID `json:"userID"` // ID is the unique identifier for the Missi
 
 } //@name TrainingRequestDetails
 
@@ -69,3 +69,7 @@ type TrainingRequestList struct {
 	ID     uuid.UUID `json:"id"`     // ID is the unique identifier for the user.
 	TrainingTitle string    `json:"training_title"` // object is the object of the missions.
 } //@name TrainingRequestList
+// @Description	TrainingRequestDescision represents the descision of training request .
+type TrainingRequestDescision struct {
+	DecisionCompany string  `json:"decision_company"`
+} //@name TrainingRequestDescision

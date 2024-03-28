@@ -42,3 +42,12 @@ func ReadAllList(db *gorm.DB, model []domains.TrainingRequest, modelID uuid.UUID
 	err := db.Where("user_id = ? ", modelID).Find(&model).Error
 	return model, err
 }
+
+
+
+// ReadByID retrieves a user by their unique identifier.
+func ReadUserByID(db *gorm.DB, model domains.Users, id uuid.UUID) (domains.Users, error) {
+	err := db.First(&model, id).Error
+	return model, err
+}
+

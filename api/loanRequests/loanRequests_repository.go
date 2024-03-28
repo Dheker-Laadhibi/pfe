@@ -32,8 +32,8 @@ func ReadByID(db *gorm.DB, model domains.LoanRequests, id uuid.UUID) (domains.Lo
 	return model, err
 }
 
-// ReadAllPagination retrieves a paginated list of LoanRequests based on company ID, limit, and offset.
-func ReadAllPagination(db *gorm.DB, model []domains.LoanRequests, modelID uuid.UUID, limit, offset int) ([]domains.LoanRequests, error) {
-	err := db.Where("user_id = ? ", modelID).Limit(limit).Offset(offset).Find(&model).Error
+// ReadAllPagination retrieves a paginated list of LoanRequests based on user ID, limit, and offset.
+func ReadAllPagination(db *gorm.DB, model []domains.LoanRequests, conditionField string, modelID uuid.UUID, limit, offset int) ([]domains.LoanRequests, error) {
+	err := db.Where(conditionField+" = ? ", modelID).Limit(limit).Offset(offset).Find(&model).Error
 	return model, err
 }

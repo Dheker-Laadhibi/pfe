@@ -19,19 +19,34 @@ import (
 // @Accept			json
 // @Produce			json
 // @Security 		ApiKeyAuth
+// @Param				companyID				path			string		true		"Company ID"
 // @Param			request			body			advanceSalaryRequest.AdvanceSalaryRequestDemande		true		"AdvanceSalaryRequestsquery params"
 // @Success			201				{object}		utils.ApiResponses
 // @Failure			400				{object}		utils.ApiResponses	"Invalid request"
 // @Failure			401				{object}		utils.ApiResponses	"Unauthorized"
 // @Failure			403				{object}		utils.ApiResponses	"Forbidden"
 // @Failure			500				{object}		utils.ApiResponses	"Internal Server Error"
-// @Router			/AdvanceSalaryRequests	[post]
+// @Router			/advance_salaryRequests/{companyID}	[post]
 func (db Database) AddAdvanceSalaryRequest(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
 	logrus.Error("userUd from session", session.UserID)
 
+	// Parse and validate the company ID from the request parameter
+	companyID, err := uuid.Parse(ctx.Param("companyID"))
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Check if the employee belongs to the specified company
+	if err := domains.CheckEmployeeBelonging(db.DB, companyID, session.UserID, session.CompanyID); err != nil {
+		logrus.Error("Error verifying employee belonging. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
 	// Parse the incoming JSON request into a AdvanceSalaryRequestDemande struct
 	advanceSalaryRequests := new(AdvanceSalaryRequestDemande)
 	if err := ctx.ShouldBindJSON(advanceSalaryRequests); err != nil {
@@ -42,10 +57,11 @@ func (db Database) AddAdvanceSalaryRequest(ctx *gin.Context) {
 
 	// Create a new AdvanceSalaryRequests demande in the database
 	dbAdvanceSalary := &domains.AdvanceSalaryRequests{
-		ID:     uuid.New(),
-		Amount: advanceSalaryRequests.Amount,
-		Reason: advanceSalaryRequests.Reason,
-		UserID: session.UserID,
+		ID:        uuid.New(),
+		Amount:    advanceSalaryRequests.Amount,
+		Reason:    advanceSalaryRequests.Reason,
+		CompanyID: companyID,
+		UserID:    session.UserID,
 	}
 	if err := domains.Create(db.DB, dbAdvanceSalary); err != nil {
 		logrus.Error("Error saving data to the database. Error: ", err.Error())
@@ -71,7 +87,7 @@ func (db Database) AddAdvanceSalaryRequest(ctx *gin.Context) {
 // @Failure				401					{object}		utils.ApiResponses		"Unauthorized"
 // @Failure				403					{object}		utils.ApiResponses		"Forbidden"
 // @Failure				500					{object}		utils.ApiResponses		"Internal Server Error"
-// @Router				/AdvanceSalaryRequests/{userID}	[get]
+// @Router				/advance_salaryRequests/user/{userID}	[get]
 func (db Database) ReadAdvanceSalaryRequest(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -127,7 +143,7 @@ func (db Database) ReadAdvanceSalaryRequest(ctx *gin.Context) {
 	offset := (page - 1) * limit
 
 	// Retrieve all company data from the database
-	AdvanceSalaryRequests, err := ReadAllPagination(db.DB, []domains.AdvanceSalaryRequests{}, userID, limit, offset)
+	AdvanceSalaryRequests, err := ReadAllPagination(db.DB, []domains.AdvanceSalaryRequests{}, "user_id", userID, limit, offset)
 	if err != nil {
 		logrus.Error("Error occurred while finding all company data. Error: ", err)
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
@@ -166,9 +182,119 @@ func (db Database) ReadAdvanceSalaryRequest(ctx *gin.Context) {
 
 }
 
-// ReadAdvanceSalaryRequestsCount	Handles the retrieval the number of all AdvanceSalaryRequests.
+// ReadAdvanceSalaryRequestsByCompany			Handles the retrieval of all AdvanceSalaryRequests for a specific company .
+// @Summary        		Get AdvanceSalaryRequests
+// @Description    		Get all AdvanceSalaryRequests by companyID.
+// @Tags				AdvanceSalaryRequests
+// @Produce				json
+// @Security 			ApiKeyAuth
+// @Param				companyID				path			string		true		"Company ID"
+// @Param				page			query		int					false       "Page"
+// @Param				limit			query		int					false	    "Limit"
+// @Success				200					{array}			advanceSalaryRequest.AdvanceSalaryRequestDetails
+// @Failure				400					{object}		utils.ApiResponses		"Invalid request"
+// @Failure				401					{object}		utils.ApiResponses		"Unauthorized"
+// @Failure				403					{object}		utils.ApiResponses		"Forbidden"
+// @Failure				500					{object}		utils.ApiResponses		"Internal Server Error"
+// @Router				/advance_salaryRequests/company/{companyID}	[get]
+func (db Database) ReadAdvanceSalaryRequestsByCompany(ctx *gin.Context) {
+
+	// Extract JWT values from the context
+	session := utils.ExtractJWTValues(ctx)
+
+	// Parse and validate the AdvanceSalaryRequestsID from the request parameter
+	companyID, err := uuid.Parse(ctx.Param("companyID"))
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Check if the employee belongs to the specified company
+	if err := domains.CheckEmployeeBelonging(db.DB, companyID, session.UserID, session.CompanyID); err != nil {
+		logrus.Error("Error verifying employee belonging. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Parse and validate the page from the request parameter
+	page, err := strconv.Atoi(ctx.DefaultQuery("page", strconv.Itoa(constants.DEFAULT_PAGE_PAGINATION)))
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid INT format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Parse and validate the limit from the request parameter
+	limit, err := strconv.Atoi(ctx.DefaultQuery("limit", strconv.Itoa(constants.DEFAULT_LIMIT_PAGINATION)))
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid INT format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Check if the advanceSalaryRequest's value is among the allowed choices
+	validChoices := utils.ResponseLimitPagination()
+	isValidChoice := false
+	for _, choice := range validChoices {
+		if uint(limit) == choice {
+			isValidChoice = true
+			break
+		}
+	}
+
+	// If the value is invalid, set it to default DEFAULT_LIMIT_PAGINATION
+	if !isValidChoice {
+		limit = constants.DEFAULT_LIMIT_PAGINATION
+	}
+
+	// Generate offset
+	offset := (page - 1) * limit
+
+	// Retrieve all company data from the database
+	AdvanceSalaryRequests, err := ReadAllPagination(db.DB, []domains.AdvanceSalaryRequests{}, "company_id", companyID, limit, offset)
+	if err != nil {
+		logrus.Error("Error occurred while finding all company data. Error: ", err)
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
+		return
+	}
+
+	// Retriece total count
+	count, err := domains.ReadTotalCount(db.DB, &domains.AdvanceSalaryRequests{}, "company_id", companyID)
+	if err != nil {
+		logrus.Error("Error occurred while finding total count. Error: ", err)
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
+		return
+	}
+
+	// Generate a AdvanceSalaryRequest structure as a response
+	response := AdvanceSalaryRequestPagination{}
+	listAdvanceSalaryRequest := []AdvanceSalaryRequestDetails{}
+	for _, advanceSalaryRequests := range AdvanceSalaryRequests {
+
+		listAdvanceSalaryRequest = append(listAdvanceSalaryRequest, AdvanceSalaryRequestDetails{
+			ID:        advanceSalaryRequests.ID,
+			UserID:    advanceSalaryRequests.UserID,
+			Amount:    advanceSalaryRequests.Amount,
+			Status:    advanceSalaryRequests.Status,
+			Reason:    advanceSalaryRequests.Reason,
+			CreatedAt: advanceSalaryRequests.CreatedAt,
+		})
+	}
+
+	response.Items = listAdvanceSalaryRequest
+	response.Page = uint(page)
+	response.Limit = uint(limit)
+	response.TotalCount = count
+
+	// Respond with success
+	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, response)
+
+}
+
+// ReadAdvanceSalaryRequestsCount	Handles the retrieval the number of all AdvanceSalaryRequests by userID.
 // @Summary        			Get AdvanceSalaryRequestscount
-// @Description    			Get all AdvanceSalaryRequestscount.
+// @Description    			Get all AdvanceSalaryRequestscount by user.
 // @Tags					AdvanceSalaryRequests
 // @Produce					json
 // @Security 				ApiKeyAuth
@@ -178,7 +304,7 @@ func (db Database) ReadAdvanceSalaryRequest(ctx *gin.Context) {
 // @Failure					401					{object}		utils.ApiResponses		"Unauthorized"
 // @Failure					403					{object}		utils.ApiResponses		"Forbidden"
 // @Failure					500					{object}		utils.ApiResponses		"Internal Server Error"
-// @Router					/AdvanceSalaryRequests/{userID}/count	[get]
+// @Router					/advance_salaryRequests/{userID}/count	[get]
 func (db Database) ReadAdvanceSalaryRequestCount(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -215,6 +341,59 @@ func (db Database) ReadAdvanceSalaryRequestCount(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, count)
 }
 
+//*****************
+
+// ReadAdvanceSalaryRequestsCountByCompany	Handles the retrieval the number of all AdvanceSalaryRequests by companyID.
+// @Summary        			Get AdvanceSalaryRequestscount
+// @Description    			Get all AdvanceSalaryRequestscount by company.
+// @Tags					AdvanceSalaryRequests
+// @Produce					json
+// @Security 				ApiKeyAuth
+// @Param					companyID				path			string		true		"Company ID"
+// @Success					200					{object}		advanceSalaryRequest.AdvanceSalaryRequestCount
+// @Failure					400					{object}		utils.ApiResponses		"Invalid request"
+// @Failure					401					{object}		utils.ApiResponses		"Unauthorized"
+// @Failure					403					{object}		utils.ApiResponses		"Forbidden"
+// @Failure					500					{object}		utils.ApiResponses		"Internal Server Error"
+// @Router					/advance_salaryRequests/count/{companyID}	[get]
+func (db Database) ReadAdvanceSalaryRequestCountbycompany(ctx *gin.Context) {
+
+	// Extract JWT values from the context
+	session := utils.ExtractJWTValues(ctx)
+
+	// Parse and validate the AdvanceSalaryRequestsID from the request parameter
+	companyID, err := uuid.Parse(ctx.Param("companyID"))
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Check if the employee belongs to the specified company
+	if err := domains.CheckEmployeeBelonging(db.DB, companyID, session.UserID, session.CompanyID); err != nil {
+		logrus.Error("Error verifying employee belonging. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Retrieve all AdvanceSalaryRequest data from the database
+	AdvanceSalaryRequests, err := domains.ReadTotalCount(db.DB, &domains.AdvanceSalaryRequests{}, "company_id", companyID)
+	if err != nil {
+		logrus.Error("Error occurred while finding all user data. Error: ", err)
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
+		return
+	}
+
+	count := AdvanceSalaryRequestCount{
+		Count: AdvanceSalaryRequests,
+	}
+
+	// Respond with success
+	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, count)
+}
+
+//*****************
+
 // ReadAdvanceSalaryRequests		Handles the retrieval of one AdvanceSalaryRequests.
 // @Summary        		Get AdvanceSalaryRequests
 // @Description    		Get one AdvanceSalaryRequests.
@@ -228,7 +407,7 @@ func (db Database) ReadAdvanceSalaryRequestCount(ctx *gin.Context) {
 // @Failure				401						{object}		utils.ApiResponses		"Unauthorized"
 // @Failure				403						{object}		utils.ApiResponses		"Forbidden"
 // @Failure				500						{object}		utils.ApiResponses		"Internal Server Error"
-// @Router				/AdvanceSalaryRequests/{userID}/{ID}	[get]
+// @Router				/advance_salaryRequests/{userID}/{ID}	[get]
 func (db Database) ReadOneAdvanceSalaryRequest(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -293,7 +472,7 @@ func (db Database) ReadOneAdvanceSalaryRequest(ctx *gin.Context) {
 // @Failure				401						{object}		utils.ApiResponses		"Unauthorized"
 // @Failure				403						{object}		utils.ApiResponses		"Forbidden"
 // @Failure				500						{object}		utils.ApiResponses		"Internal Server Error"
-// @Router				/AdvanceSalaryRequests/{userID}/{ID}	[put]
+// @Router				/advance_salaryRequests/{userID}/{ID}	[put]
 func (db Database) UpdateAdvanceSalaryRequest(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -365,7 +544,7 @@ func (db Database) UpdateAdvanceSalaryRequest(ctx *gin.Context) {
 // @Failure				401						{object}		utils.ApiResponses			"Unauthorized"
 // @Failure				403						{object}		utils.ApiResponses			"Forbidden"
 // @Failure				500						{object}		utils.ApiResponses			"Internal Server Error"
-// @Router				/AdvanceSalaryRequests/{userID}/{ID}	[delete]
+// @Router				/advance_salaryRequests/{userID}/{ID}	[delete]
 func (db Database) DeleteAdvanceSalaryRequest(ctx *gin.Context) {
 
 	// Extract JWT values from the context

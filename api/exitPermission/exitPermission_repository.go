@@ -32,8 +32,8 @@ func ReadByID(db *gorm.DB, model domains.ExitPermission, id uuid.UUID) (domains.
 	return model, err
 }
 
-// ReadAllPagination retrieves a paginated list of ExitPermission based on company ID, limit, and offset.
-func ReadAllPagination(db *gorm.DB, model []domains.ExitPermission, modelID uuid.UUID, limit, offset int) ([]domains.ExitPermission, error) {
-	err := db.Where("user_id = ? ", modelID).Limit(limit).Offset(offset).Find(&model).Error
+// ReadAllPagination retrieves a paginated list of exitPermissions based on a conditionField, limit, and offset.
+func ReadAllPagination(db *gorm.DB, model []domains.ExitPermission, conditionField string, modelID uuid.UUID, limit, offset int) ([]domains.ExitPermission, error) {
+	err := db.Where(conditionField+" = ? ", modelID).Limit(limit).Offset(offset).Find(&model).Error
 	return model, err
 }

@@ -39,6 +39,9 @@ definitions:
         description: Status of the advanceSalaryRequest request.(pending, approved,
           rejected)
         type: string
+      userID:
+        description: User ID associated with the advance salary request
+        type: string
     type: object
   AdvanceSalaryRequestIn:
     description: AdvanceSalaryRequestIn represents the input structure for updating
@@ -58,11 +61,12 @@ definitions:
       responseKey:
         type: string
     type: object
-  AssignTestIn:
-    description: AssignTestIn represents the input structure for creating a new test.
+  CandidatAnswerIn:
+    description: CandidatAnswerIn represents the input structure for updating the
+      CandidatAnswer.
     properties:
-      testID:
-        description: The testID associated with the candidat
+      candidatAnswer:
+        description: The candidat answer to the question
         type: string
     type: object
   CompaniesDetails:
@@ -332,6 +336,76 @@ definitions:
           list.
         type: integer
     type: object
+  ExperienceCount:
+    description: ProjectsCount represents the count of projects.
+    properties:
+      count:
+        description: Count is the number of projects.
+        type: integer
+    type: object
+  ExperienceDetails:
+    description: ExperienceDetails represents detailed information about a specific
+      user exp.
+    properties:
+      CompanyID:
+        type: string
+      id:
+        description: ID is the unique identifier for the exp.
+        type: string
+      professional_training:
+        description: the user exp
+        type: string
+    type: object
+  ExperienceIn:
+    description: ExperienceIn represents the input structure for creating a new experiences
+      for one user .
+    properties:
+      professional_training:
+        description: experiences that wil be added to the specified user
+        type: string
+    required:
+    - professional_training
+    type: object
+  ExperienceList:
+    description: ExperienceList represents a simplified version of the project for
+      listing purposes.
+    properties:
+      id:
+        description: ID is the unique identifier for the project.
+        type: string
+      professional_trainings:
+        description: technologies required to develop the project
+        type: string
+    type: object
+  ExperiencePagination:
+    description: ExperiencePagination represents the paginated list of projects.
+    properties:
+      items:
+        description: Items is a slice containing individual project details.
+        items:
+          $ref: '#/definitions/ExperienceTable'
+        type: array
+      limit:
+        description: Limit is the maximum number of items per page in the pagination.
+        type: integer
+      page:
+        description: Page is the current page number in the pagination.
+        type: integer
+      totalCount:
+        description: TotalCount is the total number of project in the entire list.
+        type: integer
+    type: object
+  ExperienceTable:
+    description: ExperienceTable represents a single project entry in a table.
+    properties:
+      id:
+        description: ID is the unique identifier for the project.
+        type: string
+      professional_training:
+        description: ProfessionalTrainings pq.StringArray `json:"professional_trainings"
+          binding:"required"`
+        type: string
+    type: object
   InternsCount:
     description: InternsCount represents the count of interns.
     properties:
@@ -497,6 +571,9 @@ definitions:
         type: string
       type:
         description: Type of LeaveRequests (e.g., annual, sick, maternity, unpaid)
+        type: string
+      userID:
+        description: User ID associated with the Leave requests
         type: string
     type: object
   LeaveIn:
@@ -775,16 +852,21 @@ definitions:
           with the project. It is required.
         type: string
       description:
+        description: The description of the project
         maxLength: 80
         minLength: 3
         type: string
       exp_date:
+        description: the expiration date of the project
         type: string
       projectname:
         description: projectname is the  name of the project. It is required and should
           be between 3 and 35 characters.
         maxLength: 35
         minLength: 3
+        type: string
+      specialty:
+        description: The specialty of the project
         type: string
       technologies:
         description: technologies required to develop the project
@@ -1022,6 +1104,46 @@ definitions:
         description: Name is the name of the role.
         type: string
     type: object
+  ScoresTable:
+    description: ScoresTable represents a single Scores entry in a table.
+    properties:
+      firstname:
+        description: The user's first name
+        type: string
+      id_candidat:
+        description: ID is the unique identifier for the candidat.
+        type: string
+      id_test:
+        description: ID is the unique identifier for the test.
+        type: string
+      lastname:
+        description: The user's last name
+        type: string
+      score:
+        description: The score associated with the test and the candidat
+        type: integer
+      title:
+        description: The title of the test
+        type: string
+    type: object
+  ScosPagination:
+    description: ScoresPagination represents the paginated list of Scores.
+    properties:
+      items:
+        description: Items is a slice containing individual test details.
+        items:
+          $ref: '#/definitions/ScoresTable'
+        type: array
+      limit:
+        description: Limit is the maximum number of items per page in the pagination.
+        type: integer
+      page:
+        description: Page is the current page number in the pagination.
+        type: integer
+      totalCount:
+        description: TotalCount is the total number of tests in the entire list.
+        type: integer
+    type: object
   Signin:
     description: Signin represents the information required for signing in candidat.
     properties:
@@ -1108,18 +1230,6 @@ definitions:
           type: string
         type: array
     type: object
-  TestsIn:
-    description: TestsIn represents the input structure for creating a new test.
-    properties:
-      specialty:
-        description: The specialty of the test
-        type: string
-      technologies:
-        description: The technologies assigned to the test
-        items:
-          type: string
-        type: array
-    type: object
   TestsList:
     description: TestsList represents a simplified version of the test for listing
       purposes.
@@ -1136,12 +1246,13 @@ definitions:
         type: array
     type: object
   TestsPagination:
-    description: TestsPagination represents the paginated list of tests.
+    description: QuestionsPagination represents the paginated list of questions by
+      testID.
     properties:
       items:
         description: Items is a slice containing individual test details.
         items:
-          $ref: '#/definitions/TestsTable'
+          $ref: '#/definitions/QuestionsTable'
         type: array
       limit:
         description: Limit is the maximum number of items per page in the pagination.
@@ -1152,36 +1263,6 @@ definitions:
       totalCount:
         description: TotalCount is the total number of tests in the entire list.
         type: integer
-    type: object
-  TestsQuestionsPagination:
-    description: TestsQuestionsPagination represents the paginated list of tests.
-    properties:
-      items:
-        description: Items is a slice containing individual test details.
-        items:
-          $ref: '#/definitions/TestsQuestionsTable'
-        type: array
-      limit:
-        description: Limit is the maximum number of items per page in the pagination.
-        type: integer
-      page:
-        description: Page is the current page number in the pagination.
-        type: integer
-      totalCount:
-        description: TotalCount is the total number of tests in the entire list.
-        type: integer
-    type: object
-  TestsQuestionsTable:
-    description: TestsQuestionsTable represents a single test entry in a table.
-    properties:
-      id:
-        description: ID is the unique identifier for the test.
-        type: string
-      randomQuestions:
-        description: The questions associated with the test
-        items:
-          type: string
-        type: array
     type: object
   TestsTable:
     description: TestsTable represents a single test entry in a table.
@@ -1200,6 +1281,111 @@ definitions:
         items:
           type: string
         type: array
+      title:
+        description: The title of the test
+        type: string
+    type: object
+  TrainingRequestDescision:
+    description: TrainingRequestDescision represents the descision of training request
+      .
+    properties:
+      decision_company:
+        type: string
+    type: object
+  TrainingRequestDetails:
+    description: TrainingRequestDetails represents detailed information about a specific
+      MissionOrders.
+    properties:
+      decision_company:
+        type: string
+      description:
+        description: Description of   the missionOrders
+        type: string
+      id:
+        type: string
+      reason:
+        description: Adress client for the Missi
+        type: string
+      request_date:
+        description: RequestDate
+        type: string
+      training_title:
+        description: Object   of the missionOrders
+        type: string
+      userID:
+        description: ID is the unique identifier for the Missi
+        type: string
+    type: object
+  TrainingRequestIn:
+    description: TrainingRequestIn represents the input structure for updating the
+      attributes  of MissionOrders.
+    properties:
+      decision_company:
+        type: string
+      description:
+        description: Description of   the missionOrders
+        type: string
+      reason:
+        description: Adress client for the Missi
+        type: string
+      request_date:
+        description: RequestDate
+        type: string
+      training_title:
+        description: Object   of the missionOrders
+        type: string
+      userID:
+        description: ID is the unique identifier for the Missi
+        type: string
+    required:
+    - description
+    - reason
+    - request_date
+    - training_title
+    - userID
+    type: object
+  TrainingRequestPagination:
+    description: TrainingRequestPagination represents the paginated list of missions.
+    properties:
+      items:
+        description: Items is a slice containing individual missions details.
+        items:
+          $ref: '#/definitions/TrainingRequestTable'
+        type: array
+      limit:
+        description: Limit is the maximum number of items per page in the pagination.
+        type: integer
+      page:
+        description: Page is the current page number in the pagination.
+        type: integer
+      totalCount:
+        description: TotalCount is the total number of missions orders in the entire
+          list.
+        type: integer
+    type: object
+  TrainingRequestTable:
+    description: TrainingRequestTable represents a single TrainingRequest entry in
+      a table.
+    properties:
+      decision_company:
+        type: string
+      description:
+        description: Description of   the missionOrders
+        type: string
+      id:
+        type: string
+      reason:
+        description: Adress client for the Missi
+        type: string
+      request_date:
+        description: RequestDate
+        type: string
+      training_title:
+        description: Object   of the missionOrders
+        type: string
+      userID:
+        description: ID is the unique identifier for the Missi
+        type: string
     type: object
   UsersCount:
     description: UsersCount represents the count of users.
@@ -1304,24 +1490,30 @@ definitions:
         type: integer
     type: object
   UsersTable:
-    description: UsersTable represents a single user entry in a table.
+    description: UsersTable represents a single project entry in a table.
     properties:
-      createdAt:
-        description: CreatedAt is the timestamp indicating when the user entry was
-          created.
+      code:
+        description: code is the code of pfe project
         type: string
-      email:
-        description: Email is the email address of the user.
+      companyID:
+        description: CompanyID is the unique identifier for the company associated
+          with the project. It is required.
         type: string
-      firstname:
-        description: Firstname is the first name of the user.
+      expdate:
+        description: expdate is the timestamp indicating when the project entry will
+          ends.
         type: string
       id:
-        description: ID is the unique identifier for the user.
+        description: ID is the unique identifier for the project.
         type: string
-      lastname:
-        description: Lastname is the last name of the user.
+      projectname:
+        description: projectname is the  name of the project. It is required .
         type: string
+      technologies:
+        description: technologies required to develop the project
+        items:
+          type: string
+        type: array
     type: object
   codeProject:
     description: codeProject represents code project about a specific project.
@@ -1386,12 +1578,17 @@ info:
   title: Project Name
   version: "0.1"
 paths:
-  /AdvanceSalaryRequests:
+  /advance_salaryRequests/{companyID}:
     post:
       consumes:
       - application/json
       description: Create a new AdvanceSalaryRequests.
       parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
       - description: AdvanceSalaryRequestsquery params
         in: body
         name: request
@@ -1426,54 +1623,7 @@ paths:
       summary: Create AdvanceSalaryRequestsdemande
       tags:
       - AdvanceSalaryRequests
-  /AdvanceSalaryRequests/{userID}:
-    get:
-      description: Get all AdvanceSalaryRequests.
-      parameters:
-      - description: User ID
-        in: path
-        name: userID
-        required: true
-        type: string
-      - description: Page
-        in: query
-        name: page
-        type: integer
-      - description: Limit
-        in: query
-        name: limit
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/AdvanceSalaryRequestDetails'
-            type: array
-        "400":
-          description: Invalid request
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ApiResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: Get AdvanceSalaryRequests
-      tags:
-      - AdvanceSalaryRequests
-  /AdvanceSalaryRequests/{userID}/{ID}:
+  /advance_salaryRequests/{userID}/{ID}:
     delete:
       consumes:
       - application/json
@@ -1607,9 +1757,9 @@ paths:
       summary: Update AdvanceSalaryRequests
       tags:
       - AdvanceSalaryRequests
-  /AdvanceSalaryRequests/{userID}/count:
+  /advance_salaryRequests/{userID}/count:
     get:
-      description: Get all AdvanceSalaryRequestscount.
+      description: Get all AdvanceSalaryRequestscount by user.
       parameters:
       - description: User ID
         in: path
@@ -1644,25 +1794,32 @@ paths:
       summary: Get AdvanceSalaryRequestscount
       tags:
       - AdvanceSalaryRequests
-  /LeaveRequests:
-    post:
-      consumes:
-      - application/json
-      description: Create a new LeaveRequests.
+  /advance_salaryRequests/company/{companyID}:
+    get:
+      description: Get all AdvanceSalaryRequests by companyID.
       parameters:
-      - description: LeaveRequests query params
-        in: body
-        name: request
+      - description: Company ID
+        in: path
+        name: companyID
         required: true
-        schema:
-          $ref: '#/definitions/LeaveDemande'
+        type: string
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
-            $ref: '#/definitions/ApiResponse'
+            items:
+              $ref: '#/definitions/AdvanceSalaryRequestDetails'
+            type: array
         "400":
           description: Invalid request
           schema:
@@ -1681,12 +1838,49 @@ paths:
             $ref: '#/definitions/ApiResponse'
       security:
       - ApiKeyAuth: []
-      summary: Create LeaveRequests demande
+      summary: Get AdvanceSalaryRequests
       tags:
-      - LeaveRequests
-  /LeaveRequests/{userID}:
+      - AdvanceSalaryRequests
+  /advance_salaryRequests/count/{companyID}:
     get:
-      description: Get all LeaveRequests.
+      description: Get all AdvanceSalaryRequestscount by company.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AdvanceSalaryRequestCount'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get AdvanceSalaryRequestscount
+      tags:
+      - AdvanceSalaryRequests
+  /advance_salaryRequests/user/{userID}:
+    get:
+      description: Get all AdvanceSalaryRequests.
       parameters:
       - description: User ID
         in: path
@@ -1708,7 +1902,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/LeaveDetails'
+              $ref: '#/definitions/AdvanceSalaryRequestDetails'
             type: array
         "400":
           description: Invalid request
@@ -1728,180 +1922,9 @@ paths:
             $ref: '#/definitions/ApiResponse'
       security:
       - ApiKeyAuth: []
-      summary: Get LeaveRequests
+      summary: Get AdvanceSalaryRequests
       tags:
-      - LeaveRequests
-  /LeaveRequests/{userID}/{ID}:
-    delete:
-      consumes:
-      - application/json
-      description: Delete one LeaveRequests.
-      parameters:
-      - description: User ID
-        in: path
-        name: userID
-        required: true
-        type: string
-      - description: LeaveRequests ID
-        in: path
-        name: ID
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "400":
-          description: Invalid request
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ApiResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: Delete LeaveRequests
-      tags:
-      - LeaveRequests
-    get:
-      description: Get one LeaveRequests.
-      parameters:
-      - description: User ID
-        in: path
-        name: userID
-        required: true
-        type: string
-      - description: LeaveRequests ID
-        in: path
-        name: ID
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/LeaveDetails'
-        "400":
-          description: Invalid request
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ApiResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: Get LeaveRequests
-      tags:
-      - LeaveRequests
-    put:
-      consumes:
-      - application/json
-      description: Update one LeaveRequests.
-      parameters:
-      - description: User ID
-        in: path
-        name: userID
-        required: true
-        type: string
-      - description: LeaveRequests ID
-        in: path
-        name: ID
-        required: true
-        type: string
-      - description: LeaveRequests query params
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/LeaveIn'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "400":
-          description: Invalid request
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ApiResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: Update LeaveRequests
-      tags:
-      - LeaveRequests
-  /LeaveRequests/{userID}/count:
-    get:
-      description: Get all LeaveRequests count.
-      parameters:
-      - description: User ID
-        in: path
-        name: userID
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/LeaveCount'
-        "400":
-          description: Invalid request
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ApiResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: Get LeaveRequests count
-      tags:
-      - LeaveRequests
+      - AdvanceSalaryRequests
   /auth/signin:
     post:
       consumes:
@@ -1978,6 +2001,51 @@ paths:
       summary: Signup
       tags:
       - Authentification
+  /candidats/{companyID}:
+    post:
+      consumes:
+      - application/json
+      description: Create a new candidate.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      - description: condidat query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/CondidatIn'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create candidate
+      tags:
+      - Condidats
   /companies:
     get:
       description: Get all companies.
@@ -2219,50 +2287,6 @@ paths:
       summary: Get Candidats
       tags:
       - Condidats
-    post:
-      consumes:
-      - application/json
-      description: Create a new candidate.
-      parameters:
-      - description: Company ID
-        in: path
-        name: companyID
-        required: true
-        type: string
-      - description: condidat query params
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/CondidatIn'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "400":
-          description: Invalid request
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ApiResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: Create candidate
-      tags:
-      - Condidats
   /condidats/{companyID}/{ID}:
     delete:
       description: "Delete one candidat\t."
@@ -2395,49 +2419,6 @@ paths:
       summary: Update candidat
       tags:
       - Condidats
-  /condidats/{companyID}/Signin:
-    post:
-      consumes:
-      - application/json
-      description: Authenticate and log in a uscandidater.
-      parameters:
-      - description: Company ID
-        in: path
-        name: companyID
-        required: true
-        type: string
-      - description: candidat query params
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/Signin'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/LoggedIn'
-        "400":
-          description: Invalid request
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ApiResponse'
-      summary: Signin
-      tags:
-      - Condidats
   /condidats/{companyID}/count:
     get:
       description: Get number of all Candidats .
@@ -2514,12 +2495,60 @@ paths:
       summary: Get list of  Candidats
       tags:
       - Condidats
-  /exitPermission:
+  /condidats/{companyID}/signin:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate and log in a uscandidater.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      - description: candidat query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/Signin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/LoggedIn'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      summary: Signin
+      tags:
+      - Condidats
+  /exit_permission/{companyID}:
     post:
       consumes:
       - application/json
       description: Create a new exitPermission.
       parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
       - description: ExitPermission query params
         in: body
         name: request
@@ -2554,54 +2583,7 @@ paths:
       summary: Create an exitPermission demande
       tags:
       - ExitPermission
-  /exitPermission/{userID}:
-    get:
-      description: Get all exit permission for a specific user .
-      parameters:
-      - description: User ID
-        in: path
-        name: userID
-        required: true
-        type: string
-      - description: Page
-        in: query
-        name: page
-        type: integer
-      - description: Limit
-        in: query
-        name: limit
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/ExitPermissionPagination'
-            type: array
-        "400":
-          description: Invalid request
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ApiResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: Get exit permission
-      tags:
-      - ExitPermission
-  /exitPermission/user/{userID}/{ID}:
+  /exit_permission/{userID}/{ID}:
     delete:
       consumes:
       - application/json
@@ -2735,7 +2717,7 @@ paths:
       summary: Update exitPermission
       tags:
       - ExitPermission
-  /exitPermission/user/{userID}/count:
+  /exit_permission/{userID}/count:
     get:
       description: Get all exitPermission count.
       parameters:
@@ -2772,6 +2754,442 @@ paths:
       summary: Get exitPermission count
       tags:
       - ExitPermission
+  /exit_permission/company/{companyID}:
+    get:
+      description: Get all exit permission for a specific company .
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/ExitPermissionPagination'
+            type: array
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get exit permission
+      tags:
+      - ExitPermission
+  /exit_permission/count/{companyID}:
+    get:
+      description: Get all exitPermission count for a specific companyID.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ExitPermissionCount'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get exitPermission count
+      tags:
+      - ExitPermission
+  /exit_permission/user/{userID}:
+    get:
+      description: Get all exit permission for a specific user .
+      parameters:
+      - description: User ID
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/ExitPermissionPagination'
+            type: array
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get exit permission
+      tags:
+      - ExitPermission
+  /experience/{companyID}:
+    get:
+      description: Get all UserExperience.
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ExperiencePagination'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get UserExperience
+      tags:
+      - UserExperience
+  /experience/{companyID}/{ID}:
+    delete:
+      description: Delete one UserExperience.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      - description: Experience ID
+        in: path
+        name: ID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete  UserExperience
+      tags:
+      - UserExperience
+  /experience/{companyID}/{ID}/Get:
+    get:
+      description: Get one UserExperience.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      - description: Experience ID
+        in: path
+        name: ID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ExperienceDetails'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get UserExperience
+      tags:
+      - UserExperience
+  /experience/{companyID}/{ID}/update:
+    put:
+      consumes:
+      - application/json
+      description: Update  UserExperience .
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      - description: experience  ID
+        in: path
+        name: ID
+        required: true
+        type: string
+      - description: Project query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ExperienceIn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update  UserExperience
+      tags:
+      - UserExperience
+  /experience/{companyID}/count:
+    get:
+      description: Get number of all Experiences.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ExperienceCount'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get number of  Experiences
+      tags:
+      - UserExperience
+  /experience/{companyID}/create/{userID}:
+    post:
+      consumes:
+      - application/json
+      description: Create a new UserExperience.
+      parameters:
+      - description: companyID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      - description: userID
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: project query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ExperienceIn'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create UserExperience
+      tags:
+      - UserExperience
+  /experience/{companyID}/list:
+    get:
+      description: Get list of all Experiences.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/ExperienceList'
+            type: array
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get list of  Experiences
+      tags:
+      - UserExperience
   /interns/{companyID}:
     post:
       consumes:
@@ -3038,12 +3456,364 @@ paths:
       summary: Update intern
       tags:
       - Interns
-  /loanRequests:
+  /leave_requests/{companyID}:
+    post:
+      consumes:
+      - application/json
+      description: Create a new LeaveRequests.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      - description: LeaveRequests query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/LeaveDemande'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create LeaveRequests demande
+      tags:
+      - LeaveRequests
+  /leave_requests/{userID}/{ID}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete one LeaveRequests.
+      parameters:
+      - description: User ID
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: LeaveRequests ID
+        in: path
+        name: ID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete LeaveRequests
+      tags:
+      - LeaveRequests
+    get:
+      description: Get one LeaveRequests.
+      parameters:
+      - description: User ID
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: LeaveRequests ID
+        in: path
+        name: ID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/LeaveDetails'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get LeaveRequests
+      tags:
+      - LeaveRequests
+    put:
+      consumes:
+      - application/json
+      description: Update one LeaveRequests.
+      parameters:
+      - description: User ID
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: LeaveRequests ID
+        in: path
+        name: ID
+        required: true
+        type: string
+      - description: LeaveRequests query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/LeaveIn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update LeaveRequests
+      tags:
+      - LeaveRequests
+  /leave_requests/{userID}/count:
+    get:
+      description: Get all LeaveRequests count.
+      parameters:
+      - description: User ID
+        in: path
+        name: userID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/LeaveCount'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get LeaveRequests count
+      tags:
+      - LeaveRequests
+  /leave_requests/company/{companyID}:
+    get:
+      description: Get all LeaveRequests by companyID.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/LeaveDetails'
+            type: array
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get LeaveRequests
+      tags:
+      - LeaveRequests
+  /leave_requests/count/{companyID}:
+    get:
+      description: Get all LeaveRequests count for a specific companyID.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/LeaveCount'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get LeaveRequests count
+      tags:
+      - LeaveRequests
+  /leave_requests/user/{userID}:
+    get:
+      description: Get all LeaveRequests.
+      parameters:
+      - description: User ID
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/LeaveDetails'
+            type: array
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get LeaveRequests
+      tags:
+      - LeaveRequests
+  /loan_requests/{companyID}:
     post:
       consumes:
       - application/json
       description: Create a new loanRequests.
       parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
       - description: LoanRequests query params
         in: body
         name: request
@@ -3078,7 +3848,91 @@ paths:
       summary: Create an loanRequests demande
       tags:
       - LoanRequests
-  /loanRequests/{userID}:
+  /loan_requests/company/{companyID}:
+    get:
+      description: Get all LoanRequest for a specific companyID .
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/LoanRequestPagination'
+            type: array
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get LoanRequests
+      tags:
+      - LoanRequests
+  /loan_requests/company/{companyID}/count:
+    get:
+      description: Get all loanRequests count by compnayID.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/LoanRequestCount'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get loanRequests count
+      tags:
+      - LoanRequests
+  /loan_requests/user/{userID}:
     get:
       description: Get all LoanRequest for a specific user .
       parameters:
@@ -3125,7 +3979,7 @@ paths:
       summary: Get LoanRequests
       tags:
       - LoanRequests
-  /loanRequests/user/{userID}/{ID}:
+  /loan_requests/user/{userID}/{ID}:
     delete:
       consumes:
       - application/json
@@ -3259,7 +4113,7 @@ paths:
       summary: Update loanRequests
       tags:
       - LoanRequests
-  /loanRequests/user/{userID}/count:
+  /loan_requests/user/{userID}/count:
     get:
       description: Get all loanRequests count.
       parameters:
@@ -4304,7 +5158,7 @@ paths:
       - ApiKeyAuth: []
       summary: assign Project
       tags:
-      - Project
+      - ProjectsCondidats
   /projects/{companyID}/count:
     get:
       description: Get number of all projects.
@@ -5020,50 +5874,6 @@ paths:
       summary: Get tests
       tags:
       - Tests
-    post:
-      consumes:
-      - application/json
-      description: Create a new test.
-      parameters:
-      - description: Company ID
-        in: path
-        name: companyID
-        required: true
-        type: string
-      - description: Test query params
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/TestsIn'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "400":
-          description: Invalid request
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ApiResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: Create test
-      tags:
-      - Tests
   /tests/{companyID}/{ID}:
     delete:
       description: Delete one test.
@@ -5106,17 +5916,31 @@ paths:
       summary: Delete test
       tags:
       - Tests
+  /tests/{companyID}/{candidatID}/{testID}:
     get:
-      description: Get one test.
+      description: Get  all the answers of a test by candidatID.
       parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
       - description: Company ID
         in: path
         name: companyID
         required: true
         type: string
+      - description: Candidat ID
+        in: path
+        name: candidatID
+        required: true
+        type: string
       - description: Test ID
         in: path
-        name: ID
+        name: testID
         required: true
         type: string
       produces:
@@ -5144,77 +5968,41 @@ paths:
             $ref: '#/definitions/ApiResponse'
       security:
       - ApiKeyAuth: []
-      summary: Get test
+      summary: Get candidat Responses
       tags:
       - Tests
-    post:
-      consumes:
-      - application/json
-      description: Generate a list of questions for a specific Test.
-      parameters:
-      - description: nombre de questions
-        in: query
-        name: nbrQuestions
-        type: integer
-      - description: Company ID
-        in: path
-        name: companyID
-        required: true
-        type: string
-      - description: Test ID
-        in: path
-        name: ID
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "400":
-          description: Invalid request
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ApiResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: Generate a list of questions.
-      tags:
-      - Tests
+  /tests/{companyID}/{candidatID}/{testID}/{questionID}:
     put:
       consumes:
       - application/json
-      description: Update test.
+      description: Update the candidat response for a specific question.
       parameters:
       - description: Company ID
         in: path
         name: companyID
         required: true
         type: string
-      - description: Test ID
+      - description: Candidat ID
         in: path
-        name: ID
+        name: candidatID
         required: true
         type: string
-      - description: Test query params
+      - description: Test ID
+        in: path
+        name: testID
+        required: true
+        type: string
+      - description: Question ID
+        in: path
+        name: questionID
+        required: true
+        type: string
+      - description: CandidatAnswerIn query params
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/TestsIn'
+          $ref: '#/definitions/CandidatAnswerIn'
       produces:
       - application/json
       responses:
@@ -5240,64 +6028,22 @@ paths:
             $ref: '#/definitions/ApiResponse'
       security:
       - ApiKeyAuth: []
-      summary: Update test
+      summary: Update the candidat response
       tags:
       - Tests
-  /tests/{companyID}/Assign/{candidatID}:
-    post:
-      consumes:
-      - application/json
-      description: Assign an existant test to a candidat.
-      parameters:
-      - description: Company ID
-        in: path
-        name: companyID
-        required: true
-        type: string
-      - description: Candidat ID
-        in: path
-        name: candidatID
-        required: true
-        type: string
-      - description: Test query params
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/AssignTestIn'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "400":
-          description: Invalid request
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ApiResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: Assign test
-      tags:
-      - Tests
-  /tests/{companyID}/Candidats/{testID}:
+  /tests/{companyID}/TQuestions/{testID}:
     get:
-      description: Get all candidats that belongs to a specific test.
+      description: Get all Questions by testID.
       parameters:
-      - description: Company ID
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Test ID
         in: path
         name: companyID
         required: true
@@ -5332,57 +6078,7 @@ paths:
             $ref: '#/definitions/ApiResponse'
       security:
       - ApiKeyAuth: []
-      summary: Get candidats
-      tags:
-      - Tests
-  /tests/{companyID}/Questions/{testID}:
-    get:
-      description: Get all tests.
-      parameters:
-      - description: Page
-        in: query
-        name: page
-        type: integer
-      - description: Limit
-        in: query
-        name: limit
-        type: integer
-      - description: Company ID
-        in: path
-        name: companyID
-        required: true
-        type: string
-      - description: Test ID
-        in: path
-        name: testID
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/TestsQuestionsPagination'
-        "400":
-          description: Invalid request
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ApiResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: Get tests
+      summary: Get Questions
       tags:
       - Tests
   /tests/{companyID}/count:
@@ -5420,6 +6116,54 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Get number of  tests
+      tags:
+      - Tests
+  /tests/{companyID}/create/{candidatID}:
+    post:
+      consumes:
+      - application/json
+      description: Create a new test.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      - description: Candidat ID
+        in: path
+        name: candidatID
+        required: true
+        type: string
+      - description: NbrQuestions
+        in: query
+        name: nbrQuestions
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create test
       tags:
       - Tests
   /tests/{companyID}/list:
@@ -5461,6 +6205,321 @@ paths:
       summary: Get list of  tests
       tags:
       - Tests
+  /tests/{companyID}/scores:
+    get:
+      description: Get all scores.
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ScosPagination'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get candidats scores
+      tags:
+      - Tests
+  /training_request/{userID}/{companyID}:
+    post:
+      consumes:
+      - application/json
+      description: Create a new TrainingRequest.
+      parameters:
+      - description: companyID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      - description: userID
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: TrainingRequestIn query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/TrainingRequestIn'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Training request  Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create TrainingRequest
+      tags:
+      - TrainingRequest
+  /training_request/All/{userID}:
+    get:
+      description: Get all  training request .
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: User ID
+        in: path
+        name: userID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/TrainingRequestPagination'
+            type: array
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Presenceal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get TrainingRequests
+      tags:
+      - TrainingRequest
+  /training_request/count/{userID}:
+    get:
+      description: Get all TrainingRequest count.
+      parameters:
+      - description: User ID
+        in: path
+        name: userID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/MissionOrdersCount'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Presenceal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get TrainingRequest count
+      tags:
+      - TrainingRequest
+  /training_request/delete/{ID}/{userID}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete one TrainingRequest.
+      parameters:
+      - description: User Id
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: TrainingRequest ID
+        in: path
+        name: ID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: MissionOrderseal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete TrainingRequest
+      tags:
+      - TrainingRequest
+  /training_request/get/{ID}/{userID}:
+    get:
+      description: Get one TrainingRequests.
+      parameters:
+      - description: User ID
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: training_request ID
+        in: path
+        name: ID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/TrainingRequestDetails'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Presenceal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get TrainingRequests
+      tags:
+      - TrainingRequest
+  /training_request/update/{ID}/{userID}:
+    put:
+      consumes:
+      - application/json
+      description: Update one TrainingRequest.
+      parameters:
+      - description: 'userID '
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: TrainingRequestIn ID
+        in: path
+        name: ID
+        required: true
+        type: string
+      - description: TrainingRequestIn query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/TrainingRequestDescision'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Presenceal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update TrainingRequest
+      tags:
+      - TrainingRequest
   /users/{companyID}:
     get:
       description: Get all users.

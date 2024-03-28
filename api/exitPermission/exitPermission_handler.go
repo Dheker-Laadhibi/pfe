@@ -21,18 +21,34 @@ import (
 // @Accept			json
 // @Produce			json
 // @Security 		ApiKeyAuth
+// @Param				companyID				path			string		true		"Company ID"
 // @Param			request			body			exitPermission.ExitPermissionDemande		true		"ExitPermission query params"
 // @Success			201				{object}		utils.ApiResponses
 // @Failure			400				{object}		utils.ApiResponses	"Invalid request"
 // @Failure			401				{object}		utils.ApiResponses	"Unauthorized"
 // @Failure			403				{object}		utils.ApiResponses	"Forbidden"
 // @Failure			500				{object}		utils.ApiResponses	"Internal Server Error"
-// @Router			/exitPermission	[post]
+// @Router			/exit_permission/{companyID}	[post]
 func (db Database) AddExitPermission(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
 	logrus.Error("userUd from session", session.UserID)
+
+	// Parse and validate the company ID from the request parameter
+	companyID, err := uuid.Parse(ctx.Param("companyID"))
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Check if the employee belongs to the specified company
+	if err := domains.CheckEmployeeBelonging(db.DB, companyID, session.UserID, session.CompanyID); err != nil {
+		logrus.Error("Error verifying employee belonging. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
 
 	// Parse the incoming JSON request into a ExitPermissionDemande struct
 	exitPermission := new(ExitPermissionDemande)
@@ -56,6 +72,7 @@ func (db Database) AddExitPermission(ctx *gin.Context) {
 		ReturnTime:  exitPermission.ReturnDate,
 		Type:        exitPermission.Type,
 		UserID:      session.UserID,
+		CompanyID:   companyID,
 	}
 	if err := domains.Create(db.DB, dbPermission); err != nil {
 		logrus.Error("Error saving data to the database. Error: ", err.Error())
@@ -81,7 +98,7 @@ func (db Database) AddExitPermission(ctx *gin.Context) {
 // @Failure				401					{object}		utils.ApiResponses		"Unauthorized"
 // @Failure				403					{object}		utils.ApiResponses		"Forbidden"
 // @Failure				500					{object}		utils.ApiResponses		"Internal Server Error"
-// @Router				/exitPermission/{userID}	[get]
+// @Router				/exit_permission/user/{userID}	[get]
 func (db Database) ReadAllExitPermission(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -137,7 +154,7 @@ func (db Database) ReadAllExitPermission(ctx *gin.Context) {
 	offset := (page - 1) * limit
 
 	// Retrieve all exitPermission data from the database
-	exitPermission, err := ReadAllPagination(db.DB, []domains.ExitPermission{}, userID, limit, offset)
+	exitPermission, err := ReadAllPagination(db.DB, []domains.ExitPermission{}, "user_id", userID, limit, offset)
 	if err != nil {
 		logrus.Error("Error occurred while finding all exitPermission data. Error: ", err)
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
@@ -176,7 +193,114 @@ func (db Database) ReadAllExitPermission(ctx *gin.Context) {
 
 }
 
-//************************************************
+// ReadExitPermissionByCompany			Handles the retrieval of all exit permissions for a specific company .
+// @Summary        		Get exit permission
+// @Description    		Get all exit permission for a specific company .
+// @Tags				ExitPermission
+// @Produce				json
+// @Security 			ApiKeyAuth
+// @Param				companyID				path			string		true		"Company ID"
+// @Param			page			query		int					false	"Page"
+// @Param			limit			query		int					false	"Limit"
+// @Success				200					{array}			exitPermission.ExitPermissionPagination
+// @Failure				400					{object}		utils.ApiResponses		"Invalid request"
+// @Failure				401					{object}		utils.ApiResponses		"Unauthorized"
+// @Failure				403					{object}		utils.ApiResponses		"Forbidden"
+// @Failure				500					{object}		utils.ApiResponses		"Internal Server Error"
+// @Router				/exit_permission/company/{companyID}	[get]
+func (db Database) ReadAllExitPermissionByCompany(ctx *gin.Context) {
+
+	// Extract JWT values from the context
+	session := utils.ExtractJWTValues(ctx)
+
+	// Parse and validate the exitPermission ID from the request parameter
+	companyID, err := uuid.Parse(ctx.Param("companyID"))
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Check if the employee belongs to the specified company
+	if err := domains.CheckEmployeeBelonging(db.DB, companyID, session.UserID, session.CompanyID); err != nil {
+		logrus.Error("Error verifying employee belonging. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Parse and validate the page from the request parameter
+	page, err := strconv.Atoi(ctx.DefaultQuery("page", strconv.Itoa(constants.DEFAULT_PAGE_PAGINATION)))
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid INT format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Parse and validate the limit from the request parameter
+	limit, err := strconv.Atoi(ctx.DefaultQuery("limit", strconv.Itoa(constants.DEFAULT_LIMIT_PAGINATION)))
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid INT format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Check if the ExitPermissionDemande's value is among the allowed choices
+	validChoices := utils.ResponseLimitPagination()
+	isValidChoice := false
+	for _, choice := range validChoices {
+		if uint(limit) == choice {
+			isValidChoice = true
+			break
+		}
+	}
+
+	// If the value is invalid, set it to default DEFAULT_LIMIT_PAGINATION
+	if !isValidChoice {
+		limit = constants.DEFAULT_LIMIT_PAGINATION
+	}
+
+	// Generate offset
+	offset := (page - 1) * limit
+
+	// Retrieve all exitPermission data from the database
+	exitPermission, err := ReadAllPagination(db.DB, []domains.ExitPermission{}, "company_id", companyID, limit, offset)
+	if err != nil {
+		logrus.Error("Error occurred while finding all exitPermission data. Error: ", err)
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
+		return
+	}
+
+	// Retriece total count
+	count, err := domains.ReadTotalCount(db.DB, &domains.ExitPermission{}, "company_id", companyID)
+	if err != nil {
+		logrus.Error("Error occurred while finding total count. Error: ", err)
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
+		return
+	}
+
+	// Generate a ExitPermission structure as a response
+	response := ExitPermissionPagination{}
+	listExitPermission := []ExitPermissionDetails{}
+	for _, exitPermission := range exitPermission {
+
+		listExitPermission = append(listExitPermission, ExitPermissionDetails{
+			ID:        exitPermission.ID,
+			Status:    exitPermission.Status,
+			Reason:    exitPermission.Reason,
+			UserID:    exitPermission.UserID,
+			CreatedAt: exitPermission.CreatedAt,
+		})
+	}
+
+	response.Items = listExitPermission
+	response.Page = uint(page)
+	response.Limit = uint(limit)
+	response.TotalCount = count
+
+	// Respond with success
+	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, response)
+
+}
 
 // ReadExitPermissionCount	Handles the retrieval the number of all exitPermission.
 // @Summary        			Get exitPermission count
@@ -190,7 +314,7 @@ func (db Database) ReadAllExitPermission(ctx *gin.Context) {
 // @Failure					401					{object}		utils.ApiResponses		"Unauthorized"
 // @Failure					403					{object}		utils.ApiResponses		"Forbidden"
 // @Failure					500					{object}		utils.ApiResponses		"Internal Server Error"
-// @Router					/exitPermission/user/{userID}/count	[get]
+// @Router					/exit_permission/{userID}/count	[get]
 func (db Database) ReadExitPermissionCount(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -227,6 +351,59 @@ func (db Database) ReadExitPermissionCount(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, count)
 }
 
+//***********************************************
+
+// ReadExitPermissionCountByCompany	Handles the retrieval the number of all exitPermission for a specific companyID.
+// @Summary        			Get exitPermission count
+// @Description    			Get all exitPermission count for a specific companyID.
+// @Tags					ExitPermission
+// @Produce					json
+// @Security 				ApiKeyAuth
+// @Param					companyID				path			string		true		"Company ID"
+// @Success					200					{object}		exitPermission.ExitPermissionCount
+// @Failure					400					{object}		utils.ApiResponses		"Invalid request"
+// @Failure					401					{object}		utils.ApiResponses		"Unauthorized"
+// @Failure					403					{object}		utils.ApiResponses		"Forbidden"
+// @Failure					500					{object}		utils.ApiResponses		"Internal Server Error"
+// @Router					/exit_permission/count/{companyID}	[get]
+func (db Database) ReadExitPermissionCountByCompany(ctx *gin.Context) {
+
+	// Extract JWT values from the context
+	session := utils.ExtractJWTValues(ctx)
+
+	// Parse and validate the exitPermission ID from the request parameter
+	companyID, err := uuid.Parse(ctx.Param("companyID"))
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Check if the employee belongs to the specified company
+	if err := domains.CheckEmployeeBelonging(db.DB, companyID, session.UserID, session.CompanyID); err != nil {
+		logrus.Error("Error verifying employee belonging. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Retrieve all exitPermission data from the database
+	exitPermission, err := domains.ReadTotalCount(db.DB, &domains.ExitPermission{}, "company_id", companyID)
+	if err != nil {
+		logrus.Error("Error occurred while finding all exitPermission data. Error: ", err)
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
+		return
+	}
+
+	count := ExitPermissionCount{
+		Count: exitPermission,
+	}
+
+	// Respond with success
+	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, count)
+}
+
+//***********************************************
+
 // ReadExitPermission		Handles the retrieval of one exitPermission.
 // @Summary        		Get exitPermission
 // @Description    		Get one exitPermission.
@@ -240,7 +417,7 @@ func (db Database) ReadExitPermissionCount(ctx *gin.Context) {
 // @Failure				401						{object}		utils.ApiResponses		"Unauthorized"
 // @Failure				403						{object}		utils.ApiResponses		"Forbidden"
 // @Failure				500						{object}		utils.ApiResponses		"Internal Server Error"
-// @Router				/exitPermission/user/{userID}/{ID}	[get]
+// @Router				/exit_permission/{userID}/{ID}	[get]
 func (db Database) ReadOneExitPermission(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -305,7 +482,7 @@ func (db Database) ReadOneExitPermission(ctx *gin.Context) {
 // @Failure				401						{object}		utils.ApiResponses		"Unauthorized"
 // @Failure				403						{object}		utils.ApiResponses		"Forbidden"
 // @Failure				500						{object}		utils.ApiResponses		"Internal Server Error"
-// @Router				/exitPermission/user/{userID}/{ID}	[put]
+// @Router				/exit_permission/{userID}/{ID}	[put]
 func (db Database) UpdateExitPermission(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -377,7 +554,7 @@ func (db Database) UpdateExitPermission(ctx *gin.Context) {
 // @Failure				401						{object}		utils.ApiResponses			"Unauthorized"
 // @Failure				403						{object}		utils.ApiResponses			"Forbidden"
 // @Failure				500						{object}		utils.ApiResponses			"Internal Server Error"
-// @Router				/exitPermission/user/{userID}/{ID}	[delete]
+// @Router				/exit_permission/{userID}/{ID}	[delete]
 func (db Database) DeleteExitPermission(ctx *gin.Context) {
 
 	// Extract JWT values from the context

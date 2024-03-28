@@ -17,24 +17,20 @@ func TestRouterInit(router *gin.RouterGroup, db *gorm.DB) {
 	// Private
 	tests := router.Group("/tests/:companyID")
 	{
-
 		// POST endpoint to create a new test
-		tests.POST("", baseInstance.CreateTest)
-
-		// POST endpoint to Generate Questions
-		tests.POST("/:ID", baseInstance.GenerateQuestions)
-
-		// POST endpoint to Assign Tests
-		tests.POST("/Assign/:candidatID", baseInstance.AssignTest)
+		tests.POST("/create/:candidatID", baseInstance.CreateTest)
 
 		// GET endpoint to retrieve all tests for a specific company
 		tests.GET("", baseInstance.ReadTests)
 
-		// GET endpoint to retrieve all candidats for a specific test
-		tests.GET("/Candidats/:testID", baseInstance.ReadTestsCandidats)
+		// GET endpoint to retrieve all questions for a specific Test
+		tests.GET("/TQuestions/:testID", baseInstance.ReadQuestionsbyTest)
 
-		// GET endpoint to retrieve all questionss for a specific test
-		tests.GET("/Questions/:testID", baseInstance.ReadTestsQuestions)
+		// GET endpoint to retrieve all Answers details for a specific test and a specific candidat
+		tests.GET("/:candidatID/:testID", baseInstance.ReadTestAnswers)
+
+		// GET endpoint to retrieve all candidats for a specific test
+		tests.GET("/scores", baseInstance.ReadScores)
 
 		// GET endpoint to retrieve a list of tests for a specific company
 		tests.GET("/list", baseInstance.ReadTestsList)
@@ -42,11 +38,8 @@ func TestRouterInit(router *gin.RouterGroup, db *gorm.DB) {
 		// GET endpoint to retrieve the count of tests for a specific company
 		tests.GET("/count", baseInstance.ReadTestsCount)
 
-		// GET endpoint to retrieve details of a specific test
-		tests.GET("/:ID", baseInstance.ReadTest)
-
-		// PUT endpoint to update details of a specific test
-		tests.PUT("/:ID", baseInstance.UpdateTest)
+		// PUT endpoint to Update the candidat answer
+		tests.PUT("/:candidatID/:testID/:questionID", baseInstance.UpdateCandidatAnswer)
 
 		// DELETE endpoint to delete a specific test
 		tests.DELETE("/:ID", baseInstance.DeleteTest)

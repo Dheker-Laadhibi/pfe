@@ -59,6 +59,16 @@ func Update(db *gorm.DB, model interface{}, id uuid.UUID) error {
 	return db.Model(model).Where("id = ?", id).Updates(model).Error
 }
 
+// Update updates a TestQuestions identified by QuestionID with the provided model in the database.
+func UpdateAnswer(db *gorm.DB, model interface{}, id uuid.UUID, candidatID uuid.UUID, testID uuid.UUID) error {
+	return db.Model(model).Where("question_id = ? and candidat_id = ? and tests_id = ? ", id, candidatID, testID).Updates(model).Error
+}
+
+// Update updates the score in TestCandidats identified by CandidatID and TestID with the provided model in the database.
+func UpdateScore(db *gorm.DB, model interface{}, candidatID uuid.UUID, testID uuid.UUID, score int) error {
+	return db.Model(model).Where("candidat_id = ? AND tests_id = ?", candidatID, testID).Update("Score", score).Error
+}
+
 // Delete deletes a record identified by ID for the provided model from the database.
 func Delete(db *gorm.DB, model interface{}, id uuid.UUID) error {
 	return db.Delete(model, id).Error
@@ -73,6 +83,42 @@ func CheckByID(db *gorm.DB, model interface{}, id uuid.UUID) error {
 func ReadTotalCount(db *gorm.DB, model interface{}, conditionField string, conditionID uuid.UUID) (uint, error) {
 	var count int64
 	check := db.Select("id").Where(conditionField+" = ?", conditionID).Find(model)
+	if check.Error != nil {
+		return 0, check.Error
+	}
+
+	check.Count(&count)
+	return uint(count), nil
+}
+
+// ReadTotalCount retrieves the total count of records based on the specified condition.
+func ReadTotalCountQT(db *gorm.DB, model interface{}, conditionField string, conditionID uuid.UUID) (uint, error) {
+	var count int64
+	check := db.Select("tests_id").Where(conditionField+" = ?", conditionID).Find(model)
+	if check.Error != nil {
+		return 0, check.Error
+	}
+
+	check.Count(&count)
+	return uint(count), nil
+}
+
+// ReadTotalCount retrieves the total count of records based on the specified condition.
+func ReadTotalCountAnswers(db *gorm.DB, model interface{}, conditionField1 string, conditionField2 string, conditionID1 uuid.UUID, conditionID2 uuid.UUID) (uint, error) {
+	var count int64
+	check := db.Select("tests_id").Where(conditionField1+" = ? and "+conditionField2+" = ?", conditionID1, conditionID2).Find(model)
+	if check.Error != nil {
+		return 0, check.Error
+	}
+
+	check.Count(&count)
+	return uint(count), nil
+}
+
+// ReadTotalCount retrieves the total count of records based on the specified condition.
+func ReadTotalCountAS(db *gorm.DB, model interface{}, conditionField string, conditionID uuid.UUID) (uint, error) {
+	var count int64
+	check := db.Select("company_id").Where(conditionField+" = ?", conditionID).Find(model)
 	if check.Error != nil {
 		return 0, check.Error
 	}

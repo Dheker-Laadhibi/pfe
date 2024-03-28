@@ -22,6 +22,7 @@ type AdvanceSalaryRequestDetails struct {
 	Amount    float64   `gorm:"column:amount; not null"` // The amount of the advance.
 	Status    string    `json:"status"`                  // Status of the advanceSalaryRequest request.(pending, approved, rejected)
 	Reason    string    `json:"reason"`                  // Reason of the advanceSalaryRequest.
+	UserID    uuid.UUID `gorm:"column:user_id;"`         // User ID associated with the advance salary request
 	CreatedAt time.Time `json:"createdAt"`               // CreatedAt is the timestamp indicating when the advanceSalaryRequest was created.
 } //@name AdvanceSalaryRequestDetails
 

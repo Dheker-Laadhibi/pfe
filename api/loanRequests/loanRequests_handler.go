@@ -20,18 +20,34 @@ import (
 // @Accept			json
 // @Produce			json
 // @Security 		ApiKeyAuth
+// @Param				companyID				path			string		true		"Company ID"
 // @Param			request			body			loanRequests.LoanRequestDemande		true		"LoanRequests query params"
 // @Success			201				{object}		utils.ApiResponses
 // @Failure			400				{object}		utils.ApiResponses	"Invalid request"
 // @Failure			401				{object}		utils.ApiResponses	"Unauthorized"
 // @Failure			403				{object}		utils.ApiResponses	"Forbidden"
 // @Failure			500				{object}		utils.ApiResponses	"Internal Server Error"
-// @Router			/loanRequests	[post]
+// @Router			/loan_requests/{companyID}	[post]
 func (db Database) AddLoanRequests(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
 	logrus.Error("userUd from session", session.UserID)
+
+	// Parse and validate the company ID from the request parameter
+	companyID, err := uuid.Parse(ctx.Param("companyID"))
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Check if the employee belongs to the specified company
+	if err := domains.CheckEmployeeBelonging(db.DB, companyID, session.UserID, session.CompanyID); err != nil {
+		logrus.Error("Error verifying employee belonging. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
 
 	// Parse the incoming JSON request into a LoanRequestDemande struct
 	loanRequests := new(LoanRequestDemande)
@@ -49,6 +65,7 @@ func (db Database) AddLoanRequests(ctx *gin.Context) {
 		InterestRate:  loanRequests.InterestRate,
 		ReasonForLoan: loanRequests.ReasonForLoan,
 		PathDocument:  loanRequests.PathDocument,
+		CompanyID:     companyID,
 		UserID:        session.UserID,
 	}
 	if err := domains.Create(db.DB, dbLoanRequests); err != nil {
@@ -75,7 +92,7 @@ func (db Database) AddLoanRequests(ctx *gin.Context) {
 // @Failure				401					{object}		utils.ApiResponses		"Unauthorized"
 // @Failure				403					{object}		utils.ApiResponses		"Forbidden"
 // @Failure				500					{object}		utils.ApiResponses		"Internal Server Error"
-// @Router				/loanRequests/{userID}	[get]
+// @Router				/loan_requests/user/{userID}	[get]
 func (db Database) ReadAllLoanRequests(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -131,7 +148,7 @@ func (db Database) ReadAllLoanRequests(ctx *gin.Context) {
 	offset := (page - 1) * limit
 
 	// Retrieve all loanRequests data from the database
-	loanRequests, err := ReadAllPagination(db.DB, []domains.LoanRequests{}, userID, limit, offset)
+	loanRequests, err := ReadAllPagination(db.DB, []domains.LoanRequests{}, "user_id", userID, limit, offset)
 	if err != nil {
 		logrus.Error("Error occurred while finding all loanRequests data. Error: ", err)
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
@@ -174,7 +191,118 @@ func (db Database) ReadAllLoanRequests(ctx *gin.Context) {
 
 }
 
-//************************************************
+// ReadLoanRequestByCompany			Handles the retrieval of all loanRequests for a specific company .
+// @Summary        			Get LoanRequests
+// @Description    			Get all LoanRequest for a specific companyID .
+// @Tags					LoanRequests
+// @Produce					json
+// @Security 				ApiKeyAuth
+// @Param					companyID				path			string		true		"Company ID"
+// @Param					page			query		int					false	"Page"
+// @Param					limit			query		int					false	"Limit"
+// @Success				200					{array}			loanRequests.LoanRequestPagination
+// @Failure				400					{object}		utils.ApiResponses		"Invalid request"
+// @Failure				401					{object}		utils.ApiResponses		"Unauthorized"
+// @Failure				403					{object}		utils.ApiResponses		"Forbidden"
+// @Failure				500					{object}		utils.ApiResponses		"Internal Server Error"
+// @Router				/loan_requests/company/{companyID}	[get]
+func (db Database) ReadAllLoanRequestsByCompany(ctx *gin.Context) {
+
+	// Extract JWT values from the context
+	session := utils.ExtractJWTValues(ctx)
+
+	// Parse and validate the loanRequests ID from the request parameter
+	companyID, err := uuid.Parse(ctx.Param("companyID"))
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Check if the employee belongs to the specified company
+	if err := domains.CheckEmployeeBelonging(db.DB, companyID, session.UserID, session.CompanyID); err != nil {
+		logrus.Error("Error verifying employee belonging. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Parse and validate the page from the request parameter
+	page, err := strconv.Atoi(ctx.DefaultQuery("page", strconv.Itoa(constants.DEFAULT_PAGE_PAGINATION)))
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid INT format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Parse and validate the limit from the request parameter
+	limit, err := strconv.Atoi(ctx.DefaultQuery("limit", strconv.Itoa(constants.DEFAULT_LIMIT_PAGINATION)))
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid INT format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Check if the loanRequest's value is among the allowed choices
+	validChoices := utils.ResponseLimitPagination()
+	isValidChoice := false
+	for _, choice := range validChoices {
+		if uint(limit) == choice {
+			isValidChoice = true
+			break
+		}
+	}
+
+	// If the value is invalid, set it to default DEFAULT_LIMIT_PAGINATION
+	if !isValidChoice {
+		limit = constants.DEFAULT_LIMIT_PAGINATION
+	}
+
+	// Generate offset
+	offset := (page - 1) * limit
+
+	// Retrieve all loanRequests data from the database
+	loanRequests, err := ReadAllPagination(db.DB, []domains.LoanRequests{}, "company_id", companyID, limit, offset)
+	if err != nil {
+		logrus.Error("Error occurred while finding all loanRequests data. Error: ", err)
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
+		return
+	}
+
+	// Retriece total count
+	count, err := domains.ReadTotalCount(db.DB, &domains.LoanRequests{}, "company_id", companyID)
+	if err != nil {
+		logrus.Error("Error occurred while finding total count. Error: ", err)
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
+		return
+	}
+
+	// Generate a LoanRequests structure as a response
+	response := LoanRequestPagination{}
+	listLoanRequest := []LoanRequestDetails{}
+	for _, loanRequests := range loanRequests {
+
+		listLoanRequest = append(listLoanRequest, LoanRequestDetails{
+			ID:            loanRequests.ID,
+			LoanAmount:    loanRequests.LoanAmount,
+			LoanDuration:  loanRequests.LoanDuration,
+			InterestRate:  loanRequests.InterestRate,
+			ReasonForLoan: loanRequests.ReasonForLoan,
+			PathDocument:  loanRequests.PathDocument,
+			Status:        loanRequests.Status,
+			UserID:        loanRequests.UserID,
+			CreatedAt:     loanRequests.CreatedAt,
+		})
+	}
+
+	response.Items = listLoanRequest
+	response.Page = uint(page)
+	response.Limit = uint(limit)
+	response.TotalCount = count
+
+	// Respond with success
+	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, response)
+
+}
 
 // ReadLoanRequestCount	Handles the retrieval the number of all loanRequests.
 // @Summary        			Get loanRequests count
@@ -188,7 +316,7 @@ func (db Database) ReadAllLoanRequests(ctx *gin.Context) {
 // @Failure					401					{object}		utils.ApiResponses		"Unauthorized"
 // @Failure					403					{object}		utils.ApiResponses		"Forbidden"
 // @Failure					500					{object}		utils.ApiResponses		"Internal Server Error"
-// @Router					/loanRequests/user/{userID}/count	[get]
+// @Router					/loan_requests/user/{userID}/count	[get]
 func (db Database) ReadLoanRequestsCount(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -225,6 +353,55 @@ func (db Database) ReadLoanRequestsCount(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, count)
 }
 
+// ReadLoanRequestCountByCompany	Handles the retrieval the number of all loanRequests by companyID.
+// @Summary        			Get loanRequests count
+// @Description    			Get all loanRequests count by compnayID.
+// @Tags					LoanRequests
+// @Produce					json
+// @Security 				ApiKeyAuth
+// @Param					companyID				path			string		true		"Company ID"
+// @Success					200					{object}		loanRequests.LoanRequestCount
+// @Failure					400					{object}		utils.ApiResponses		"Invalid request"
+// @Failure					401					{object}		utils.ApiResponses		"Unauthorized"
+// @Failure					403					{object}		utils.ApiResponses		"Forbidden"
+// @Failure					500					{object}		utils.ApiResponses		"Internal Server Error"
+// @Router					/loan_requests/company/{companyID}/count	[get]
+func (db Database) ReadLoanRequestsCountByCompany(ctx *gin.Context) {
+
+	// Extract JWT values from the context
+	session := utils.ExtractJWTValues(ctx)
+
+	// Parse and validate the loanRequests ID from the request parameter
+	companyID, err := uuid.Parse(ctx.Param("companyID"))
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Check if the employee belongs to the specified company
+	if err := domains.CheckEmployeeBelonging(db.DB, companyID, session.UserID, session.CompanyID); err != nil {
+		logrus.Error("Error verifying employee belonging. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Retrieve all loanRequests data from the database
+	loanRequests, err := domains.ReadTotalCount(db.DB, &domains.LoanRequests{}, "company_id", companyID)
+	if err != nil {
+		logrus.Error("Error occurred while finding all loanRequests data. Error: ", err)
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
+		return
+	}
+
+	count := LoanRequestCount{
+		Count: loanRequests,
+	}
+
+	// Respond with success
+	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, count)
+}
+
 // ReadLoanRequest		Handles the retrieval of one loanRequests.
 // @Summary        		Get loanRequests
 // @Description    		Get one loanRequests.
@@ -238,7 +415,7 @@ func (db Database) ReadLoanRequestsCount(ctx *gin.Context) {
 // @Failure				401						{object}		utils.ApiResponses		"Unauthorized"
 // @Failure				403						{object}		utils.ApiResponses		"Forbidden"
 // @Failure				500						{object}		utils.ApiResponses		"Internal Server Error"
-// @Router				/loanRequests/user/{userID}/{ID}	[get]
+// @Router				/loan_requests/user/{userID}/{ID}	[get]
 func (db Database) ReadOneLoanRequests(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -307,7 +484,7 @@ func (db Database) ReadOneLoanRequests(ctx *gin.Context) {
 // @Failure				401						{object}		utils.ApiResponses		"Unauthorized"
 // @Failure				403						{object}		utils.ApiResponses		"Forbidden"
 // @Failure				500						{object}		utils.ApiResponses		"Internal Server Error"
-// @Router				/loanRequests/user/{userID}/{ID}	[put]
+// @Router				/loan_requests/user/{userID}/{ID}	[put]
 func (db Database) UpdateLoanRequests(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -379,7 +556,7 @@ func (db Database) UpdateLoanRequests(ctx *gin.Context) {
 // @Failure				401						{object}		utils.ApiResponses			"Unauthorized"
 // @Failure				403						{object}		utils.ApiResponses			"Forbidden"
 // @Failure				500						{object}		utils.ApiResponses			"Internal Server Error"
-// @Router				/loanRequests/user/{userID}/{ID}	[delete]
+// @Router				/loan_requests/user/{userID}/{ID}	[delete]
 func (db Database) DeleteLoanRequests(ctx *gin.Context) {
 
 	// Extract JWT values from the context

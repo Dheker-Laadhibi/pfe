@@ -138,7 +138,7 @@ func (db Database) ReadPresences(ctx *gin.Context) {
 
 	// Generate offset
 	offset := (page - 1) * limit
-	// Check if the employee belongs to the specified company
+	// CheckEmployeeSession checks if the user's session matches the specified user and company.
 	if err := domains.CheckEmployeeSession(db.DB, userID, session.UserID, session.CompanyID); err != nil {
 		logrus.Error("Error verifying employee belonging. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())

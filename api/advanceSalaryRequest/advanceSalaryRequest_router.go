@@ -15,17 +15,22 @@ func AdvanceSalaryRequestsRouterInit(router *gin.RouterGroup, db *gorm.DB) {
 	NewAdvanceSalaryRequestsRepository(db)
 
 	// Private
-	AdvanceSalaryRequest := router.Group("/AdvanceSalaryRequests")
+	AdvanceSalaryRequest := router.Group("/advance_salaryRequests")
 	{
-
 		//Create a new AdvanceSalaryRequest demande
-		AdvanceSalaryRequest.POST("", baseInstance.AddAdvanceSalaryRequest)
+		AdvanceSalaryRequest.POST("/:companyID", baseInstance.AddAdvanceSalaryRequest)
 
-		// GET endpoint to retrieve all AdvanceSalaryRequest for a specific user
-		AdvanceSalaryRequest.GET("/:userID", baseInstance.ReadAdvanceSalaryRequest)
+		// GET endpoint to retrieve all AdvanceSalaryRequest for a specific user   advance_salaryRequests/company/{userID}
+		AdvanceSalaryRequest.GET("/user/:userID", baseInstance.ReadAdvanceSalaryRequest)
+
+		// GET endpoint to retrieve all AdvanceSalaryRequest for a specific company
+		AdvanceSalaryRequest.GET("/company/:companyID", baseInstance.ReadAdvanceSalaryRequestsByCompany)
 
 		// GET endpoint to retrieve the count of AdvanceSalaryRequest for a specific user
 		AdvanceSalaryRequest.GET("/:userID/count", baseInstance.ReadAdvanceSalaryRequestCount)
+
+		// GET endpoint to retrieve the count of AdvanceSalaryRequest for a specific company
+		AdvanceSalaryRequest.GET("/count/:companyID", baseInstance.ReadAdvanceSalaryRequestCountbycompany)
 
 		// GET endpoint to retrieve details of a specific AdvanceSalaryRequest for a specific user
 		AdvanceSalaryRequest.GET("/:userID/:ID", baseInstance.ReadOneAdvanceSalaryRequest)

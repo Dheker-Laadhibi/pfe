@@ -15,17 +15,23 @@ func LeaveRouterInit(router *gin.RouterGroup, db *gorm.DB) {
 	NewLeaveRequestsRepository(db)
 
 	// Private
-	leave := router.Group("/LeaveRequests")
+	leave := router.Group("/leave_requests")
 	{
 
 		//Create a new Leave demande
-		leave.POST("", baseInstance.AddLeave)
+		leave.POST("/:companyID", baseInstance.AddLeave)
 
 		// GET endpoint to retrieve all leave for a specific user
-		leave.GET("/:userID", baseInstance.ReadLeave)
+		leave.GET("/user/:userID", baseInstance.ReadLeave)
+
+		// GET endpoint to retrieve all leave for a specific company
+		leave.GET("/company/:companyID", baseInstance.ReadLeaveByCompany)
 
 		// GET endpoint to retrieve the count of leave for a specific user
 		leave.GET("/:userID/count", baseInstance.ReadLeaveCount)
+
+		// GET endpoint to retrieve the count of leave for a specific company
+		leave.GET("/count/:companyID", baseInstance.ReadLeaveCountByCompany)
 
 		// GET endpoint to retrieve details of a specific leave for a specific user
 		leave.GET("/:userID/:ID", baseInstance.ReadOneLeave)

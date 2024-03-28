@@ -15,25 +15,31 @@ func ExitPermissionRouterInit(router *gin.RouterGroup, db *gorm.DB) {
 	NewExitPermissionRepository(db)
 
 	// Private
-	exitPermission := router.Group("/exitPermission")
+	exitPermission := router.Group("/exit_permission")
 	{
 
 		//Create a new exitPermission demande
-		exitPermission.POST("", baseInstance.AddExitPermission)
+		exitPermission.POST("/:companyID", baseInstance.AddExitPermission)
 
 		// GET endpoint to retrieve all exitPermission for a specific user
-		exitPermission.GET("/:userID", baseInstance.ReadAllExitPermission)
+		exitPermission.GET("/user/:userID", baseInstance.ReadAllExitPermission)
+
+		// GET endpoint to retrieve all exitPermission for a specific company
+		exitPermission.GET("/company/:companyID", baseInstance.ReadAllExitPermissionByCompany)
 
 		// GET endpoint to retrieve the count of exitPermission for a specific user
-		exitPermission.GET("/user/:userID/count", baseInstance.ReadExitPermissionCount)
+		exitPermission.GET("/:userID/count", baseInstance.ReadExitPermissionCount)
+
+		// GET endpoint to retrieve the count of exitPermission for a specific company
+		exitPermission.GET("/count/:companyID", baseInstance.ReadExitPermissionCountByCompany)
 
 		// GET endpoint to retrieve details of a specific exitPermission for a specific user
-		exitPermission.GET("/user/:userID/:ID", baseInstance.ReadOneExitPermission)
+		exitPermission.GET("/:userID/:ID", baseInstance.ReadOneExitPermission)
 
 		// PUT endpoint to update the details of a specific exitPermission for a specific user
-		exitPermission.PUT("/user/:userID/:ID", baseInstance.UpdateExitPermission)
+		exitPermission.PUT("/:userID/:ID", baseInstance.UpdateExitPermission)
 
 		// DELETE endpoint to delete a specific exitPermission for a specific user
-		exitPermission.DELETE("/user/:userID/:ID", baseInstance.DeleteExitPermission)
+		exitPermission.DELETE("/:userID/:ID", baseInstance.DeleteExitPermission)
 	}
 }

@@ -24,6 +24,7 @@ type LeaveRequestDetails struct {
 	Type      string    `gorm:"column:leave_type; not null; default:false"` //  Type of LeaveRequests (e.g., annual, sick, maternity, unpaid)
 	Status    string    `json:"status"`                                     // Status of the LeaveRequests request (pending, approved, rejected)
 	Reason    string    `json:"reason"`                                     // Reason of the LeaveRequests
+	UserID    uuid.UUID `gorm:"column:user_id;"`                            // User ID associated with the Leave requests
 	CreatedAt time.Time `json:"createdAt"`                                  // CreatedAt is the timestamp indicating when the LeaveRequests was created.
 } //@name LeaveDetails
 

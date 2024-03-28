@@ -1,6 +1,7 @@
 package training_request
 
 import (
+	"fmt"
 	"labs/constants"
 	"labs/domains"
 	"net/http"
@@ -58,13 +59,12 @@ func (db Database) CreateTrainingRequestByUser(ctx *gin.Context) {
 		return
 	}
 
-// indicating if the exact user making the request is the same as the user associated with the session.
-if err := domains.CheckEmployeeSession(db.DB, userID, session.UserID, session.CompanyID); err != nil {
-	logrus.Error("Error verifying employee belonging. Error: ", err.Error())
-	utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
-	return
-}
-
+	// indicating if the exact user making the request is the same as the user associated with the session.
+	if err := domains.CheckEmployeeSession(db.DB, userID, session.UserID, session.CompanyID); err != nil {
+		logrus.Error("Error verifying employee belonging. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
 
 	// Parse the incoming JSON request into a PresenceIn struct
 	trainingR := new(TrainingRequestIn)
@@ -85,12 +85,12 @@ if err := domains.CheckEmployeeSession(db.DB, userID, session.UserID, session.Co
 
 	// Create a new training request  in the database
 	dbTraining := &domains.TrainingRequest{
-		ID:           uuid.New(),
-		TrainingTitle:       trainingR.TrainingTitle,
-		Description:  trainingR.Description,
-		Reason: trainingR.Reason,
-		RequestDate: dt,
-		UserID:       trainingR.UserID, //IDUser
+		ID:            uuid.New(),
+		TrainingTitle: trainingR.TrainingTitle,
+		Description:   trainingR.Description,
+		Reason:        trainingR.Reason,
+		RequestDate:   dt,
+		UserID:        trainingR.UserID, //IDUser
 	}
 
 	if err := domains.Create(db.DB, dbTraining); err != nil {
@@ -115,13 +115,13 @@ if err := domains.CheckEmployeeSession(db.DB, userID, session.UserID, session.Co
 // @Param			page			query		int			false		"Page"
 // @Param			limit			query		int			false		"Limit"
 // @Param				userID				path			string		true		"User ID"
-// @Success				200					{array}			training_request.TrainingRequestPagination 
+// @Success				200					{array}			training_request.TrainingRequestPagination
 // @Failure				400					{object}		utils.ApiResponses		"Invalid request"
 // @Failure				401					{object}		utils.ApiResponses		"Unauthorized"
 // @Failure				403					{object}		utils.ApiResponses		"Forbidden"
 // @Failure				500					{object}		utils.ApiResponses		"Presenceal Server Error"
 // @Router				/training_request/All/{userID}	[get]
-func (db Database) ReadMissionsOrders(ctx *gin.Context) {
+func (db Database) ReadTrainingsRequest(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
@@ -189,20 +189,18 @@ func (db Database) ReadMissionsOrders(ctx *gin.Context) {
 		return
 	}
 
-	
-
 	// Generate a  training request  orders  structure as a response
 	response := TrainingRequestPagination{}
 	dataTableTraining := []TrainingRequestTable{}
 	for _, Training := range Trainings {
 
 		dataTableTraining = append(dataTableTraining, TrainingRequestTable{
-			ID: Training.ID,
-			TrainingTitle:      Training.TrainingTitle,
-			Description: Training.Description,
+			ID:            Training.ID,
+			TrainingTitle: Training.TrainingTitle,
+			Description:   Training.Description,
 			RequestDate:   Training.RequestDate,
-			Reason:   Training.Reason,
-			UserID:     Training.UserID,
+			Reason:        Training.Reason,
+			UserID:        Training.UserID,
 		})
 	}
 	response.Items = dataTableTraining
@@ -213,7 +211,6 @@ func (db Database) ReadMissionsOrders(ctx *gin.Context) {
 	// Respond with success
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, response)
 }
-
 
 // number of alllll trainings requests of a user
 // ReadTrainingsRequestCount	Handles the retrieval the number of all TrainingRequest.
@@ -229,7 +226,7 @@ func (db Database) ReadMissionsOrders(ctx *gin.Context) {
 // @Failure					403					{object}		utils.ApiResponses		"Forbidden"
 // @Failure					500					{object}		utils.ApiResponses		"Presenceal Server Error"
 // @Router					/training_request/count/{userID}	[get]
-func (db Database) ReadMissionOrdersCount(ctx *gin.Context) {
+func (db Database) ReadTrainingsCount(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
@@ -250,13 +247,12 @@ func (db Database) ReadMissionOrdersCount(ctx *gin.Context) {
 	}
 
 	// Retrieve all  training request  data from the database
-	training_request , err := domains.ReadTotalCount(db.DB, &domains.TrainingRequest{}, "user_id", session.UserID)
+	training_request, err := domains.ReadTotalCount(db.DB, &domains.TrainingRequest{}, "user_id", session.UserID)
 	if err != nil {
 		logrus.Error("Error occurred while finding all user data. Error: ", err)
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
 		return
 	}
-	
 
 	count := TrainingRequestsCount{
 		Count: training_request,
@@ -268,10 +264,10 @@ func (db Database) ReadMissionOrdersCount(ctx *gin.Context) {
 
 //oneeeeeeeee training request
 
-// ReadPresence		Handles the retrieval of one TrainingRequests.
+// ReadPresence			Handles the retrieval of one TrainingRequests.
 // @Summary        		Get TrainingRequests
 // @Description    		Get one TrainingRequests.
-// @Tags				TrainingRequests
+// @Tags				TrainingRequest
 // @Produce				json
 // @Security 			ApiKeyAuth
 // @Param				userID					path			string		true		"User ID"
@@ -282,7 +278,7 @@ func (db Database) ReadMissionOrdersCount(ctx *gin.Context) {
 // @Failure				403						{object}		utils.ApiResponses		"Forbidden"
 // @Failure				500						{object}		utils.ApiResponses		"Presenceal Server Error"
 // @Router				/training_request/get/{ID}/{userID}	[get]
-func (db Database) ReadMissionOrders(ctx *gin.Context) {
+func (db Database) ReadTrainingsRequests(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
@@ -320,15 +316,13 @@ func (db Database) ReadMissionOrders(ctx *gin.Context) {
 
 	// Generate a training request   structure as a response
 	details := TrainingRequestDetails{
-		ID:        trainings.ID,
-		TrainingTitle: trainings.TrainingTitle,
-		Reason:   trainings.Reason,
-		Description: trainings.Description,
-		RequestDate: trainings.RequestDate,
-		UserID: trainings.UserID,
-		DecisionCompany:trainings.DecisionCompany ,
-
-		
+		ID:              trainings.ID,
+		TrainingTitle:   trainings.TrainingTitle,
+		Reason:          trainings.Reason,
+		Description:     trainings.Description,
+		RequestDate:     trainings.RequestDate,
+		UserID:          trainings.UserID,
+		DecisionCompany: trainings.DecisionCompany,
 	}
 
 	// Respond with success
@@ -342,17 +336,16 @@ func (db Database) ReadMissionOrders(ctx *gin.Context) {
 // @Accept				json
 // @Produce				json
 // @Security 			ApiKeyAuth
-// @Param				userID					path			string							true		"userID ID"
-// @Param				ID						path			string							true		"TrainingRequestIn ID"
-// @Param				request					body			training_request.TrainingRequestIn	true		"TrainingRequestIn query params"
+// @Param				userID					path			string							true		"userID "
+// @Param				ID						path			string							true		    "TrainingRequestIn ID"
+// @Param				request					body			training_request.TrainingRequestDescision	true		"TrainingRequestIn query params"
 // @Success				200						{object}		utils.ApiResponses
 // @Failure				400						{object}		utils.ApiResponses		"Invalid request"
 // @Failure				401						{object}		utils.ApiResponses		"Unauthorized"
 // @Failure				403						{object}		utils.ApiResponses		"Forbidden"
 // @Failure				500						{object}		utils.ApiResponses		"Presenceal Server Error"
 // @Router				/training_request/update/{ID}/{userID}	[put]
-func (db Database) UpdateMissionOrders(ctx *gin.Context) {
-
+func (db Database) UpdateTraining(ctx *gin.Context) {
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
 
@@ -364,6 +357,28 @@ func (db Database) UpdateMissionOrders(ctx *gin.Context) {
 		return
 	}
 
+	// Initialize an empty Users object
+	//var user domains.Users
+
+	// Retrieve the user by ID using ReadByID function
+	/* user, err = ReadUserByID(db.DB, user, userID)
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	} */
+
+	// Read the role name based on its ID
+	roleName, err := domains.ReadRoleName(db.DB, session.RoleID)
+	if err != nil {
+		// Print the role name to the console
+fmt.Println("Role Name:", roleName)
+		logrus.Error("Error reading role name: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+// Print the role name to the console
+fmt.Println("Role Name:", roleName)
 	// Parse and validate the training_request ID from the request parameter
 	objectID, err := uuid.Parse(ctx.Param("ID"))
 	if err != nil {
@@ -372,42 +387,49 @@ func (db Database) UpdateMissionOrders(ctx *gin.Context) {
 		return
 	}
 
-	// Check if the employee belongs to the specified company
+	// indicating if the exact user making the request is the same as the user associated with the session.
 	if err := domains.CheckEmployeeSession(db.DB, userID, session.UserID, session.CompanyID); err != nil {
+		
 		logrus.Error("Error verifying employee belonging. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
 		return
 	}
 
-	// Parse the incoming JSON request into a training_request struct
-	TraininIn := new(TrainingRequestIn)
-	if err := ctx.ShouldBindJSON(TraininIn); err != nil {
-		logrus.Error("Error mapping request from frontend. Error: ", err.Error())
-		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+	// Check if the role is a manager role
+	if roleName == "Manager" {
+		// Parse the incoming JSON request into a training_request struct
+		TraininIn := new(TrainingRequestDescision)
+		if err := ctx.ShouldBindJSON(TraininIn); err != nil {
+			logrus.Error("Error mapping request from frontend. Error: ", err.Error())
+			utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+			return
+		}
+
+		// Check if the training_request with the specified ID exists
+		if err = domains.CheckByID(db.DB, &domains.TrainingRequest{}, objectID); err != nil {
+			logrus.Error("Error checking if the TraininIn  with the specified ID exists. Error: ", err.Error())
+			utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+			return
+		}
+
+		// Update the training_request data in the database
+		dbTraining := &domains.TrainingRequest{
+			DecisionCompany: TraininIn.DecisionCompany,
+		}
+
+		if err = domains.Update(db.DB, dbTraining, objectID); err != nil {
+			logrus.Error("Error updating user data in the database. Error: ", err.Error())
+			utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
+			return
+		}
+
+		// Respond with success
+		utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, utils.Null())
 		return
 	}
 
-	// Check if the training_request with the specified ID exists
-	if err = domains.CheckByID(db.DB, &domains.TrainingRequest{}, objectID); err != nil {
-		logrus.Error("Error checking if the TraininIn  with the specified ID exists. Error: ", err.Error())
-		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
-		return
-	}
-
-	// Update the training_request data in the database
-	dbTraining := &domains.TrainingRequest{
-		DecisionCompany: TraininIn.DecisionCompany,
-		
-	}
-
-	if err = domains.Update(db.DB, dbTraining, objectID); err != nil {
-		logrus.Error("Error updating user data in the database. Error: ", err.Error())
-		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
-		return
-	}
-
-	// Respond with success
-	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, utils.Null())
+	// If the user is not a manager, return an error response
+	utils.BuildErrorResponse(ctx, http.StatusForbidden, "User is not authorized to perform updates", utils.Null())
 }
 
 // DeleteTrainingRequest 	Handles the deletion of a TrainingRequest.
@@ -425,7 +447,7 @@ func (db Database) UpdateMissionOrders(ctx *gin.Context) {
 // @Failure				403						{object}		utils.ApiResponses			"Forbidden"
 // @Failure				500						{object}		utils.ApiResponses			"MissionOrderseal Server Error"
 // @Router				/training_request/delete/{ID}/{userID}	[delete]
-func (db Database) DeleteMissionOrders(ctx *gin.Context) {
+func (db Database) DeleteTrainingsRequest(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)

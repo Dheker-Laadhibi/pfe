@@ -33,7 +33,7 @@ func ReadByID(db *gorm.DB, model domains.LeaveRequests, id uuid.UUID) (domains.L
 }
 
 // ReadAllPagination retrieves a paginated list of LeaveRequests based on user ID, limit, and offset.
-func ReadAllPagination(db *gorm.DB, model []domains.LeaveRequests, modelID uuid.UUID, limit, offset int) ([]domains.LeaveRequests, error) {
-	err := db.Where("user_id = ? ", modelID).Limit(limit).Offset(offset).Find(&model).Error
+func ReadAllPagination(db *gorm.DB, model []domains.LeaveRequests, conditionField string, modelID uuid.UUID, limit, offset int) ([]domains.LeaveRequests, error) {
+	err := db.Where(conditionField+" = ? ", modelID).Limit(limit).Offset(offset).Find(&model).Error
 	return model, err
 }

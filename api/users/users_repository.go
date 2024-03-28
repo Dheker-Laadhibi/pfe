@@ -37,3 +37,5 @@ func ReadByID(db *gorm.DB, model domains.Users, id uuid.UUID) (domains.Users, er
 	err := db.First(&model, id).Error
 	return model, err
 }
+
+

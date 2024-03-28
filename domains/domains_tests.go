@@ -41,6 +41,8 @@
 package domains
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/lib/pq"
 	"gorm.io/gorm"
@@ -49,19 +51,27 @@ import (
 // Tests represents the test information in the system.
 type Tests struct {
 	ID           uuid.UUID      `gorm:"column:id; primaryKey; type:uuid; not null;"` // Unique identifier for the test
+	Title        string         `gorm:"column:title; not null;"`                     // The title of the test
 	Specialty    string         `gorm:"column:specialty; not null;"`                 // The specialty of the test
 	Technologies pq.StringArray `gorm:"column:technologies; type:text[]; not null;"` // The technologies assigned to the test
 	Questions    []Questions    `gorm:"many2many:testQuestions"`                     // The questions assigned to the test
 	Candidats    []Condidats    `gorm:"many2many:testCandidats"`                     // The candidats who belongs to that test
+	ExpDate      time.Time      `gorm:"column:exp_date;"`                            // exp date of the test
 	CompanyID    uuid.UUID      `gorm:"column:company_id; type:uuid; not null;"`     // ID of the company to which the test belongs
 	gorm.Model
 }
 
 // TestQuestions represents the questions assigned to test.
 type TestQuestions struct {
-	TestID          uuid.UUID      `gorm:"column:tests_id; primaryKey;"`            // The testID associated with the questions
-	RandomQuestions pq.StringArray `gorm:"column:random_questions; type:text[];"`   // The questions associated with the test
-	CompanyID       uuid.UUID      `gorm:"column:company_id; type:uuid; not null;"` // ID of the company associated with the question and the test
+	TestID               uuid.UUID      `gorm:"column:tests_id; primaryKey;"`                         // The testID associated with the questions
+	QuestionID           uuid.UUID      `gorm:"column:question_id; primaryKey; type:uuid; not null;"` // The questionID associated with the question
+	Question             string         `gorm:"column:question; not null;"`                           // The text of the question
+	CorrectAnswer        string         `gorm:"column:correct_answer; not null;"`                     // The correct answer to the question
+	Options              pq.StringArray `gorm:"column:options; type:text[]; not null;"`               // The options of the question
+	AssociatedTechnology string         `gorm:"column:associated_technology; not null;"`              // Associated technology or subject for the question
+	CandidatAnswer       string         `gorm:"column:candidat_answer; "`                             // The candidat answer to the question
+	CandidatID           uuid.UUID      `gorm:"column:candidat_id; type:uuid; not null;"`             // ID of the candidat associated with the test
+	CompanyID            uuid.UUID      `gorm:"column:company_id; type:uuid; not null;"`              // ID of the company associated with the question and the test
 }
 
 // TestCandidats represents the candidats assigned to tests.

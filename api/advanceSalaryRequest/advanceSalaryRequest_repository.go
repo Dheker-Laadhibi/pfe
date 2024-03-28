@@ -33,7 +33,7 @@ func ReadByID(db *gorm.DB, model domains.AdvanceSalaryRequests, id uuid.UUID) (d
 }
 
 // ReadAllPagination retrieves a paginated list of AdvanceSalaryRequests based on user ID, limit, and offset.
-func ReadAllPagination(db *gorm.DB, model []domains.AdvanceSalaryRequests, modelID uuid.UUID, limit, offset int) ([]domains.AdvanceSalaryRequests, error) {
-	err := db.Where("user_id = ? ", modelID).Limit(limit).Offset(offset).Find(&model).Error
+func ReadAllPagination(db *gorm.DB, model []domains.AdvanceSalaryRequests, conditionField string, modelID uuid.UUID, limit, offset int) ([]domains.AdvanceSalaryRequests, error) {
+	err := db.Where(conditionField+" = ? ", modelID).Limit(limit).Offset(offset).Find(&model).Error
 	return model, err
 }

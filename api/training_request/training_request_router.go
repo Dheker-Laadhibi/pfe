@@ -15,26 +15,26 @@ func TrainingRequestRouterInit(router *gin.RouterGroup, db *gorm.DB) {
 	NewNewTrainingRequestRepository(db)
 
 	// Private
-	TrainingRequest := router.Group("/missions")
+	TrainingRequest := router.Group("/training_request")
 	{
 
 		// create endpoint to create a specific MissionOrders for a specific user
-		TrainingRequest.POST("/:companyID", baseInstance.CreateTrainingRequestByUser)
+		TrainingRequest.POST("/:userID/:companyID", baseInstance.CreateTrainingRequestByUser)
 
 		// GET endpoint to retrieve all MissionOrders for a specific user
-		TrainingRequest.GET("/All/:userID", baseInstance.ReadMissionsOrders)
+		TrainingRequest.GET("/All/:userID", baseInstance.ReadTrainingsRequest)
 
 		// GET endpoint to retrieve the count of MissionOrders for a specific user
-		TrainingRequest.GET("/count/:userID", baseInstance.ReadMissionOrdersCount)
+		TrainingRequest.GET("/count/:userID", baseInstance.ReadTrainingsCount)
 
 		// GET endpoint to retrieve details of a specific MissionOrders for a specific user
-		TrainingRequest.GET("/get/:ID/:userID", baseInstance.ReadMissionOrders)
+		TrainingRequest.GET("/get/:ID/:userID", baseInstance.ReadTrainingsRequests)
 
 		// PUT endpoint to update the details of a specific MissionOrders for a specific user
-		TrainingRequest.PUT("/update/:ID/:userID", baseInstance.UpdateMissionOrders)
+		TrainingRequest.PUT("/update/:ID/:userID", baseInstance.UpdateTraining)
 
 		// DELETE endpoint to delete a specific MissionsOrders for a specific user
-		TrainingRequest.DELETE("/delete/:ID/:userID", baseInstance.DeleteMissionOrders)
+		TrainingRequest.DELETE("/delete/:ID/:userID", baseInstance.DeleteTrainingsRequest)
 
 	}
 }

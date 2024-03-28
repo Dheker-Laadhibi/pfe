@@ -40,7 +40,7 @@ func CandidatRouterInit(router *gin.RouterGroup, db *gorm.DB) {
 		candidats.DELETE("/:ID", baseInstance.DeleteCondidat)
 
 		// signin endpoint to  a specific condidat
-		candidats.POST("/Signin", baseInstance.SigninCandidat)
+		candidats.POST("/signin", baseInstance.SigninCandidat)
 
 	}
 }
