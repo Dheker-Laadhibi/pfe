@@ -15,29 +15,29 @@ func CandidatRouterInit(router *gin.RouterGroup, db *gorm.DB) {
 	NewCondidatRepository(db)
 
 	// Private
-	candidats := router.Group("/candidats/:companyID")
+	candidats := router.Group("/candidats")
 	{
 
 		// POST endpoint to create a new condidat
-		candidats.POST("", baseInstance.Createcandidate)
+		candidats.POST("/:companyID", baseInstance.Createcandidate)
 
 		// GET endpoint to retrieve all condidats for a specific company
-		candidats.GET("", baseInstance.ReadCandidats)
+		candidats.GET("/:companyID", baseInstance.ReadCandidats)
 
 		// GET endpoint to retrieve a list of condidats for a specific company
-		candidats.GET("/list", baseInstance.ReadCondidatsList)
+		candidats.GET("/:companyID/list", baseInstance.ReadCondidatsList)
 
 		// GET endpoint to retrieve the count of condidats for a specific company
-		candidats.GET("/count", baseInstance.ReadCandidatsCount)
+		candidats.GET("/:companyID/count", baseInstance.ReadCandidatsCount)
 
 		// GET endpoint to retrieve details of a specific condidat
-		candidats.GET("/:ID", baseInstance.Readcandidat)
+		candidats.GET("/:companyID/:ID", baseInstance.Readcandidat)
 
 		// PUT endpoint to update a specific condidat
-		candidats.PUT("/:ID", baseInstance.Updatecandidat)
+		candidats.PUT("/:companyID/:ID", baseInstance.Updatecandidat)
 
 		// DELETE endpoint to delete a specific condidat
-		candidats.DELETE("/:ID", baseInstance.DeleteCondidat)
+		candidats.DELETE("/:companyID/:ID", baseInstance.DeleteCondidat)
 
 		// signin endpoint to  a specific condidat
 		candidats.POST("/signin", baseInstance.SigninCandidat)

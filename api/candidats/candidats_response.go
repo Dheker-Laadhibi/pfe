@@ -14,7 +14,7 @@ type CondidatIn struct {
 	RoleName  string    `json:"role_name"`   //  define condidat role 
 	University     string    `json:"university"  binding:"min=3,max=30"`
 	Password       string    `json:"password" binding:"required,min=10,max=255"` // Password is the user's password. It is required, and its length should be between 10 and 255 characters.
-	CompanyID      uuid.UUID `json:"companyID" binding:"required"`               // CompanyID is the unique identifier for the company associated with the user. It is required.
+	             // CompanyID is the unique identifier for the company associated with the user. It is required.
 } //@name CondidatIn
 
 // @Description	CondidtasPagination represents the paginated list of Condidats.
@@ -55,6 +55,7 @@ type CondidatDetails struct {
 	CompanyName      string    `json:"companyName"` // CompanyName is the name of the company associated with the condidat.
 	LevelOfEducation string    `json:"educationLevel"`
 	University       string    `json:"university"`
+	RoleName  string    `json:"role_name"`  
 } //@name CondidatDetails
 
 // @Description	Signin represents the information required for signing in candidat.
@@ -63,11 +64,22 @@ type Signin struct {
 	Password string `json:"password" binding:"required,min=10,max=255"` // Password is the user's password. It is required, and its length should be between 10 and 255 characters.
 } //@name Signin
 
+
+
+// @Description	LoggedInResponse represents the response structure after successful login.
+type LoggedInResponse struct {
+	AccessToken string   `json:"accessToken"` // AccessToken is the token obtained after successful login for authentication purposes.
+	Candidat        LoggedIn `json:"Candidat"`        // User is the structure containing details of the logged-in user.
+} //@name LoggedInResponse
+
+
+
+
+
 // @Description	LoggedIn represents the candidat details after successful login.
 type LoggedIn struct {
 	ID        uuid.UUID `json:"ID"`            // ID is the unique identifier for the candidat.
-	Firstname string    `json:"first_name"`    // Name is the name of the candidat.
-	Lastname  string    `json:"last_name"`     // Name is the name of the candidat.
+	Name           string    `json:"name"`           // Name is the name of the user..
 	Email     string    `json:"email"`         // Email is the email address of the candidat.
 	CompanyID uuid.UUID `json:"workCompanyId"` // CompanyID is the unique identifier for the candidat company.
 } //@name LoggedIn

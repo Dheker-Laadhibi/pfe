@@ -673,6 +673,64 @@ const docTemplate = `{
                 }
             }
         },
+        "/candidats/signin": {
+            "post": {
+                "description": "Authenticate and log in a candidate.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Condidats"
+                ],
+                "summary": "Signin",
+                "parameters": [
+                    {
+                        "description": "candidat query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Signin"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/LoggedInResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/candidats/{companyID}": {
             "post": {
                 "security": [
@@ -1209,71 +1267,6 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/CondidatsList"
                             }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/condidats/{companyID}/signin": {
-            "post": {
-                "description": "Authenticate and log in a uscandidater.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Condidats"
-                ],
-                "summary": "Signin",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Company ID",
-                        "name": "companyID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "candidat query params",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/Signin"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/LoggedIn"
                         }
                     },
                     "400": {
@@ -8338,6 +8331,9 @@ const docTemplate = `{
                     "description": "last name of condidat",
                     "type": "string"
                 },
+                "role_name": {
+                    "type": "string"
+                },
                 "university": {
                     "type": "string"
                 }
@@ -8347,7 +8343,6 @@ const docTemplate = `{
             "description": "CondidatIn represents the input structure for creating a new condidat.",
             "type": "object",
             "required": [
-                "companyID",
                 "email",
                 "password"
             ],
@@ -8356,10 +8351,6 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 30,
                     "minLength": 3
-                },
-                "companyID": {
-                    "description": "CompanyID is the unique identifier for the company associated with the user. It is required.",
-                    "type": "string"
                 },
                 "education_level": {
                     "type": "string",
@@ -9006,12 +8997,8 @@ const docTemplate = `{
                     "description": "Email is the email address of the candidat.",
                     "type": "string"
                 },
-                "first_name": {
-                    "description": "Name is the name of the candidat.",
-                    "type": "string"
-                },
-                "last_name": {
-                    "description": "Name is the name of the candidat.",
+                "name": {
+                    "description": "Name is the name of the user..",
                     "type": "string"
                 },
                 "workCompanyId": {
@@ -9024,17 +9011,17 @@ const docTemplate = `{
             "description": "LoggedInResponse represents the response structure after successful login.",
             "type": "object",
             "properties": {
-                "accessToken": {
-                    "description": "AccessToken is the token obtained after successful login for authentication purposes.",
-                    "type": "string"
-                },
-                "user": {
+                "Candidat": {
                     "description": "User is the structure containing details of the logged-in user.",
                     "allOf": [
                         {
                             "$ref": "#/definitions/LoggedIn"
                         }
                     ]
+                },
+                "accessToken": {
+                    "description": "AccessToken is the token obtained after successful login for authentication purposes.",
+                    "type": "string"
                 }
             }
         },
@@ -9423,23 +9410,11 @@ const docTemplate = `{
             }
         },
         "QuestionsTable": {
-            "description": "QuestionsTable represents a single question entry in a table.",
+            "description": "TestsTable represents a single question entry in a table.",
             "type": "object",
             "properties": {
-                "associatedTechnology": {
-                    "description": "Associated technology or subject for the question",
-                    "type": "string"
-                },
-                "correctAnswer": {
-                    "description": "The correct answer to the question",
-                    "type": "string"
-                },
                 "createdAt": {
-                    "description": "CreatedAt is the timestamp indicating when the question entry was created.",
-                    "type": "string"
-                },
-                "id": {
-                    "description": "ID is the unique identifier for the question.",
+                    "description": "CreatedAt is the timestamp indicating when the test entry was created.",
                     "type": "string"
                 },
                 "options": {
@@ -9451,6 +9426,10 @@ const docTemplate = `{
                 },
                 "question": {
                     "description": "The text of the question",
+                    "type": "string"
+                },
+                "questionID": {
+                    "description": "The questionID associated with the question",
                     "type": "string"
                 }
             }

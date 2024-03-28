@@ -159,6 +159,8 @@ definitions:
       lastname:
         description: last name of condidat
         type: string
+      role_name:
+        type: string
       university:
         type: string
     type: object
@@ -168,10 +170,6 @@ definitions:
       adress:
         maxLength: 30
         minLength: 3
-        type: string
-      companyID:
-        description: CompanyID is the unique identifier for the company associated
-          with the user. It is required.
         type: string
       education_level:
         maxLength: 30
@@ -208,7 +206,6 @@ definitions:
         minLength: 3
         type: string
     required:
-    - companyID
     - email
     - password
     type: object
@@ -674,11 +671,8 @@ definitions:
       email:
         description: Email is the email address of the candidat.
         type: string
-      first_name:
-        description: Name is the name of the candidat.
-        type: string
-      last_name:
-        description: Name is the name of the candidat.
+      name:
+        description: Name is the name of the user..
         type: string
       workCompanyId:
         description: CompanyID is the unique identifier for the candidat company.
@@ -688,14 +682,14 @@ definitions:
     description: LoggedInResponse represents the response structure after successful
       login.
     properties:
+      Candidat:
+        allOf:
+        - $ref: '#/definitions/LoggedIn'
+        description: User is the structure containing details of the logged-in user.
       accessToken:
         description: AccessToken is the token obtained after successful login for
           authentication purposes.
         type: string
-      user:
-        allOf:
-        - $ref: '#/definitions/LoggedIn'
-        description: User is the structure containing details of the logged-in user.
     type: object
   MissionOrdersCount:
     description: MissionOrdersCount represents the count of MissionOrders.
@@ -995,20 +989,11 @@ definitions:
         type: integer
     type: object
   QuestionsTable:
-    description: QuestionsTable represents a single question entry in a table.
+    description: TestsTable represents a single question entry in a table.
     properties:
-      associatedTechnology:
-        description: Associated technology or subject for the question
-        type: string
-      correctAnswer:
-        description: The correct answer to the question
-        type: string
       createdAt:
-        description: CreatedAt is the timestamp indicating when the question entry
-          was created.
-        type: string
-      id:
-        description: ID is the unique identifier for the question.
+        description: CreatedAt is the timestamp indicating when the test entry was
+          created.
         type: string
       options:
         description: The options of the question
@@ -1017,6 +1002,9 @@ definitions:
         type: array
       question:
         description: The text of the question
+        type: string
+      questionID:
+        description: The questionID associated with the question
         type: string
     type: object
   RolesCount:
@@ -2038,6 +2026,44 @@ paths:
       summary: Create candidate
       tags:
       - Condidats
+  /candidats/signin:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate and log in a candidate.
+      parameters:
+      - description: candidat query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/Signin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/LoggedInResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      summary: Signin
+      tags:
+      - Condidats
   /companies:
     get:
       description: Get all companies.
@@ -2485,49 +2511,6 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Get list of  Candidats
-      tags:
-      - Condidats
-  /condidats/{companyID}/signin:
-    post:
-      consumes:
-      - application/json
-      description: Authenticate and log in a uscandidater.
-      parameters:
-      - description: Company ID
-        in: path
-        name: companyID
-        required: true
-        type: string
-      - description: candidat query params
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/Signin'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/LoggedIn'
-        "400":
-          description: Invalid request
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ApiResponse'
-      summary: Signin
       tags:
       - Condidats
   /exit_permission/{companyID}:

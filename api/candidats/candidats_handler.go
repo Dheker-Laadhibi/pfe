@@ -74,7 +74,7 @@ func (db Database) Createcandidate(ctx *gin.Context) {
 		University:     condidat.University,
 		RoleID: res,
 		Educationlevel: condidat.Educationlevel,
-		CompanyID:      condidat.CompanyID,
+		CompanyID:      companyID,
 
 	}
 	if err := domains.Create(db.DB, dbCondidat); err != nil {
@@ -86,6 +86,23 @@ func (db Database) Createcandidate(ctx *gin.Context) {
 	// Respond with success
 	utils.BuildResponse(ctx, http.StatusCreated, constants.CREATED, utils.Null())
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // ReadCandidats 	Handles the retrieval of all Candidats .
 // @Summary        	Get Candidats
@@ -512,18 +529,17 @@ func (db Database) DeleteCondidat(ctx *gin.Context) {
 
 // SigninCandidat 	Handles the candidat signin process.
 // @Summary			Signin
-// @Description		Authenticate and log in a uscandidater.
+// @Description		Authenticate and log in a candidate.
 // @Tags			Condidats
 // @Accept			json
 // @Produce			json
-// @Param			companyID			path			string			true		"Company ID"
 // @Param			request		body		candidats.Signin		true	"candidat query params"
-// @Success			200			{object}	candidats.LoggedIn
+// @Success			200			{object}	candidats.LoggedInResponse
 // @Failure			400			{object}	utils.ApiResponses		"Invalid request"
 // @Failure			401			{object}	utils.ApiResponses		"Unauthorized"
 // @Failure			403			{object}	utils.ApiResponses		"Forbidden"
 // @Failure			500			{object}	utils.ApiResponses		"Internal Server Error"
-// @Router			/condidats/{companyID}/signin	[post]
+// @Router			/candidats/signin	[post]
 func (db Database) SigninCandidat(ctx *gin.Context) {
 
 	// Parse the incoming JSON request into a Signin struct
@@ -549,14 +565,20 @@ func (db Database) SigninCandidat(ctx *gin.Context) {
 		return
 	}
 
-	// Prepare the response with candidat details
-	response := LoggedIn{
-		ID:        data.ID,
-		Firstname: data.Firstname,
-		Lastname:  data.Lastname,
-		Email:     data.Email,
-		CompanyID: data.CompanyID,
+// Generate JWT token
+token := utils.GenerateToken(data.ID, data.CompanyID, data.RoleID)
+
+	// Prepare the response
+	response := LoggedInResponse{
+		AccessToken: token,
+		Candidat: LoggedIn{
+			ID:        data.ID,
+			Name:      data.Firstname + " " + data.Lastname,
+			Email:     data.Email,
+			CompanyID: data.CompanyID,
+		},
 	}
+
 	// Respond with success
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, response)
 }
