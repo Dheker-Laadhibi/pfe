@@ -51,3 +51,18 @@ func ReadRoleName(db *gorm.DB, roleID uuid.UUID) (string, error) {
 	err := db.Select("id, name").Where("id = ?", roleID).First(role).Error
 	return role.Name, err
 }
+
+
+
+
+
+
+// GetRoleIDByName retrieves the ID of a role by its name.
+/*func GetRoleIDByName(db *gorm.DB, roleName string) (uuid.UUID, error) {
+      role := new(Roles)
+    err := db.Where("name = ?", roleName).First(&role).Error
+    if err != nil {
+        return uuid.Nil, err
+    }
+    return role.ID, nil
+}*/

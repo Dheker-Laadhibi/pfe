@@ -14,7 +14,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Createcandidate 		Handles the creation of a new candidate.
+// Createcandidate 	Handles the creation of a new candidate.
 // @Summary        	Create candidate
 // @Description    	Create a new candidate.
 // @Tags			Condidats
@@ -58,6 +58,11 @@ func (db Database) Createcandidate(ctx *gin.Context) {
 	}
 	// Hash the user's password
 	hash, _ := bcrypt.GenerateFromPassword([]byte(condidat.Password), bcrypt.DefaultCost)
+	res, err := domains.GetRoleIDByName(db.DB,condidat.RoleName , session.CompanyID)
+	if err != nil {
+		logrus.Error("Error finding the Role. Error: ", err.Error())
+		return
+	}
 	// Create a new candidate in the database
 	dbCondidat := &domains.Condidats{
 		ID:             uuid.New(),
@@ -67,8 +72,10 @@ func (db Database) Createcandidate(ctx *gin.Context) {
 		Password:       string(hash),
 		Adress:         condidat.Adress,
 		University:     condidat.University,
+		RoleID: res,
 		Educationlevel: condidat.Educationlevel,
 		CompanyID:      condidat.CompanyID,
+
 	}
 	if err := domains.Create(db.DB, dbCondidat); err != nil {
 		logrus.Error("Error saving data to the database. Error: ", err.Error())

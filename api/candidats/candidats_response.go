@@ -6,12 +6,13 @@ import (
 
 // @Description	CondidatIn represents the input structure for creating a new condidat.
 type CondidatIn struct {
-	Firstname      string    `json:"firstName" binding:"required,min=3,max=30"` // Firstname is the first name of the user. It is required and should be between 3 and 30 characters.
-	Lastname       string    `json:"lastName" binding:"required,min=3,max=35"`  // Lastname is the last name of the user. It is required and should be between 3 and 35 characters.
-	Adress         string    `json:"adress" binding:"required,min=3,max=35"`
+	Firstname string `json:"firstName" binding:"min=3,max=30"`	// Firstname is the first name of the user. It is required and should be between 3 and 30 characters.
+	Lastname       string    `json:"lastName"  binding:"min=3,max=30"`  // Lastname is the last name of the user. It is required and should be between 3 and 35 characters.
+	Adress         string    `json:"adress"  binding:"min=3,max=30"`
 	Email          string    `json:"email" binding:"required,email,max=255"` // Email is the email address of the user. It is required, should be a valid email, and maximum length is 255 characters.
-	Educationlevel string    `json:"education_level" binding:"required,min=3,max=35"`
-	University     string    `json:"university" binding:"required,min=3,max=35"`
+	Educationlevel string    `json:"education_level"  binding:"min=3,max=30"`
+	RoleName  string    `json:"role_name"`   //  define condidat role 
+	University     string    `json:"university"  binding:"min=3,max=30"`
 	Password       string    `json:"password" binding:"required,min=10,max=255"` // Password is the user's password. It is required, and its length should be between 10 and 255 characters.
 	CompanyID      uuid.UUID `json:"companyID" binding:"required"`               // CompanyID is the unique identifier for the company associated with the user. It is required.
 } //@name CondidatIn

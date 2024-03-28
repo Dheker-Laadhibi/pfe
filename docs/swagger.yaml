@@ -166,7 +166,7 @@ definitions:
     description: CondidatIn represents the input structure for creating a new condidat.
     properties:
       adress:
-        maxLength: 35
+        maxLength: 30
         minLength: 3
         type: string
       companyID:
@@ -174,7 +174,7 @@ definitions:
           with the user. It is required.
         type: string
       education_level:
-        maxLength: 35
+        maxLength: 30
         minLength: 3
         type: string
       email:
@@ -191,7 +191,7 @@ definitions:
       lastName:
         description: Lastname is the last name of the user. It is required and should
           be between 3 and 35 characters.
-        maxLength: 35
+        maxLength: 30
         minLength: 3
         type: string
       password:
@@ -200,19 +200,17 @@ definitions:
         maxLength: 255
         minLength: 10
         type: string
+      role_name:
+        description: define condidat role
+        type: string
       university:
-        maxLength: 35
+        maxLength: 30
         minLength: 3
         type: string
     required:
-    - adress
     - companyID
-    - education_level
     - email
-    - firstName
-    - lastName
     - password
-    - university
     type: object
   CondidatsCount:
     description: CondidatsCount represents the count of condidats.
@@ -1490,30 +1488,24 @@ definitions:
         type: integer
     type: object
   UsersTable:
-    description: UsersTable represents a single project entry in a table.
+    description: UsersTable represents a single user entry in a table.
     properties:
-      code:
-        description: code is the code of pfe project
+      createdAt:
+        description: CreatedAt is the timestamp indicating when the user entry was
+          created.
         type: string
-      companyID:
-        description: CompanyID is the unique identifier for the company associated
-          with the project. It is required.
+      email:
+        description: Email is the email address of the user.
         type: string
-      expdate:
-        description: expdate is the timestamp indicating when the project entry will
-          ends.
+      firstname:
+        description: Firstname is the first name of the user.
         type: string
       id:
-        description: ID is the unique identifier for the project.
+        description: ID is the unique identifier for the user.
         type: string
-      projectname:
-        description: projectname is the  name of the project. It is required .
+      lastname:
+        description: Lastname is the last name of the user.
         type: string
-      technologies:
-        description: technologies required to develop the project
-        items:
-          type: string
-        type: array
     type: object
   codeProject:
     description: codeProject represents code project about a specific project.

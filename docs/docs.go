@@ -8347,19 +8347,14 @@ const docTemplate = `{
             "description": "CondidatIn represents the input structure for creating a new condidat.",
             "type": "object",
             "required": [
-                "adress",
                 "companyID",
-                "education_level",
                 "email",
-                "firstName",
-                "lastName",
-                "password",
-                "university"
+                "password"
             ],
             "properties": {
                 "adress": {
                     "type": "string",
-                    "maxLength": 35,
+                    "maxLength": 30,
                     "minLength": 3
                 },
                 "companyID": {
@@ -8368,7 +8363,7 @@ const docTemplate = `{
                 },
                 "education_level": {
                     "type": "string",
-                    "maxLength": 35,
+                    "maxLength": 30,
                     "minLength": 3
                 },
                 "email": {
@@ -8385,7 +8380,7 @@ const docTemplate = `{
                 "lastName": {
                     "description": "Lastname is the last name of the user. It is required and should be between 3 and 35 characters.",
                     "type": "string",
-                    "maxLength": 35,
+                    "maxLength": 30,
                     "minLength": 3
                 },
                 "password": {
@@ -8394,9 +8389,13 @@ const docTemplate = `{
                     "maxLength": 255,
                     "minLength": 10
                 },
+                "role_name": {
+                    "description": "define condidat role",
+                    "type": "string"
+                },
                 "university": {
                     "type": "string",
-                    "maxLength": 35,
+                    "maxLength": 30,
                     "minLength": 3
                 }
             }
@@ -10056,35 +10055,28 @@ const docTemplate = `{
             }
         },
         "UsersTable": {
-            "description": "UsersTable represents a single project entry in a table.",
+            "description": "UsersTable represents a single user entry in a table.",
             "type": "object",
             "properties": {
-                "code": {
-                    "description": "code is the code of pfe project",
+                "createdAt": {
+                    "description": "CreatedAt is the timestamp indicating when the user entry was created.",
                     "type": "string"
                 },
-                "companyID": {
-                    "description": "CompanyID is the unique identifier for the company associated with the project. It is required.",
+                "email": {
+                    "description": "Email is the email address of the user.",
                     "type": "string"
                 },
-                "expdate": {
-                    "description": "expdate is the timestamp indicating when the project entry will ends.",
+                "firstname": {
+                    "description": "Firstname is the first name of the user.",
                     "type": "string"
                 },
                 "id": {
-                    "description": "ID is the unique identifier for the project.",
+                    "description": "ID is the unique identifier for the user.",
                     "type": "string"
                 },
-                "projectname": {
-                    "description": "projectname is the  name of the project. It is required .",
+                "lastname": {
+                    "description": "Lastname is the last name of the user.",
                     "type": "string"
-                },
-                "technologies": {
-                    "description": "technologies required to develop the project",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
                 }
             }
         },
