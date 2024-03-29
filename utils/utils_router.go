@@ -35,6 +35,12 @@ func InitRouter() *gin.Engine {
 	gin.SetMode(gin.DebugMode)
 
 	router := gin.New()
+	//recovery
+	//It's a crucial middleware for keeping
+	//your server stable and operational even when unexpected errors occur.
+
+	//logger:logs details about each incoming HTTP request
+	//such as the HTTP method, the requested URL, the response status code
 
 	router.Use(gin.Recovery(), gin.Logger())
 
@@ -42,8 +48,12 @@ func InitRouter() *gin.Engine {
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowOrigins = []string{"*"}
 	corsConfig.AllowMethods = []string{"GET", "POST", "PUT", "DELETE"}
+	//configurations to allow requests from any origin (*)
 	corsConfig.AllowHeaders = []string{"*"}
+
+	// it allows requests with credentials(informations)
 	corsConfig.AllowCredentials = true
+	// initialize a Gin router with recovery, logging, and CORS configurations
 	router.Use(cors.New(corsConfig))
 
 	return router

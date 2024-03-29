@@ -80,6 +80,6 @@ type LoggedInResponse struct {
 type LoggedIn struct {
 	ID        uuid.UUID `json:"ID"`            // ID is the unique identifier for the candidat.
 	Name           string    `json:"name"`           // Name is the name of the user..
-	Email     string    `json:"email"`         // Email is the email address of the candidat.
+	Email     string         `json:"email"`         // Email is the email address of the candidat.
 	CompanyID uuid.UUID `json:"workCompanyId"` // CompanyID is the unique identifier for the candidat company.
 } //@name LoggedIn

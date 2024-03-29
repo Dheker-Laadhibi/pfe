@@ -575,6 +575,7 @@ token := utils.GenerateToken(data.ID, data.CompanyID, data.RoleID)
 			ID:        data.ID,
 			Name:      data.Firstname + " " + data.Lastname,
 			Email:     data.Email,
+			
 			CompanyID: data.CompanyID,
 		},
 	}
