@@ -1,5 +1,4 @@
 /*
-
 	Package utils provides utility functions and configurations for the application.
 
 	The InitRouter function initializes and returns a Gin router with specific configurations.
@@ -31,7 +30,8 @@ import (
 
 // InitRouter initializes and returns a Gin router with specific configurations.
 func InitRouter() *gin.Engine {
-
+//provides additional debug information and enables features that are helpful
+// during development and debugging, such as:
 	gin.SetMode(gin.DebugMode)
 
 	router := gin.New()
@@ -50,7 +50,7 @@ func InitRouter() *gin.Engine {
 	corsConfig.AllowMethods = []string{"GET", "POST", "PUT", "DELETE"}
 	//configurations to allow requests from any origin (*)
 	corsConfig.AllowHeaders = []string{"*"}
-
+	
 	// it allows requests with credentials(informations)
 	corsConfig.AllowCredentials = true
 	// initialize a Gin router with recovery, logging, and CORS configurations

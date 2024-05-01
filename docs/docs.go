@@ -732,6 +732,74 @@ const docTemplate = `{
             }
         },
         "/candidats/{companyID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all Candidats .",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Condidats"
+                ],
+                "summary": "Get Candidats",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/CondidtasPagination"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -770,6 +838,328 @@ const docTemplate = `{
                 "responses": {
                     "201": {
                         "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/candidats/{companyID}/count": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get number of all Candidats .",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Condidats"
+                ],
+                "summary": "Get number of  Candidats",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/CondidatsCount"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/candidats/{companyID}/list": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get list of all Candidats.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Condidats"
+                ],
+                "summary": "Get list of  Candidats",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/CondidatsList"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/candidats/{companyID}/{ID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get one candidat.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Condidats"
+                ],
+                "summary": "Get candidat",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "candidat ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/CondidatDetails"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update one candidat.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Condidats"
+                ],
+                "summary": "Update candidat",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "candidat ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "candidat query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/CondidatIn"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete one candidat\t.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Condidats"
+                ],
+                "summary": "Delete candidat",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "candidat ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/ApiResponse"
                         }
@@ -1068,398 +1458,6 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Company ID",
-                        "name": "ID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/condidats/{companyID}": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Get all Candidats .",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Condidats"
-                ],
-                "summary": "Get Candidats",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Page",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Limit",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Company ID",
-                        "name": "companyID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/CondidtasPagination"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/condidats/{companyID}/count": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Get number of all Candidats .",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Condidats"
-                ],
-                "summary": "Get number of  Candidats",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Company ID",
-                        "name": "companyID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/CondidatsCount"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/condidats/{companyID}/list": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Get list of all Candidats.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Condidats"
-                ],
-                "summary": "Get list of  Candidats",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Company ID",
-                        "name": "companyID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/CondidatsList"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/condidats/{companyID}/{ID}": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Get one candidat.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Condidats"
-                ],
-                "summary": "Get candidat",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Company ID",
-                        "name": "companyID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "candidat ID",
-                        "name": "ID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/CondidatDetails"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Update one candidat.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Condidats"
-                ],
-                "summary": "Update candidat",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Company ID",
-                        "name": "companyID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "candidat ID",
-                        "name": "ID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "candidat query params",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/CondidatIn"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Delete one candidat\t.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Condidats"
-                ],
-                "summary": "Delete candidat",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Company ID",
-                        "name": "companyID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "candidat ID",
                         "name": "ID",
                         "in": "path",
                         "required": true
@@ -2510,72 +2508,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/interns/Delete/{companyID}/{SupervisorID}": {
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Delete one intern.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Interns"
-                ],
-                "summary": "Delete intern",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "companyID",
-                        "name": "companyID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "SupervisorID",
-                        "name": "SupervisorID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/interns/all/{companyID}/{SupervisorID}": {
+        "/interns/{companyID}": {
             "get": {
                 "security": [
                     {
@@ -2607,13 +2540,6 @@ const docTemplate = `{
                         "type": "string",
                         "description": "companyID",
                         "name": "companyID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "SupervisorID",
-                        "name": "SupervisorID",
                         "in": "path",
                         "required": true
                     }
@@ -2652,7 +2578,84 @@ const docTemplate = `{
                 }
             }
         },
-        "/interns/count/{companyID}": {
+        "/interns/{companyID}/add/{supervisorID}": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create a new intern.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Interns"
+                ],
+                "summary": "Create intern",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "companyID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "supervisorID",
+                        "name": "supervisorID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Intern query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/InternsIn"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/interns/{companyID}/count": {
             "get": {
                 "security": [
                     {
@@ -2710,7 +2713,137 @@ const docTemplate = `{
                 }
             }
         },
-        "/interns/update/{companyID}/{ID}": {
+        "/interns/{companyID}/delete/{internID}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete one intern.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Interns"
+                ],
+                "summary": "Delete intern",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "companyID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "internID",
+                        "name": "internID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/interns/{companyID}/intern/{internID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get one intern.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Interns"
+                ],
+                "summary": "Get intern",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "internID ",
+                        "name": "internID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/InternsDetails"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/interns/{companyID}/update/{internID}": {
             "put": {
                 "security": [
                     {
@@ -2739,7 +2872,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Intern ID",
-                        "name": "ID",
+                        "name": "internID",
                         "in": "path",
                         "required": true
                     },
@@ -2758,141 +2891,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/interns/{companyID}": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Create a new intern.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Interns"
-                ],
-                "summary": "Create intern",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "companyID",
-                        "name": "companyID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Intern query params",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/InternsIn"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/interns/{companyID}/{ID}": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Get one intern.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Interns"
-                ],
-                "summary": "Get intern",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "company ID",
-                        "name": "companyID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "internID ",
-                        "name": "ID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/InternsDetails"
                         }
                     },
                     "400": {
@@ -3998,7 +3996,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/missions/All/{userID}": {
+        "/missions/All/{companyID}": {
             "get": {
                 "security": [
                     {
@@ -4028,8 +4026,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "User ID",
-                        "name": "userID",
+                        "description": "companyID",
+                        "name": "companyID",
                         "in": "path",
                         "required": true
                     }
@@ -4071,7 +4069,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/missions/count/{userID}": {
+        "/missions/count/{companyID}": {
             "get": {
                 "security": [
                     {
@@ -4089,8 +4087,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User ID",
-                        "name": "userID",
+                        "description": "companyID",
+                        "name": "companyID",
                         "in": "path",
                         "required": true
                     }
@@ -4129,7 +4127,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/missions/delete/{ID}/{userID}": {
+        "/missions/delete/{companyID}/{ID}": {
             "delete": {
                 "security": [
                     {
@@ -4150,8 +4148,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User Id",
-                        "name": "userID",
+                        "description": "companyID",
+                        "name": "companyID",
                         "in": "path",
                         "required": true
                     },
@@ -4197,7 +4195,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/missions/get/{ID}/{userID}": {
+        "/missions/get/{companyID}/{ID}": {
             "get": {
                 "security": [
                     {
@@ -4215,8 +4213,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User ID",
-                        "name": "userID",
+                        "description": "companyID",
+                        "name": "companyID",
                         "in": "path",
                         "required": true
                     },
@@ -4262,7 +4260,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/missions/update/{ID}/{userID}": {
+        "/missions/update/{companyID}/{ID}": {
             "put": {
                 "security": [
                     {
@@ -4283,14 +4281,14 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "userID ID",
-                        "name": "userID",
+                        "description": "companyID ",
+                        "name": "companyID",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "MissionOrdersIn ID",
+                        "description": "ID ",
                         "name": "ID",
                         "in": "path",
                         "required": true
@@ -4339,7 +4337,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/missions/{companyID}": {
+        "/missions/{companyID}/{userID}": {
             "post": {
                 "security": [
                     {
@@ -4362,6 +4360,13 @@ const docTemplate = `{
                         "type": "string",
                         "description": "companyID",
                         "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "userID",
+                        "name": "userID",
                         "in": "path",
                         "required": true
                     },
@@ -4865,74 +4870,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/presences/delete/{ID}/{userID}": {
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Delete one presence.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Presences"
-                ],
-                "summary": "Delete presence",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "user ID",
-                        "name": "userID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Presence ID",
-                        "name": "ID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Presenceal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/presences/get/{ID}/{userID}": {
             "get": {
                 "security": [
@@ -4998,84 +4935,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/presences/update/{ID}/{userID}": {
-            "put": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Update one presence.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Presences"
-                ],
-                "summary": "Update presence",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "userID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Presence ID",
-                        "name": "ID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Presence query params",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/PresencesIn"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Presenceal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/presences/{companyID}": {
+        "/presences/{companyID}/{userID}": {
             "post": {
                 "security": [
                     {
@@ -5098,6 +4958,13 @@ const docTemplate = `{
                         "type": "string",
                         "description": "companyID",
                         "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "userID",
+                        "name": "userID",
                         "in": "path",
                         "required": true
                     },
@@ -5617,7 +5484,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "ProjectsCondidats"
+                    "Project"
                 ],
                 "summary": "assign Project",
                 "parameters": [
@@ -6836,12 +6703,6 @@ const docTemplate = `{
                         "name": "candidatID",
                         "in": "path",
                         "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "NbrQuestions",
-                        "name": "nbrQuestions",
-                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -6849,67 +6710,6 @@ const docTemplate = `{
                         "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ApiResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/tests/{companyID}/list": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Get list of all tests.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Tests"
-                ],
-                "summary": "Get list of  tests",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Company ID",
-                        "name": "companyID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/TestsList"
-                            }
                         }
                     },
                     "400": {
@@ -7045,6 +6845,74 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/tests/{companyID}/{candidatID}/list": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get list of all tests for a specific candidat .",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tests"
+                ],
+                "summary": "Get list of  tests",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Candidat ID",
+                        "name": "candidatID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/TestsList"
+                            }
                         }
                     },
                     "400": {
@@ -7249,7 +7117,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/training_request/All/{userID}": {
+        "/training_request/All/{companyID}": {
             "get": {
                 "security": [
                     {
@@ -7279,8 +7147,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "User ID",
-                        "name": "userID",
+                        "description": "companyID ",
+                        "name": "companyID",
                         "in": "path",
                         "required": true
                     }
@@ -7322,7 +7190,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/training_request/count/{userID}": {
+        "/training_request/count/{companyID}": {
             "get": {
                 "security": [
                     {
@@ -7340,8 +7208,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User ID",
-                        "name": "userID",
+                        "description": "companyID ",
+                        "name": "companyID",
                         "in": "path",
                         "required": true
                     }
@@ -7380,7 +7248,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/training_request/delete/{ID}/{userID}": {
+        "/training_request/delete/{companyID}/{ID}": {
             "delete": {
                 "security": [
                     {
@@ -7401,8 +7269,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User Id",
-                        "name": "userID",
+                        "description": "companyID",
+                        "name": "companyID",
                         "in": "path",
                         "required": true
                     },
@@ -7448,7 +7316,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/training_request/get/{ID}/{userID}": {
+        "/training_request/get/{companyID}/{ID}": {
             "get": {
                 "security": [
                     {
@@ -7466,8 +7334,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User ID",
-                        "name": "userID",
+                        "description": "companyID",
+                        "name": "companyID",
                         "in": "path",
                         "required": true
                     },
@@ -7513,7 +7381,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/training_request/update/{ID}/{userID}": {
+        "/training_request/update/{companyID}/{ID}": {
             "put": {
                 "security": [
                     {
@@ -7534,8 +7402,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "userID ",
-                        "name": "userID",
+                        "description": "companyID",
+                        "name": "companyID",
                         "in": "path",
                         "required": true
                     },
@@ -7590,7 +7458,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/training_request/{userID}/{companyID}": {
+        "/training_request/{companyID}/{userID}": {
             "post": {
                 "security": [
                     {
@@ -8286,6 +8154,10 @@ const docTemplate = `{
                 "name": {
                     "description": "Name is the name of the company.",
                     "type": "string"
+                },
+                "website": {
+                    "description": "Website is the website URL of the company.",
+                    "type": "string"
                 }
             }
         },
@@ -8354,7 +8226,7 @@ const docTemplate = `{
                 },
                 "education_level": {
                     "type": "string",
-                    "maxLength": 30,
+                    "maxLength": 100,
                     "minLength": 3
                 },
                 "email": {
@@ -8405,6 +8277,12 @@ const docTemplate = `{
             "description": "CondidatsList represents a simplified version of the Condidats for listing purposes.",
             "type": "object",
             "properties": {
+                "adress": {
+                    "type": "string"
+                },
+                "educationlevel": {
+                    "type": "string"
+                },
                 "firstname": {
                     "description": "Name is the name of the condidat.",
                     "type": "string"
@@ -8416,6 +8294,9 @@ const docTemplate = `{
                 "lastname": {
                     "description": "Name is the name of the condidat.",
                     "type": "string"
+                },
+                "university": {
+                    "type": "string"
                 }
             }
         },
@@ -8423,8 +8304,13 @@ const docTemplate = `{
             "description": "CondidatsTable represents a single condidat entry in a table.",
             "type": "object",
             "properties": {
+                "adress": {
+                    "type": "string"
+                },
+                "educationlevel": {
+                    "type": "string"
+                },
                 "email": {
-                    "description": "Email is the email address of the condidat.",
                     "type": "string"
                 },
                 "firstname": {
@@ -8437,6 +8323,9 @@ const docTemplate = `{
                 },
                 "lastname": {
                     "description": "Lastname is the last name of the condidat.",
+                    "type": "string"
+                },
+                "university": {
                     "type": "string"
                 }
             }
@@ -8659,7 +8548,11 @@ const docTemplate = `{
             "description": "InternsDetails represents detailed information about a specific intern.",
             "type": "object",
             "properties": {
+                "adress": {
+                    "type": "string"
+                },
                 "educationLevel": {
+                    "description": "intern's education level",
                     "type": "string"
                 },
                 "email": {
@@ -8670,6 +8563,9 @@ const docTemplate = `{
                     "description": "Firstname is the first name of the intern.",
                     "type": "string"
                 },
+                "gender": {
+                    "type": "string"
+                },
                 "id": {
                     "description": "ID is the unique identifier for the intern.",
                     "type": "string"
@@ -8678,10 +8574,15 @@ const docTemplate = `{
                     "description": "Lastname is the last name of the intern.",
                     "type": "string"
                 },
+                "phoneNumber": {
+                    "type": "string"
+                },
                 "startDate": {
+                    "description": "startDate of internship",
                     "type": "string"
                 },
                 "university": {
+                    "description": "university",
                     "type": "string"
                 }
             }
@@ -8689,62 +8590,41 @@ const docTemplate = `{
         "InternsIn": {
             "description": "InternsIn represents the input structure for creating a new intern.",
             "type": "object",
-            "required": [
-                "companyID",
-                "educationalSupervisorEmail",
-                "educationalSupervisorName",
-                "educationalSupervisorPhone",
-                "email",
-                "firstName",
-                "lastName",
-                "password",
-                "supervisor_id"
-            ],
             "properties": {
-                "companyID": {
-                    "description": "companyID",
+                "adress": {
                     "type": "string"
                 },
-                "educationalSupervisorEmail": {
-                    "description": "education supervisor email  from the university",
-                    "type": "string",
-                    "maxLength": 255
-                },
-                "educationalSupervisorName": {
-                    "type": "string",
-                    "maxLength": 35,
-                    "minLength": 3
-                },
-                "educationalSupervisorPhone": {
-                    "description": "education supervisor phone from the university",
-                    "type": "string",
-                    "maxLength": 15
+                "educationLevel": {
+                    "description": "Lastname        string    ` + "`" + `gorm:\"column:last_name; not null;\"` + "`" + `",
+                    "type": "string"
                 },
                 "email": {
                     "description": "Email is the email address of the intern. It is required, should be a valid email, and maximum length is 255 characters.",
-                    "type": "string",
-                    "maxLength": 255
+                    "type": "string"
+                },
+                "end_date": {
+                    "type": "string"
                 },
                 "firstName": {
                     "description": "Firstname is the first name of the intern. It is required and should be between 3 and 30 characters.",
-                    "type": "string",
-                    "maxLength": 30,
-                    "minLength": 3
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string"
                 },
                 "lastName": {
                     "description": "Lastname is the last name of the intern. It is required and should be between 3 and 35 characters.",
-                    "type": "string",
-                    "maxLength": 35,
-                    "minLength": 3
+                    "type": "string"
                 },
-                "password": {
-                    "description": "Lastname        string    ` + "`" + `gorm:\"column:last_name; not null;\"` + "`" + `",
-                    "type": "string",
-                    "maxLength": 255,
-                    "minLength": 10
+                "phoneNumber": {
+                    "type": "string"
                 },
-                "supervisor_id": {
-                    "description": "SupervisorID  is the unique identifier for the user associated with the user. It is required.",
+                "start_date": {
+                    "description": "start date of the internship",
+                    "type": "string"
+                },
+                "university": {
+                    "description": "university",
                     "type": "string"
                 }
             }
@@ -8778,12 +8658,25 @@ const docTemplate = `{
             "description": "InternsTable represents a single intern entry in a table.",
             "type": "object",
             "properties": {
+                "adress": {
+                    "type": "string"
+                },
+                "educationLevel": {
+                    "description": "intern's education level",
+                    "type": "string"
+                },
                 "email": {
                     "description": "Email is the email address of the intern.",
                     "type": "string"
                 },
+                "end_date": {
+                    "type": "string"
+                },
                 "firstname": {
                     "description": "Firstname is the first name of the intern.",
+                    "type": "string"
+                },
+                "gender": {
                     "type": "string"
                 },
                 "id": {
@@ -8792,6 +8685,17 @@ const docTemplate = `{
                 },
                 "lastname": {
                     "description": "Lastname is the last name of the intern.",
+                    "type": "string"
+                },
+                "phoneNumber": {
+                    "type": "string"
+                },
+                "start_date": {
+                    "description": "start date of the internship",
+                    "type": "string"
+                },
+                "university": {
+                    "description": "university",
                     "type": "string"
                 }
             }
@@ -8986,23 +8890,27 @@ const docTemplate = `{
             }
         },
         "LoggedIn": {
-            "description": "LoggedIn represents the candidat details after successful login.",
+            "description": "LoggedIn represents the user details after successful login.",
             "type": "object",
             "properties": {
                 "ID": {
-                    "description": "ID is the unique identifier for the candidat.",
+                    "description": "ID is the unique identifier for the user.",
                     "type": "string"
                 },
                 "email": {
-                    "description": "Email is the email address of the candidat.",
+                    "description": "Email is the email address of the user.",
                     "type": "string"
                 },
                 "name": {
-                    "description": "Name is the name of the user..",
+                    "description": "Name is the name of the user.",
+                    "type": "string"
+                },
+                "profilePicture": {
+                    "description": "ProfilePicture is the URL or path to the user's profile picture.",
                     "type": "string"
                 },
                 "workCompanyId": {
-                    "description": "CompanyID is the unique identifier for the candidat company.",
+                    "description": "CompanyID is the unique identifier for the user's company.",
                     "type": "string"
                 }
             }
@@ -9038,6 +8946,9 @@ const docTemplate = `{
         "MissionOrdersDetails": {
             "description": "MissionOrdersDetails represents detailed information about a specific MissionOrders.",
             "type": "object",
+            "required": [
+                "userID"
+            ],
             "properties": {
                 "description": {
                     "description": "Description of   the missionOrders",
@@ -9064,7 +8975,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "userID": {
-                    "description": "User ID associated with the missionOrders",
+                    "description": "ID is the unique identifier for the Missi",
                     "type": "string"
                 }
             }
@@ -9073,26 +8984,33 @@ const docTemplate = `{
             "description": "MissionOrdersIn represents the input structure for updating the attributes  of MissionOrders.",
             "type": "object",
             "required": [
-                "Adress_client",
                 "description",
                 "object",
-                "userID"
+                "transport"
             ],
             "properties": {
                 "Adress_client": {
-                    "description": "Adress client for the Missi",
+                    "description": "Adress client for the Mission",
                     "type": "string"
                 },
                 "description": {
                     "description": "Description of   the missionOrders",
                     "type": "string"
                 },
+                "end_date": {
+                    "description": "EndDte    of the missionOrders",
+                    "type": "string"
+                },
                 "object": {
                     "description": "Object   of the missionOrders",
                     "type": "string"
                 },
-                "userID": {
-                    "description": "ID is the unique identifier for the Missi",
+                "start_date": {
+                    "description": "StartDate of the missionOrders",
+                    "type": "string"
+                },
+                "transport": {
+                    "description": "Transport of the missionOrders",
                     "type": "string"
                 }
             }
@@ -9186,8 +9104,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "check",
-                "matricule",
-                "userID"
+                "matricule"
             ],
             "properties": {
                 "check": {
@@ -9197,10 +9114,6 @@ const docTemplate = `{
                 "matricule": {
                     "description": "Seen is a boolean indicating whether the presence has been seen or not. It is required.",
                     "type": "integer"
-                },
-                "userID": {
-                    "description": "unique User ID",
-                    "type": "string"
                 }
             }
         },
@@ -9208,12 +9121,7 @@ const docTemplate = `{
             "description": "ProjectIn represents the input structure for creating a new project.",
             "type": "object",
             "required": [
-                "code",
-                "companyID",
-                "description",
-                "exp_date",
-                "projectname",
-                "technologies"
+                "code"
             ],
             "properties": {
                 "code": {
@@ -9221,10 +9129,6 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 30,
                     "minLength": 3
-                },
-                "companyID": {
-                    "description": "CompanyID is the unique identifier for the company associated with the project. It is required.",
-                    "type": "string"
                 },
                 "description": {
                     "description": "The description of the project",
@@ -9242,7 +9146,7 @@ const docTemplate = `{
                     "maxLength": 35,
                     "minLength": 3
                 },
-                "specialty": {
+                "speciality": {
                     "description": "The specialty of the project",
                     "type": "string"
                 },
@@ -9413,6 +9317,10 @@ const docTemplate = `{
             "description": "TestsTable represents a single question entry in a table.",
             "type": "object",
             "properties": {
+                "associatedTechnology": {
+                    "description": "Associated technology or subject for the question",
+                    "type": "string"
+                },
                 "createdAt": {
                     "description": "CreatedAt is the timestamp indicating when the test entry was created.",
                     "type": "string"
@@ -9716,6 +9624,10 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                },
+                "title": {
+                    "description": "The title of the test",
+                    "type": "string"
                 }
             }
         },
@@ -9820,8 +9732,7 @@ const docTemplate = `{
                 "description",
                 "reason",
                 "request_date",
-                "training_title",
-                "userID"
+                "training_title"
             ],
             "properties": {
                 "decision_company": {
@@ -9841,10 +9752,6 @@ const docTemplate = `{
                 },
                 "training_title": {
                     "description": "Object   of the missionOrders",
-                    "type": "string"
-                },
-                "userID": {
-                    "description": "ID is the unique identifier for the Missi",
                     "type": "string"
                 }
             }
@@ -10034,28 +9941,38 @@ const docTemplate = `{
             }
         },
         "UsersTable": {
-            "description": "UsersTable represents a single user entry in a table.",
+            "description": "UsersTable represents a single project entry in a table.",
             "type": "object",
             "properties": {
-                "createdAt": {
-                    "description": "CreatedAt is the timestamp indicating when the user entry was created.",
+                "code": {
+                    "description": "code is the code of pfe project",
                     "type": "string"
                 },
-                "email": {
-                    "description": "Email is the email address of the user.",
+                "companyID": {
+                    "description": "CompanyID is the unique identifier for the company associated with the project. It is required.",
                     "type": "string"
                 },
-                "firstname": {
-                    "description": "Firstname is the first name of the user.",
+                "expdate": {
+                    "description": "expdate is the timestamp indicating when the project entry will ends.",
                     "type": "string"
                 },
                 "id": {
-                    "description": "ID is the unique identifier for the user.",
+                    "description": "ID is the unique identifier for the project.",
                     "type": "string"
                 },
-                "lastname": {
-                    "description": "Lastname is the last name of the user.",
+                "projectname": {
+                    "description": "projectname is the  name of the project. It is required .",
                     "type": "string"
+                },
+                "speciality": {
+                    "type": "string"
+                },
+                "technologies": {
+                    "description": "technologies required to develop the project",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },

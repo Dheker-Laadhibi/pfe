@@ -79,7 +79,6 @@ func (db Database) CreateUserExperience(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusCreated, constants.CREATED, utils.Null())
 }
 
-// read all and Get   list demand a relation with company id ??!
 
 // ReadUserExperience	Handles the retrieval of all UserExperiences.
 // @Summary        	Get UserExperience

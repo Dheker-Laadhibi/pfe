@@ -13,7 +13,7 @@ type Database struct {
 	DB *gorm.DB
 }
 
-// NewExperienceRepository performs automatic migration of project-related structures in the database.
+// NewExperienceRepository performs automatic migration of user ecperience-related structures in the database.
 func NewExperienceRepository(db *gorm.DB) {
 	if err := db.AutoMigrate(&domains.UserExperience{}); err != nil {
 		logrus.Fatal("An error occurred during automatic migration of the  UserExperience structure. Error: ", err)
@@ -26,13 +26,13 @@ func ReadAllPagination(db *gorm.DB, model []domains.UserExperience, modelID uuid
 	return model, err
 }
 
-// ReadAllList retrieves a list of projects based on company ID.
+// ReadAllList retrieves a list of user ecperience based on company ID.
 func ReadAllList(db *gorm.DB, model []domains.UserExperience, modelID uuid.UUID) ([]domains.UserExperience, error) {
 	err := db.Where("company_id = ? ", modelID).Find(&model).Error
 	return model, err
 }
 
-// ReadByID retrieves a project by their unique identifier.
+// ReadByID retrieves a user ecperience by their unique identifier.
 func ReadByID(db *gorm.DB, model domains.UserExperience, id uuid.UUID) (domains.UserExperience, error) {
 	err := db.First(&model, id).Error
 	return model, err

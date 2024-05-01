@@ -22,14 +22,15 @@ import (
 // @Accept			json
 // @Produce			json
 // @Security 		ApiKeyAuth
-// @Param			companyID		   path			string				true	"companyID"
+// @Param			companyID	    path			string				true	"companyID"
+// @Param			userID	        path			string				true	"userID"
 // @Param			request			body			presences.PresencesIn	true "Presence query params"
 // @Success			201				{object}		utils.ApiResponses
 // @Failure			400				{object}		utils.ApiResponses	"Invalid request"
 // @Failure			401				{object}		utils.ApiResponses	"Unauthorized"
 // @Failure			403				{object}		utils.ApiResponses	"Forbidden"
 // @Failure			500				{object}		utils.ApiResponses	"Presenceal Server Error"
-// @Router			/presences/{companyID}	[post]
+// @Router			/presences/{companyID}/{userID}	[post]
 func (db Database) CreatePresence(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -37,6 +38,14 @@ func (db Database) CreatePresence(ctx *gin.Context) {
 
 	// Parse and validate the company ID from the request parameter
 	companyID, err := uuid.Parse(ctx.Param("companyID"))
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
+	// Parse and validate the user ID from the request parameter
+	userID, err := uuid.Parse(ctx.Param("userID"))
 	if err != nil {
 		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
@@ -63,7 +72,7 @@ func (db Database) CreatePresence(ctx *gin.Context) {
 		ID:        uuid.New(),
 		Matricule: presence.Matricule,
 		Check:     presence.Check,
-		UserID: presence.UserID, //IDUser
+		UserID: userID, //IDUser
 
 	}
 	if err := domains.Create(db.DB, dbPresence); err != nil {
@@ -76,23 +85,23 @@ func (db Database) CreatePresence(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusCreated, constants.CREATED, utils.Null())
 }
 
-//GetAll Presences of a uuuuuuuuuser
 
-// ReadPresences	Handles the retrieval of all presences.
-// @Summary        		Get presences
-// @Description    		Get all presences.
-// @Tags				Presences
-// @Produce				json
-// @Security 			ApiKeyAuth
-// @Param			page			query		int			false		"Page"
-// @Param			limit			query		int			false		"Limit"
-// @Param				userID				path			string		true		"User ID"
-// @Success				200					{array}			presences.PresencesDetails
-// @Failure				400					{object}		utils.ApiResponses		"Invalid request"
-// @Failure				401					{object}		utils.ApiResponses		"Unauthorized"
-// @Failure				403					{object}		utils.ApiResponses		"Forbidden"
-// @Failure				500					{object}		utils.ApiResponses		"Presenceal Server Error"
-// @Router				/presences/All/{userID}	[get]
+
+// ReadPresences   Handles the retrieval of all presences.
+// @Summary        Get presences
+// @Description    Get all presences.
+// @Tags		   Presences
+// @Produce		   json
+// @Security 	   ApiKeyAuth
+// @Param		   page			   query		int			false		"Page"
+// @Param		   limit		   query		int			false		"Limit"
+// @Param		   userID		   path			string		true		"User ID"
+// @Success		   200			   {array}		presences.PresencesDetails
+// @Failure		   400			   {object}		utils.ApiResponses		"Invalid request"
+// @Failure		   401			   {object}		utils.ApiResponses		"Unauthorized"
+// @Failure		   403			   {object}		utils.ApiResponses		"Forbidden"
+// @Failure		   500			   {object}		utils.ApiResponses		"Presenceal Server Error"
+// @Router		   /presences/All/{userID}	[get]
 func (db Database) ReadPresences(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -115,7 +124,7 @@ func (db Database) ReadPresences(ctx *gin.Context) {
 		return
 	}
 
-	// Parse and validate the presence ID from the request parameter
+	// Parse and validate the user ID from the request parameter
 	userID, err := uuid.Parse(ctx.Param("userID"))
 	if err != nil {
 		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
@@ -158,14 +167,8 @@ if err != nil {
 	return
 }
 
-	/* // Retrieve all presence data from the database
-	presences, err := ReadAll(db.DB, domains.Presences{}, session.UserID)
-	if err != nil {
-		logrus.Error("Error occurred while finding all presences  data. Error: ", err)
-		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
-		return
-	} */
-// Generate a mission orders  structure as a response
+	
+// Generate the presence's   structure as a response
 response := PresencesPagination{}
 dataTablePresence := []PresencesTable{}
 for _, presence := range presences {
@@ -174,7 +177,7 @@ for _, presence := range presences {
 		ID:        presence.ID,
 		Check:presence.Check ,
 		Matricule:presence.Matricule,
-		UserID:   presence.UserID,
+		
 		
 	})
 }
@@ -184,38 +187,30 @@ response.Limit = uint(limit)
 response.TotalCount = count
 
 
-
-
-
-
-
-
-
-
 	// Respond with success
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, response)
 }
 
-// number of alllll presences of a user
+
 // ReadPresencesCount	Handles the retrieval the number of all presences.
-// @Summary        			Get presences count
-// @Description    			Get all presences count.
-// @Tags					Presences
-// @Produce					json
-// @Security 				ApiKeyAuth
-// @Param					userID				path			string		true		"User ID"
-// @Success					200					{object}		presences.PresencesCount
-// @Failure					400					{object}		utils.ApiResponses		"Invalid request"
-// @Failure					401					{object}		utils.ApiResponses		"Unauthorized"
-// @Failure					403					{object}		utils.ApiResponses		"Forbidden"
-// @Failure					500					{object}		utils.ApiResponses		"Presenceal Server Error"
-// @Router					/presences/count/{userID}	[get] 
+// @Summary        		Get presences count
+// @Description    		Get all presences count.
+// @Tags				Presences
+// @Produce				json
+// @Security 			ApiKeyAuth
+// @Param				userID				path			string		true		"User ID"
+// @Success				200					{object}		presences.PresencesCount
+// @Failure				400					{object}		utils.ApiResponses		"Invalid request"
+// @Failure				401					{object}		utils.ApiResponses		"Unauthorized"
+// @Failure				403					{object}		utils.ApiResponses		"Forbidden"
+// @Failure				500					{object}		utils.ApiResponses		"Presenceal Server Error"
+// @Router				/presences/count/{userID}	[get] 
 func (db Database) ReadPresencesCount(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
 
-	// Parse and validate the presence ID from the request parameter
+	// Parse and validate the user ID from the request parameter
 	userID, err := uuid.Parse(ctx.Param("userID"))
 	if err != nil {
 		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
@@ -250,9 +245,9 @@ func (db Database) ReadPresencesCount(ctx *gin.Context) {
 
 }
 
-//oneeeeeeeee presences
 
-// ReadPresence		Handles the retrieval of one presence.
+
+// ReadPresence		    Handles the retrieval of one presence.
 // @Summary        		Get presence
 // @Description    		Get one presence.
 // @Tags				Presences
@@ -308,139 +303,11 @@ func (db Database) ReadPresence(ctx *gin.Context) {
 		Matricule: presence.Matricule,
 
 		Check: presence.Check,
+		UserID: userID,
 
-		/* ID        uuid.UUID `json:"id"`        // ID is the unique identifier for the presence.
-		Matricule      uint    `json:"matricule"`      // Type is the type or category of the presence.
-		Check  */
+		
 	}
 
 	// Respond with success
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, details)
-}
-
-// UpdatePresence 	Handles the update of a presence.
-// @Summary        		Update presence
-// @Description    		Update one presence.
-// @Tags				Presences
-// @Accept				json
-// @Produce				json
-// @Security 			ApiKeyAuth
-// @Param				userID					path			string							true		"User ID"
-// @Param				ID						path			string							true		"Presence ID"
-// @Param				request					body			presences.PresencesIn	true		"Presence query params"
-// @Success				200						{object}		utils.ApiResponses
-// @Failure				400						{object}		utils.ApiResponses		"Invalid request"
-// @Failure				401						{object}		utils.ApiResponses		"Unauthorized"
-// @Failure				403						{object}		utils.ApiResponses		"Forbidden"
-// @Failure				500						{object}		utils.ApiResponses		"Presenceal Server Error"
-// @Router				/presences/update/{ID}/{userID}	[put]
-func (db Database) UpdatePresence(ctx *gin.Context) {
-
-	// Extract JWT values from the context
-	session := utils.ExtractJWTValues(ctx)
-
-	// Parse and validate the user ID from the request parameter
-	userID, err := uuid.Parse(ctx.Param("userID"))
-	if err != nil {
-		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
-		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
-		return
-	}
-
-	// Parse and validate the presence ID from the request parameter
-	objectID, err := uuid.Parse(ctx.Param("ID"))
-	if err != nil {
-		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
-		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
-		return
-	}
-
-	// Check if the employee belongs to the specified company
-	if err := domains.CheckEmployeeSession(db.DB, userID, session.UserID, session.CompanyID); err != nil {
-		logrus.Error("Error verifying employee belonging. Error: ", err.Error())
-		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
-		return
-	}
-
-	// Parse the incoming JSON request into a PresenceIn struct
-	presence := new(PresencesIn)
-	if err := ctx.ShouldBindJSON(presence); err != nil {
-		logrus.Error("Error mapping request from frontend. Error: ", err.Error())
-		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
-		return
-	}
-
-	// Check if the presence with the specified ID exists
-	if err = domains.CheckByID(db.DB, &domains.Presences{}, objectID); err != nil {
-		logrus.Error("Error checking if the presence with the specified ID exists. Error: ", err.Error())
-		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
-		return
-	}
-
-	// Update the presence data in the database
-	dbPresence := &domains.Presences{
-		Matricule: presence.Matricule,
-	}
-	if err = domains.Update(db.DB, dbPresence, objectID); err != nil {
-		logrus.Error("Error updating user data in the database. Error: ", err.Error())
-		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
-		return
-	}
-
-	// Respond with success
-	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, utils.Null())
-}
-
-// DeletePresence 	Handles the deletion of a presence.
-// @Summary        		Delete presence
-// @Description    		Delete one presence.
-// @Tags				Presences
-// @Accept				json
-// @Produce				json
-// @Security 			ApiKeyAuth
-// @Param				userID					path			string			true		"user ID"
-// @Param				ID						path			string			true		"Presence ID"
-// @Success				200						{object}		utils.ApiResponses
-// @Failure				400						{object}		utils.ApiResponses			"Invalid request"
-// @Failure				401						{object}		utils.ApiResponses			"Unauthorized"
-// @Failure				403						{object}		utils.ApiResponses			"Forbidden"
-// @Failure				500						{object}		utils.ApiResponses			"Presenceal Server Error"
-// @Router				/presences/delete/{ID}/{userID}	[delete]
-func (db Database) DeletePresence(ctx *gin.Context) {
-
-	// Extract JWT values from the context
-	session := utils.ExtractJWTValues(ctx)
-
-	// Parse and validate the user ID from the request parameter
-	userID, err := uuid.Parse(ctx.Param("userID"))
-	if err != nil {
-		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
-		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
-		return
-	}
-
-	// Parse and validate the presence ID from the request parameter
-	objectID, err := uuid.Parse(ctx.Param("ID"))
-	if err != nil {
-		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
-		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
-		return
-	}
-
-	// Check if the employee belongs to the specified company
-	if err := domains.CheckEmployeeSession(db.DB, userID, session.UserID, session.CompanyID); err != nil {
-		logrus.Error("Error verifying employee belonging. Error: ", err.Error())
-		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
-		return
-	}
-
-	// Delete the user data from the database
-	if err := domains.Delete(db.DB, &domains.Presences{}, objectID); err != nil {
-		logrus.Error("Error deleting user data from the database. Error: ", err.Error())
-		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
-		return
-	}
-
-	// Respond with success
-	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, utils.Null())
 }

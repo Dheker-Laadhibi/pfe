@@ -3,6 +3,7 @@ package interns
 import (
 	"labs/constants"
 	"labs/domains"
+	"time"
 
 	"net/http"
 	"strconv"
@@ -12,16 +13,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
-	"golang.org/x/crypto/bcrypt"
 )
 
 /**
 
 IMPORTANT:
 The user ID represents the unique identifier of an employee who holds the role of former intern groups.
-Please ensure that appropriate permissions and access controls are in place for this user.
+
 */
-//last update 26/02/2024 by dheker 21:27
 
 // CreateIntern 	Handles the creation of a new intern.
 // @Summary        	Create intern
@@ -30,28 +29,38 @@ Please ensure that appropriate permissions and access controls are in place for 
 // @Accept			json
 // @Produce			json
 // @Security 		ApiKeyAuth
-// @Param			companyID		   path			string				true	"companyID"
+// @Param			companyID		path			string				true	"companyID"
+// @Param			supervisorID	path			string				true	"supervisorID"
 // @Param			request			body			interns.InternsIn	true	"Intern query params"
 // @Success			201				{object}		utils.ApiResponses
 // @Failure			400				{object}		utils.ApiResponses	"Invalid request"
 // @Failure			401				{object}		utils.ApiResponses	"Unauthorized"
 // @Failure			403				{object}		utils.ApiResponses	"Forbidden"
 // @Failure			500				{object}		utils.ApiResponses	"Internal Server Error"
-// @Router			/interns/{companyID}	[post]
+// @Router			/interns/{companyID}/add/{supervisorID}	[post]
 func (db Database) CreateIntern(ctx *gin.Context) {
-
+	
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
 
-	// Parse and validate the user ID from the request parameter
+	// Parse and validate the company ID from the request parameter
 	companyID, err := uuid.Parse(ctx.Param("companyID"))
 	if err != nil {
 		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
 		return
 	}
+// Parse and validate the supervisorID  from the request parameter
+supervisorID, err := uuid.Parse(ctx.Param("supervisorID"))
+if err != nil {
+	logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
+	utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+	return
+}
 
-	// Check if the employee belongs to the specified user
+
+
+	// Check if the intern belongs to the specified compnay
 	if err := domains.CheckEmployeeBelonging(db.DB, companyID, session.UserID, session.CompanyID); err != nil {
 		logrus.Error("Error verifying employee belonging. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
@@ -66,22 +75,35 @@ func (db Database) CreateIntern(ctx *gin.Context) {
 		return
 	}
 
-	// Hash the intern's password
-	hash, _ := bcrypt.GenerateFromPassword([]byte(intern.Password), bcrypt.DefaultCost)
+	layout := "2006-01-02" // Format de date année-mois-jour
 
+	// Analyser la date ExpDate en tant que time.Time
+	dt, err := time.Parse(layout, intern.StartDate)
+	if err != nil {
+		logrus.Error("Erreur lors de l'analyse de la date : ", err.Error())
+		// Gérer l'erreur ici
+	}
+
+	
+
+	// Analyser la date ExpDate en tant que time.Time
+	dt2, err := time.Parse(layout, intern.EndDate)
+	if err != nil {
+		logrus.Error("Erreur lors de l'analyse de la date : ", err.Error())
+		// Gérer l'erreur ici
+	}
 	// Create a new intern in the database
 	dbIntern := &domains.Interns{
 		ID:                         uuid.New(),
 		Firstname:                  intern.Firstname,
 		Lastname:                   intern.Lastname,
 		Email:                      intern.Email,
-		Password:                   string(hash),
-		EducationalSupervisorEmail: intern.EducationalSupervisorEmail,
-		EducationalSupervisorName:  intern.EducationalSupervisorName,
-		EducationalSupervisorPhone: intern.EducationalSupervisorPhone,
-		SupervisorID:               intern.SupervisorID,
-		//CreatedByUserID: session.UserID,
-		CompanyID: intern.CompanyID,
+        LevelOfEducation: intern.LevelOfEducation,
+		StartDate: dt,
+		EndDate: dt2,
+        University: intern.University,
+		SupervisorID:               supervisorID,
+		CompanyID :companyID,
 	}
 	if err := domains.Create(db.DB, dbIntern); err != nil {
 		logrus.Error("Error saving data to the database. Error: ", err.Error())
@@ -93,7 +115,7 @@ func (db Database) CreateIntern(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusCreated, constants.CREATED, utils.Null())
 }
 
-/*Gettttttttttttttt Alllllllllllllllllllllllllllllllll interns of one instructer*/
+
 
 // ReadInterns 		Handles the retrieval of all interns.
 // @Summary        	Get interns
@@ -101,16 +123,15 @@ func (db Database) CreateIntern(ctx *gin.Context) {
 // @Tags			Interns
 // @Produce			json
 // @Security 		ApiKeyAuth
-// @Param			page			query		int			false		"Page"
-// @Param			limit			query		int			false		"Limit"
-// @Param			companyID		    path		string		true	"companyID"
-// @Param			SupervisorID		    path		string		true	"SupervisorID"
+// @Param			page			query		int			false	"Page"
+// @Param			limit			query		int			false	"Limit"
+// @Param			companyID		path		string		true	"companyID"
 // @Success			200				{object}	interns.InternsPagination
 // @Failure			400				{object}	utils.ApiResponses		"Invalid request"
 // @Failure			401				{object}	utils.ApiResponses		"Unauthorized"
 // @Failure			403				{object}	utils.ApiResponses		"Forbidden"
 // @Failure			500				{object}	utils.ApiResponses		"Internal Server Error"
-// @Router			/interns/all/{companyID}/{SupervisorID}	[get]
+// @Router			/interns/{companyID}	[get]
 func (db Database) ReadInterns(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -132,7 +153,7 @@ func (db Database) ReadInterns(ctx *gin.Context) {
 		return
 	}
 
-	// Parse and validate the user ID from the request parameter
+	// Parse and validate the companyID  from the request parameter
 	companyID, err := uuid.Parse(ctx.Param("companyID"))
 	if err != nil {
 		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
@@ -140,13 +161,7 @@ func (db Database) ReadInterns(ctx *gin.Context) {
 		return
 	}
 
-	// Parse and validate the user ID from the request parameter
-	SupervisorID, err := uuid.Parse(ctx.Param("SupervisorID"))
-	if err != nil {
-		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
-		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
-		return
-	}
+	
 
 	// Check if the intern's value is among the allowed choices
 	validChoices := utils.ResponseLimitPagination()
@@ -166,7 +181,7 @@ func (db Database) ReadInterns(ctx *gin.Context) {
 	// Generate offset
 	offset := (page - 1) * limit
 
-	// Check if the employee belongs to the specified user
+	// Check if the employee belongs to the specified intenr
 	if err := domains.CheckEmployeeBelonging(db.DB, companyID, session.UserID, session.CompanyID); err != nil {
 		logrus.Error("Error verifying employee belonging. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
@@ -174,15 +189,15 @@ func (db Database) ReadInterns(ctx *gin.Context) {
 	}
 
 	// Retrieve all intern data from the database
-	interns, err := ReadAllPagination(db.DB, []domains.Interns{}, SupervisorID, limit, offset)
+	interns, err := ReadAllPagination(db.DB, []domains.Interns{}, companyID, limit, offset)
 	if err != nil {
 		logrus.Error("Error occurred while finding all intern data. Error: ", err)
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
 		return
 	}
 
-	// Retrieve total count
-	count, err := domains.ReadTotalCount(db.DB, &domains.Interns{}, "user_id", session.UserID)
+	// Retrieve total count by one supervisor 
+	count, err := domains.ReadTotalCount(db.DB, &domains.Interns{}, "company_id", session.CompanyID)
 	if err != nil {
 		logrus.Error("Error occurred while finding total count. Error: ", err)
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
@@ -199,6 +214,10 @@ func (db Database) ReadInterns(ctx *gin.Context) {
 			Firstname: intern.Firstname,
 			Lastname:  intern.Lastname,
 			Email:     intern.Email,
+			LevelOfEducation: intern.LevelOfEducation,
+			University: intern.University,
+			EndDate:intern.EndDate ,
+			StartDate: intern.StartDate,
 		})
 	}
 	response.Items = dataTableIntern
@@ -210,9 +229,9 @@ func (db Database) ReadInterns(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, response)
 }
 
-/* Numbeeeeeeeeeeeeeeeeeer of Alll Internnnnnn in one company                                    */
+                           
 
-// ReadInternsCount 	Handles the retrieval the number of all interns.
+// ReadInternsCount Handles the retrieval the number of all interns.
 // @Summary        	Get number of  interns
 // @Description    	Get number of all interns.
 // @Tags			Interns
@@ -224,14 +243,14 @@ func (db Database) ReadInterns(ctx *gin.Context) {
 // @Failure			401						{object}		utils.ApiResponses	"Unauthorized"
 // @Failure			403						{object}		utils.ApiResponses	"Forbidden"
 // @Failure			500						{object}		utils.ApiResponses	"Internal Server Error"
-// @Router			/interns/count/{companyID}	[get]
+// @Router			/interns/{companyID}/count	[get]
 // to add relation with company
 func (db Database) ReadInternsCount(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
 
-	// Parse and validate the user ID from the request parameter
+	// Parse and validate the companyID  from the request parameter
 	companyID, err := uuid.Parse(ctx.Param("companyID"))
 	if err != nil {
 		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
@@ -263,7 +282,7 @@ func (db Database) ReadInternsCount(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, internsCount)
 }
 
-/*Geeeeeeeeeeeeet Onnnnnnnnnnnnnnnnnnnnnnnnnnnnne           inteeeeeeeeeeeeeeeeeeeeeeeeeeern*/
+
 
 // ReadIntern 		Handles the retrieval of one intern.
 // @Summary        	Get intern
@@ -271,20 +290,20 @@ func (db Database) ReadInternsCount(ctx *gin.Context) {
 // @Tags			Interns
 // @Produce			json
 // @Security 		ApiKeyAuth
-// @Param			companyID			path			string			  true	   "company ID"
-// @Param			ID					path			string			  true	    "internID "
+// @Param			companyID			path	string			  true	   "company ID"
+// @Param			internID			path	string			  true	    "internID "
 // @Success			200					{object}		interns.InternsDetails
 // @Failure			400					{object}		utils.ApiResponses		"Invalid request"
 // @Failure			401					{object}		utils.ApiResponses		"Unauthorized"
 // @Failure			403					{object}		utils.ApiResponses		"Forbidden"
 // @Failure			500					{object}		utils.ApiResponses		"Internal Server Error"
-// @Router			/interns/{companyID}/{ID}	[get]
+// @Router			/interns/{companyID}/intern/{internID}	[get]
 func (db Database) ReadIntern(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
 
-	// Parse and validate the user ID from the request parameter
+	// Parse and validate the companyID  from the request parameter
 	companyID, err := uuid.Parse(ctx.Param("companyID"))
 	if err != nil {
 		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
@@ -293,7 +312,7 @@ func (db Database) ReadIntern(ctx *gin.Context) {
 	}
 
 	// Parse and validate the intern ID from the request parameter
-	ID, err := uuid.Parse(ctx.Param("ID"))
+	ID, err := uuid.Parse(ctx.Param("internID"))
 	if err != nil {
 		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
@@ -324,12 +343,13 @@ func (db Database) ReadIntern(ctx *gin.Context) {
 		LevelOfEducation: intern.LevelOfEducation,
 		University:       intern.University,
 		StartDate:        intern.StartDate,
+
 	}
 	// Respond with success
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, details)
 }
 
-// UpdateIntern 		Handles the update of a intern.
+// UpdateIntern 	Handles the update of a intern.
 // @Summary        	Update intern
 // @Description    	Update intern.
 // @Tags			Interns
@@ -337,20 +357,20 @@ func (db Database) ReadIntern(ctx *gin.Context) {
 // @Produce			json
 // @Security 		ApiKeyAuth
 // @Param			companyID			path			string				true	"companyID"
-// @Param			ID					path			string				true	"Intern ID"
-// @Param			request				body			interns.InternsIn		true	"Intern query params"
+// @Param			internID			path			string				true	"Intern ID"
+// @Param			request				body			interns.InternsIn	true	"Intern query params"
 // @Success			200					{object}		utils.ApiResponses
 // @Failure			400					{object}		utils.ApiResponses			"Invalid request"
 // @Failure			401					{object}		utils.ApiResponses			"Unauthorized"
 // @Failure			403					{object}		utils.ApiResponses			"Forbidden"
 // @Failure			500					{object}		utils.ApiResponses			"Internal Server Error"
-// @Router			/interns/update/{companyID}/{ID}	[put]
+// @Router			/interns/{companyID}/update/{internID}	[put]
 func (db Database) UpdateIntern(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
 
-	// Parse and validate the user ID from the request parameter
+	// Parse and validate the companyID  from the request parameter
 	companyID, err := uuid.Parse(ctx.Param("companyID"))
 	if err != nil {
 		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
@@ -359,14 +379,14 @@ func (db Database) UpdateIntern(ctx *gin.Context) {
 	}
 
 	// Parse and validate the intern ID from the request parameter
-	objectID, err := uuid.Parse(ctx.Param("ID"))
+	objectID, err := uuid.Parse(ctx.Param("internID"))
 	if err != nil {
 		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
 		return
 	}
 
-	// Check if the employee belongs to the specified user
+	// Check if the employee belongs to the specified company
 	if err := domains.CheckEmployeeBelonging(db.DB, companyID, session.UserID, session.CompanyID); err != nil {
 		logrus.Error("Error verifying employee belonging. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
@@ -381,6 +401,9 @@ func (db Database) UpdateIntern(ctx *gin.Context) {
 		return
 	}
 
+	
+	
+
 	// Check if the intern with the specified ID exists
 	if err = domains.CheckByID(db.DB, &domains.Interns{}, objectID); err != nil {
 		logrus.Error("Error checking if the intern with the specified ID exists. Error: ", err.Error())
@@ -390,9 +413,12 @@ func (db Database) UpdateIntern(ctx *gin.Context) {
 
 	// Update the intern data in the database
 	dbIntern := &domains.Interns{
-		Firstname: intern.Firstname,
-		Lastname:  intern.Lastname,
-		Email:     intern.Email,
+	
+	Email: intern.Email,
+	Gender: intern.Gender,
+	PhoneNumber: intern.PhoneNumber,
+	Adress: intern.Adress,
+
 	}
 	if err = domains.Update(db.DB, dbIntern, objectID); err != nil {
 		logrus.Error("Error updating intern data in the database. Error: ", err.Error())
@@ -411,19 +437,19 @@ func (db Database) UpdateIntern(ctx *gin.Context) {
 // @Produce			json
 // @Security 		ApiKeyAuth
 // @Param			companyID			path			string			true	"companyID"
-// @Param			SupervisorID					path			string			true	"SupervisorID"
+// @Param			internID		    path			string			true	"internID"
 // @Success			200					{object}		utils.ApiResponses
 // @Failure			400					{object}		utils.ApiResponses		"Invalid request"
 // @Failure			401					{object}		utils.ApiResponses		"Unauthorized"
 // @Failure			403					{object}		utils.ApiResponses		"Forbidden"
 // @Failure			500					{object}		utils.ApiResponses		"Internal Server Error"
-// @Router			/interns/Delete/{companyID}/{SupervisorID}	[delete]
+// @Router			/interns/{companyID}/delete/{internID}	[delete]
 func (db Database) DeleteIntern(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
 
-	// Parse and validate the user ID from the request parameter
+	// Parse and validate the company  ID from the request parameter
 	companyID, err := uuid.Parse(ctx.Param("companyID"))
 	if err != nil {
 		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
@@ -432,7 +458,7 @@ func (db Database) DeleteIntern(ctx *gin.Context) {
 	}
 
 	// Parse and validate the intern ID from the request parameter
-	SupervisorID, err := uuid.Parse(ctx.Param("SupervisorID"))
+	internID, err := uuid.Parse(ctx.Param("internID"))
 	if err != nil {
 		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
@@ -447,14 +473,14 @@ func (db Database) DeleteIntern(ctx *gin.Context) {
 	}
 
 	// Check if the intern with the specified ID exists
-	if err := domains.CheckByID(db.DB, &domains.Interns{}, SupervisorID); err != nil {
+	if err := domains.CheckByID(db.DB, &domains.Interns{}, internID); err != nil {
 		logrus.Error("Error checking if the intern with the specified ID exists. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusNotFound, constants.DATA_NOT_FOUND, utils.Null())
 		return
 	}
 
 	// Delete the intern data from the database
-	if err := domains.Delete(db.DB, &domains.Interns{}, SupervisorID); err != nil {
+	if err := domains.Delete(db.DB, &domains.Interns{}, internID); err != nil {
 		logrus.Error("Error deleting intern data from the database. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
 		return

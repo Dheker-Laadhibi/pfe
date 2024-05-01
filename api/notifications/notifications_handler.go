@@ -23,7 +23,7 @@ import (
 // @Failure				400					{object}		utils.ApiResponses		"Invalid request"
 // @Failure				401					{object}		utils.ApiResponses		"Unauthorized"
 // @Failure				403					{object}		utils.ApiResponses		"Forbidden"
-// @Failure				500					{object}		utils.ApiResponses		"Internal Server Error"
+// @Failure			   	500					{object}		utils.ApiResponses		"Internal Server Error"
 // @Router				/notifications/{userID}	[get]
 func (db Database) ReadNotifications(ctx *gin.Context) {
 

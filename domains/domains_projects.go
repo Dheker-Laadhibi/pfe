@@ -1,50 +1,44 @@
 /*
 
-	Package domains provides the data structures representing entities in the project.
+	This package provides data structures representing entities in the project along with functions to manipulate these data. Below is a detailed description of the structures and functions provided:
 
-	Structures:
-	- Users: Represents the user information in the system.
-		- ID (uuid.UUID): Unique identifier for the user.
-		- Firstname (string): The user's first name.
-		- Lastname (string): The user's last name.
-		- Email (string): User's email address (unique).
-		- Password (string): User password.
-		- ProfilePicture (string): URL or path to the user's profile picture.
-		- Country (string): User's country.
-		- Status (bool): User's account status (true for active, false for non-active).
-		- LastLogin (time.Time): The last time the user authenticated.
-		- Role ([]Roles): The roles assigned to the user.
-		- CompanyID (uuid.UUID): ID of the company to which the user belongs.
-		- CreatedByUserID (uuid.UUID): ID of the user who created this user.
-		- gorm.Model: Standard GORM model fields (ID, CreatedAt, UpdatedAt, DeletedAt).
-
-	- UsersRoles: Represents the roles assigned to users.
-		- UserID (uuid.UUID): User's ID.
-		- RoleID (uuid.UUID): Role's ID.
-		- CompanyID (uuid.UUID): ID of the company associated with the user and role.
-
-	Functions:
-	- ReadUsersRoles(db *gorm.DB, userID, companyID uuid.UUID) ([]UsersRoles, error): Reads the roles assigned to a user.
-	- CheckEmployeeBelonging(db *gorm.DB, pathCompanyID, sessionUserID, sessionCompanyID uuid.UUID) error: Checks if the user belongs to the specified company.
-	- CheckEmployeeSession(db *gorm.DB, pathUserID, sessionUserID, sessionCompanyID uuid.UUID) error: Checks if the user's session matches the specified user and company.
-
-	Dependencies:
-	- "errors": Standard Go package for errors handling.
-	- "github.com/google/uuid": Package for working with UUIDs.
-	- "gorm.io/gorm": The GORM library for object-relational mapping in Go.
-	- "time": Standard Go package for handling time.
-
-	Usage:
-	- Import this package to utilize the provided data structures and functions for handling user information in the project.
-
-	Note:
-	- The Users structure represents the user information in the system.
-	- ReadUsersRoles reads the roles assigned to a user.
-	- CheckEmployeeBelonging checks if the user belongs to the specified company.
-	- CheckEmployeeSession checks if the user's session matches the specified user and company.
-
-	Last update :
-	01/02/2024 10:22
+Data Structures:
+Project
+ID (uuid.UUID): Unique identifier for the project.
+Code (string): The project's code.
+Projectname (string): The project's name.
+Specialty (string): The project's specialty.
+Description (string): Description of the project.
+Technologies (pq.StringArray): Technologies used in the project.
+ExpDate (time.Time): Expiration date of the project.
+Condidats ([]Condidats): Candidates associated with the project.
+CompanyID (uuid.UUID): ID of the company to which the project belongs.
+gorm.Model: Standard GORM model fields (ID, CreatedAt, UpdatedAt, DeletedAt).
+ProjectsCondidats
+ProjectID (uuid.UUID): ID of the project.
+CondidatID (uuid.UUID): ID of the candidate.
+CompanyID (uuid.UUID): ID of the company associated with the project and candidate.
+gorm.Model: Standard GORM model fields (ID, CreatedAt, UpdatedAt, DeletedAt).
+Functions:
+ReadProjectsCondidats(db *gorm.DB, projectID, companyID uuid.UUID) ([]ProjectsCondidats, error): Reads the candidates assigned to a project.
+CheckProjectCodeExists(db *gorm.DB, code string) (bool, error): Checks if a project code already exists in the database.
+*AssignProjectCondidat(db gorm.DB, projectID, condidatID, companyID uuid.UUID) error: Associates a candidate with a project in the ProjectsCondidats table.
+FindProjectIDByCode(db *gorm.DB, projectCode string) (string, error): Searches for the project ID based on the project code in the database.
+Dependencies:
+"github.com/google/uuid": Package for working with UUIDs.
+"github.com/lib/pq": Package for manipulating string arrays in PostgreSQL.
+"gorm.io/gorm": The GORM library for object-relational mapping in Go.
+"time": Standard Go package for handling time.
+Usage:
+Import this package to utilize the provided data structures and functions for manipulating project information in the project.
+Note:
+The Project structure represents project information in the system.
+ReadProjectsCondidats reads the candidates assigned to a project.
+CheckProjectCodeExists checks if a project code already exists in the database.
+AssignProjectCondidat associates a candidate with a project.
+FindProjectIDByCode searches for the project ID based on the project code.
+Last update:
+01/02/2024 10:22 - dheker
 
 */
 
@@ -67,9 +61,9 @@ type Project struct {
 	Description  string         `gorm:"column:description; not null;"`               // projects description (mission  )
 	Technologies pq.StringArray `gorm:"column:technologies;type:TEXT[]"`             // project's technologies
 	ExpDate      time.Time      `gorm:"column:exp_date;"`                            // exp date of project
-	Condidats    []Condidats    `gorm:"many2many:projects_condidats"`
-	CompanyID    uuid.UUID      `gorm:"column:company_id; type:uuid; not null;"` // ID of the company to which the user belongs
-	gorm.Model
+	Condidats    []Condidats    `gorm:"many2many:projects_condidats"`                //projects candidats 
+	CompanyID    uuid.UUID      `gorm:"column:company_id; type:uuid; not null;"`     // ID of the company to which the user belongs
+	gorm.Model     
 }
 
 // UsersRoles represents the roles assigned to users.
@@ -87,13 +81,7 @@ func ReadProjectsCondidats(db *gorm.DB, projectID, companyID uuid.UUID) ([]Proje
 	return project, err
 }
 
-/*
-// ReadUsersRoles reads the roles assigned to a user.
-func ReadUsersRoles(db *gorm.DB, userID, companyID uuid.UUID) ([]UsersRoles, error) {
-	var user []UsersRoles
-	err := db.Where("users_id = ? AND company_id = ?", userID, companyID).Find(&user).Error
-	return user, err
-} */
+
 
 // CheckProjectCodeExists vérifie si un code de projet existe déjà dans la base de données.
 func CheckProjectCodeExists(db *gorm.DB, code string) (bool, error) {

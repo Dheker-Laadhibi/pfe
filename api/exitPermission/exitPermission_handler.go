@@ -21,7 +21,7 @@ import (
 // @Accept			json
 // @Produce			json
 // @Security 		ApiKeyAuth
-// @Param				companyID				path			string		true		"Company ID"
+// @Param			companyID		path			string		true		"Company ID"
 // @Param			request			body			exitPermission.ExitPermissionDemande		true		"ExitPermission query params"
 // @Success			201				{object}		utils.ApiResponses
 // @Failure			400				{object}		utils.ApiResponses	"Invalid request"
@@ -84,15 +84,15 @@ func (db Database) AddExitPermission(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusCreated, constants.CREATED, utils.Null())
 }
 
-// ReadExitPermission			Handles the retrieval of all exit permissions for a specific user .
+// ReadExitPermission	Handles the retrieval of all exit permissions for a specific user .
 // @Summary        		Get exit permission
 // @Description    		Get all exit permission for a specific user .
 // @Tags				ExitPermission
 // @Produce				json
 // @Security 			ApiKeyAuth
 // @Param				userID				path			string		true		"User ID"
-// @Param			page			query		int					false	"Page"
-// @Param			limit			query		int					false	"Limit"
+// @Param			    page			    query		     int		false	     "Page"
+// @Param			    limit			    query		     int		false	     "Limit"
 // @Success				200					{array}			exitPermission.ExitPermissionPagination
 // @Failure				400					{object}		utils.ApiResponses		"Invalid request"
 // @Failure				401					{object}		utils.ApiResponses		"Unauthorized"
@@ -199,9 +199,9 @@ func (db Database) ReadAllExitPermission(ctx *gin.Context) {
 // @Tags				ExitPermission
 // @Produce				json
 // @Security 			ApiKeyAuth
-// @Param				companyID				path			string		true		"Company ID"
-// @Param			page			query		int					false	"Page"
-// @Param			limit			query		int					false	"Limit"
+// @Param				companyID			path			string		true		"Company ID"
+// @Param			    page			    query		     int		false	      "Page"
+// @Param			    limit			    query		     int		false	      "Limit"
 // @Success				200					{array}			exitPermission.ExitPermissionPagination
 // @Failure				400					{object}		utils.ApiResponses		"Invalid request"
 // @Failure				401					{object}		utils.ApiResponses		"Unauthorized"
@@ -351,7 +351,7 @@ func (db Database) ReadExitPermissionCount(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, count)
 }
 
-//***********************************************
+
 
 // ReadExitPermissionCountByCompany	Handles the retrieval the number of all exitPermission for a specific companyID.
 // @Summary        			Get exitPermission count
@@ -402,7 +402,7 @@ func (db Database) ReadExitPermissionCountByCompany(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, count)
 }
 
-//***********************************************
+
 
 // ReadExitPermission		Handles the retrieval of one exitPermission.
 // @Summary        		Get exitPermission

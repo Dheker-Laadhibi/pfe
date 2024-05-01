@@ -37,7 +37,7 @@
 	Usage:
 	- Import this package to utilize the provided data structures and functions for handling user information in the project.
 
-	Note:
+	Note:id
 	- The Users structure represents the user information in the system.
 	- CheckEmployeeBelonging checks if the user belongs to the specified company.
 	- CheckEmployeeSession checks if the user's session matches the specified user and company.
@@ -60,7 +60,7 @@ import (
 
 // Users represents the user information in the system.
 type Users struct {
-	ID              uuid.UUID `gorm:"column:id; primaryKey; type:uuid; not null;"` // Unique identifier for the user
+	ID              uuid.UUID `gorm:"column:; primaryKey; type:uuid; not null;"` // Unique identifier for the user
 	Firstname       string    `gorm:"column:first_name; not null;"`                // The user's first name
 	Lastname        string    `gorm:"column:last_name; not null;"`                 // The user's last name
 	Email           string    `gorm:"column:email; not null; unique"`              // User's email address (unique)
@@ -99,6 +99,9 @@ func CheckEmployeeSession(db *gorm.DB, pathUserID, sessionUserID, sessionCompany
 // GetRoleIDByName retrieves the role's ID based on the role name and sessionCompanyID.
 func GetRoleIDByName(db *gorm.DB, roleName string, sessionCompanyID uuid.UUID) (uuid.UUID, error) {
 	var role Roles
+
+
+
 
 	// Select the role's ID based on the role name and sessionCompanyID
 	result := db.Select("id").Where("name = ? AND company_id = ?", roleName, sessionCompanyID).First(&role)

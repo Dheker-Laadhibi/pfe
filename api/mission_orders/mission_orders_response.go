@@ -9,12 +9,12 @@ import (
 // @Description	MissionOrdersIn represents the input structure for updating the attributes  of MissionOrders.
 type MissionOrdersIn struct {
 	Object string `json:"object" binding:"required"` // Object   of the missionOrders
-
 	Description string `json:"description" binding:"required"` // Description of   the missionOrders
+	AdressClient string `json:"Adress_client"` // Adress client for the Mission
+	EndDate     string `json:"end_date"  `    // EndDte    of the missionOrders
+	StartDate   string `json:"start_date"`  // StartDate of the missionOrders
+	Transport   string    `json:"transport" binding:"required"`   // Transport of the missionOrders
 
-	AdressClient string `json:"Adress_client" binding:"required"` // Adress client for the Missi
-
-	UserID uuid.UUID `json:"userID" binding:"required"` // ID is the unique identifier for the Missi
 
 } //@name MissionOrdersIn
 
@@ -31,7 +31,8 @@ type MissionOrdersDetails struct {
 	Transport   string    `json:"transport"`   // Transport of the missionOrders
 	EndDate     time.Time `json:"end_date"`    // EndDte    of the missionOrders
 	StartDate   time.Time `json:"start_date"`  // StartDate of the missionOrders
-	UserID      uuid.UUID `json:"userID" `     // User ID associated with the missionOrders
+	UserID uuid.UUID `json:"userID" binding:"required"` // ID is the unique identifier for the Missi
+
 } //@name MissionOrdersDetails
 
 // @Description	MissionsOrdersPagination represents the paginated list of missions.
@@ -45,7 +46,7 @@ type MissionsPagination struct {
 // @Description	MissionsTable represents a single Missions entry in a table.
 type MissionsTable struct {
 	ID      uuid.UUID `json:"id"`         // ID is the unique identifier for the missions.
-	Object string    `json:"string"` // object is the object  missions of the user.
+	Object string    `json:"Object"` // object is the object  missions of the user.
 	Description string    `json:"desciption"` // description is the missions of the user.
 	Transport   string    `json:"Transport"`  // Transport of the missions.
 	StartDate   time.Time `json:"StartDate"`  // StartDate is the email address of the user.

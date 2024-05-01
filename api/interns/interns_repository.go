@@ -28,13 +28,13 @@ func NewInternRepository(db *gorm.DB) {
 
 // ReadAllPagination retrieves a paginated list of interns based on company ID, limit, and offset.
 func ReadAllPagination(db *gorm.DB, model []domains.Interns, modelID uuid.UUID, limit, offset int) ([]domains.Interns, error) {
-	err := db.Where("user_id = ? ", modelID).Limit(limit).Offset(offset).Find(&model).Error
+	err := db.Where("company_id = ? ", modelID).Limit(limit).Offset(offset).Find(&model).Error
 	return model, err
 }
 
 // ReadAllList retrieves a list of interns based on company ID.
 func ReadAllList(db *gorm.DB, model []domains.Interns, modelID uuid.UUID) ([]domains.Interns, error) {
-	err := db.Where("user_id = ? ", modelID).Find(&model).Error
+	err := db.Where("company_id = ?", modelID).Find(&model).Error
 	return model, err
 }
 

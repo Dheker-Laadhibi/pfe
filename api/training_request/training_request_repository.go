@@ -20,7 +20,7 @@ func NewNewTrainingRequestRepository(db *gorm.DB) {
 	}
 }
 
-// ReadAll retrieves all missions orders for a specific user based on user ID.
+// ReadAll retrieves all trainings  for a specific company based oncompanyID.
 func ReadAll(db *gorm.DB, model domains.TrainingRequest, id uuid.UUID) (domains.TrainingRequest, error) {
 	err := db.Where("user_id = ?", id).Find(&model).Error
 	return model, err
@@ -31,15 +31,15 @@ func ReadByID(db *gorm.DB, model domains.TrainingRequest, id uuid.UUID) (domains
 	err := db.First(&model, id).Error
 	return model, err
 }
-// ReadAllPagination retrieves a paginated list of missions based on user ID, limit, and offset.
+// ReadAllPagination retrieves a paginated list of traiining based on company ID, limit, and offset.
 func ReadAllPagination(db *gorm.DB, model []domains.TrainingRequest, modelID uuid.UUID, limit, offset int) ([]domains.TrainingRequest, error) {
-	err := db.Where("user_id = ? ", modelID).Limit(limit).Offset(offset).Find(&model).Error
+	err := db.Where("company_id = ? ", modelID).Limit(limit).Offset(offset).Find(&model).Error
 	return model, err
 }
 
-// ReadAllList retrieves a list of missions based on user ID.
+// ReadAllList retrieves a list of trainings requests  based on company ID.
 func ReadAllList(db *gorm.DB, model []domains.TrainingRequest, modelID uuid.UUID) ([]domains.TrainingRequest, error) {
-	err := db.Where("user_id = ? ", modelID).Find(&model).Error
+	err := db.Where("company_id = ? ", modelID).Find(&model).Error
 	return model, err
 }
 

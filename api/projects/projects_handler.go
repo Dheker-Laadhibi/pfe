@@ -13,15 +13,15 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// CreateProject		Handles the creation of a new Project.
+// CreateProject	Handles the creation of a new Project.
 // @Summary        	Create Project
 // @Description    	Create a new Project.
 // @Tags			Project
 // @Accept			json
 // @Produce			json
 // @Security 		ApiKeyAuth
-// @Param			companyID		path			string				true		"Company ID"
-// @Param			request			body			projects.ProjectIn		true		"project query params"
+// @Param			companyID		path			string				    true		"Company ID"
+// @Param			request			body			projects.ProjectIn		true	    "project query params"
 // @Success			201				{object}		utils.ApiResponses
 // @Failure			400				{object}		utils.ApiResponses	"Invalid request"
 // @Failure			401				{object}		utils.ApiResponses	"Unauthorized"
@@ -73,9 +73,9 @@ func (db Database) CreateProject(ctx *gin.Context) {
 		Specialty:    project.Specialty,
 		Technologies: project.Technologies,
 		Description:  project.Description,
-		ExpDate:      dt,
-		CompanyID:    project.CompanyID,
-		// ExpDate: project.,
+		ExpDate:      dt,// ExpDate: project.,
+		CompanyID:    companyID,
+		
 	}
 
 	// Vérifier si le code de projet existe déjà dans la base de données
@@ -195,6 +195,7 @@ func (db Database) ReadProjects(ctx *gin.Context) {
 		dataTableProject = append(dataTableProject, ProjectTable{
 			ID:           project.ID,
 			Code:         project.Code,
+			Specialty: project.Specialty,
 			Projectname:  project.Projectname,
 			CompanyID:    project.CompanyID,
 			Technologies: project.Technologies,
@@ -379,7 +380,7 @@ func (db Database) ReadProject(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, details)
 }
 
-// UpdateProject 		Handles the update of a Project .
+// UpdateProject 	Handles the update of a Project .
 // @Summary        	Update Project
 // @Description    	Update Project .
 // @Tags			Project
@@ -440,7 +441,8 @@ func (db Database) UpdateProject(ctx *gin.Context) {
 
 	// Update the project data in the database
 	dbProject := &domains.Project{
-
+        Code: project.Code,
+		Description: project.Description,
 		Projectname:  project.Projectname,
 		Technologies: project.Technologies,
 	}
@@ -455,7 +457,7 @@ func (db Database) UpdateProject(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, utils.Null())
 }
 
-// DeleteProject	 	Handles the deletion of a Project.
+// DeleteProject	Handles the deletion of a Project.
 // @Summary        	Delete Project
 // @Description    	Delete one Project.
 // @Tags			Project
@@ -518,22 +520,32 @@ func (db Database) DeleteProject(ctx *gin.Context) {
 // AssignProject	AssignProjectToCondidats.
 // @Summary        	assign Project
 // @Description    	assign one Project.
-// @Tags			ProjectsCondidats
+// @Tags			Project
 // @Produce			json
 // @Security 		ApiKeyAuth
-// @Param			companyID			path			string			true	"Company ID"
-// @Param			ID					path			string			true	"candidate ID"
-// @Param			request			     body			projects.codeProject		true  "project query params"
+// @Param			companyID			path			string			     true	     "Company ID"
+// @Param			ID					path			string			     true	     "candidate ID"
+// @Param			request			    body			projects.codeProject true        "project query params"
 // @Success			200					{object}		utils.ApiResponses
-// @Failure			400					{object}		utils.ApiResponses		"Invalid request"
-// @Failure			401					{object}		utils.ApiResponses		"Unauthorized"
-// @Failure			403					{object}		utils.ApiResponses		"Forbidden"
-// @Failure			500					{object}		utils.ApiResponses		"Internal Server Error"
+// @Failure			400					{object}		utils.ApiResponses		         "Invalid request"
+// @Failure			401					{object}		utils.ApiResponses		         "Unauthorized"
+// @Failure			403					{object}		utils.ApiResponses		         "Forbidden"
+// @Failure			500					{object}		utils.ApiResponses		         "Internal Server Error"
 // @Router			/projects/{companyID}/{ID}/assign	[post]
 func (db Database) AssignProjectToCondidats(ctx *gin.Context) {
 
 	// Extract JWT values from the context
-	//session := utils.ExtractJWTValues(ctx)
+	session := utils.ExtractJWTValues(ctx)
+
+
+
+
+
+
+
+
+
+
 
 	// Parse and validate the company ID from the request parameter
 	companyID, err := uuid.Parse(ctx.Param("companyID"))
@@ -542,6 +554,18 @@ func (db Database) AssignProjectToCondidats(ctx *gin.Context) {
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
 		return
 	}
+
+// Check if the employee belongs to the specified company
+if err := domains.CheckEmployeeBelonging(db.DB, companyID, session.UserID, session.CompanyID); err != nil {
+	logrus.Error("Error verifying employee belonging. Error: ", err.Error())
+	utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+	return
+}
+
+
+
+
+
 	// Check if the candidate with the specified ID exists
 	if err := domains.CheckByID(db.DB, &domains.Companies{}, companyID); err != nil {
 		logrus.Error("Error checking if the candidate with the specified ID exists. Error: ", err.Error())
@@ -564,14 +588,7 @@ func (db Database) AssignProjectToCondidats(ctx *gin.Context) {
 		return
 	}
 
-	/*	// Parse the incoming JSON request into a ProjectIn struct
-		project := new(ProjectIn)
-		if err := ctx.ShouldBindJSON(project); err != nil {
-			logrus.Error("Error mapping request from frontend. Error: ", err.Error())
-			utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
-			return
-		}
-	*/
+	
 	projectCode := new(codeProject)
 	if err := ctx.ShouldBindJSON(projectCode); err != nil {
 		logrus.Error("Error parsing request body. Error: ", err.Error())

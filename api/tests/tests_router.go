@@ -29,11 +29,11 @@ func TestRouterInit(router *gin.RouterGroup, db *gorm.DB) {
 		// GET endpoint to retrieve all Answers details for a specific test and a specific candidat
 		tests.GET("/:candidatID/:testID", baseInstance.ReadTestAnswers)
 
-		// GET endpoint to retrieve all candidats for a specific test
+		// GET endpoint to retrieve scores for all candidats
 		tests.GET("/scores", baseInstance.ReadScores)
 
 		// GET endpoint to retrieve a list of tests for a specific company
-		tests.GET("/list", baseInstance.ReadTestsList)
+		tests.GET("/:candidatID/list", baseInstance.ReadTestsList)
 
 		// GET endpoint to retrieve the count of tests for a specific company
 		tests.GET("/count", baseInstance.ReadTestsCount)

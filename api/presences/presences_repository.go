@@ -20,13 +20,13 @@ func NewPresenceRepository(db *gorm.DB) {
 	}
 }
 
-// ReadAll retrieves all notifications for a specific user based on user ID.
+// ReadAll retrieves all presences for a specific presence  based on user ID.
 func ReadAll(db *gorm.DB, model domains.Presences, id uuid.UUID) (domains.Presences, error) {
 	err := db.Where("user_id = ?", id).Find(&model).Error
 	return model, err
 }
 
-// ReadByID retrieves a notification by its unique identifier.
+// ReadByID retrieves a presence by its unique identifier.
 func ReadByID(db *gorm.DB, model domains.Presences, id uuid.UUID) (domains.Presences, error) {
 	err := db.First(&model, id).Error
 	return model, err

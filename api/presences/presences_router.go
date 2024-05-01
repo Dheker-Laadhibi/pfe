@@ -19,7 +19,7 @@ func PresenceRouterInit(router *gin.RouterGroup, db *gorm.DB) {
 	{
 
 		// create endpoint to crete a specific presences for a specific user
-		presences.POST("/:companyID", baseInstance.CreatePresence)
+		presences.POST("/:companyID/:userID", baseInstance.CreatePresence)
 
 		// GET endpoint to retrieve all presences for a specific user
 		presences.GET("/All/:userID", baseInstance.ReadPresences)
@@ -30,10 +30,6 @@ func PresenceRouterInit(router *gin.RouterGroup, db *gorm.DB) {
 		// GET endpoint to retrieve details of a specific presences for a specific user
 		presences.GET("/get/:ID/:userID", baseInstance.ReadPresence)
 
-		// PUT endpoint to update the details of a specific presences for a specific user
-		presences.PUT("/update/:ID/:userID", baseInstance.UpdatePresence)
-
-		// DELETE endpoint to delete a specific presences for a specific user
-		presences.DELETE("/delete/:ID/:userID", baseInstance.DeletePresence)
+		
 	}
 }

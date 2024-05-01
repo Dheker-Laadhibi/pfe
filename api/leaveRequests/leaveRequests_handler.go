@@ -19,7 +19,7 @@ import (
 // @Accept			json
 // @Produce			json
 // @Security 		ApiKeyAuth
-// @Param				companyID				path			string		true		"Company ID"
+// @Param			companyID		path			string		true		"Company ID"
 // @Param			request			body			leaveRequests.LeaveRequestDemande		true		"LeaveRequests query params"
 // @Success			201				{object}		utils.ApiResponses
 // @Failure			400				{object}		utils.ApiResponses	"Invalid request"
@@ -76,20 +76,20 @@ func (db Database) AddLeave(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusCreated, constants.CREATED, utils.Null())
 }
 
-// ReadLeaveRequests			Handles the retrieval of all LeaveRequests for a specific user .
+// ReadLeaveRequests	Handles the retrieval of all LeaveRequests for a specific user .
 // @Summary        		Get LeaveRequests
 // @Description    		Get all LeaveRequests.
 // @Tags				LeaveRequests
 // @Produce				json
 // @Security 			ApiKeyAuth
-// @Param				userID				path			string		true		"User ID"
-// @Param				page			query		int					false       "Page"
-// @Param				limit			query		int					false	    "Limit"
-// @Success				200					{array}			leaveRequests.LeaveRequestDetails
-// @Failure				400					{object}		utils.ApiResponses		"Invalid request"
-// @Failure				401					{object}		utils.ApiResponses		"Unauthorized"
-// @Failure				403					{object}		utils.ApiResponses		"Forbidden"
-// @Failure				500					{object}		utils.ApiResponses		"Internal Server Error"
+// @Param				userID			path		string		true		"User ID"
+// @Param				page			query		int			false       "Page"
+// @Param				limit			query		int			false	    "Limit"
+// @Success				200				{array}		    leaveRequests.LeaveRequestDetails
+// @Failure				400				{object}		utils.ApiResponses		"Invalid request"
+// @Failure				401				{object}		utils.ApiResponses		"Unauthorized"
+// @Failure				403				{object}		utils.ApiResponses		"Forbidden"
+// @Failure				500				{object}		utils.ApiResponses		"Internal Server Error"
 // @Router				/leave_requests/user/{userID}	[get]
 func (db Database) ReadLeave(ctx *gin.Context) {
 
@@ -186,20 +186,20 @@ func (db Database) ReadLeave(ctx *gin.Context) {
 
 }
 
-// ReadLeaveRequestsByCompany			Handles the retrieval of all LeaveRequests for a specific company .
+// ReadLeaveRequestsByCompany Handles the retrieval of all LeaveRequests for a specific company .
 // @Summary        		Get LeaveRequests
 // @Description    		Get all LeaveRequests by companyID.
 // @Tags				LeaveRequests
 // @Produce				json
 // @Security 			ApiKeyAuth
-// @Param				companyID				path			string		true		"Company ID"
+// @Param				companyID		path		string		true		"Company ID"
 // @Param				page			query		int					false       "Page"
 // @Param				limit			query		int					false	    "Limit"
-// @Success				200					{array}			leaveRequests.LeaveRequestDetails
-// @Failure				400					{object}		utils.ApiResponses		"Invalid request"
-// @Failure				401					{object}		utils.ApiResponses		"Unauthorized"
-// @Failure				403					{object}		utils.ApiResponses		"Forbidden"
-// @Failure				500					{object}		utils.ApiResponses		"Internal Server Error"
+// @Success				200				{array}		leaveRequests.LeaveRequestDetails
+// @Failure				400				{object}	utils.ApiResponses		"Invalid request"
+// @Failure				401				{object}	utils.ApiResponses		"Unauthorized"
+// @Failure				403				{object}	utils.ApiResponses		"Forbidden"
+// @Failure				500				{object}	utils.ApiResponses		"Internal Server Error"
 // @Router				/leave_requests/company/{companyID}	[get]
 func (db Database) ReadLeaveByCompany(ctx *gin.Context) {
 
@@ -346,15 +346,15 @@ func (db Database) ReadLeaveCount(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, count)
 }
 
-//*************************
 
-// ReadLeaveRequestsCountByCompany	Handles the retrieval the number of all LeaveRequests for a specific companyID.
+
+// ReadLeaveRequestsCountByCompany Handles the retrieval the number of all LeaveRequests for a specific companyID.
 // @Summary        			Get LeaveRequests count
 // @Description    			Get all LeaveRequests count for a specific companyID.
 // @Tags					LeaveRequests
 // @Produce					json
 // @Security 				ApiKeyAuth
-// @Param					companyID				path			string		true		"Company ID"
+// @Param					companyID			path			string		true		"Company ID"
 // @Success					200					{object}		leaveRequests.LeaveRequestCount
 // @Failure					400					{object}		utils.ApiResponses		"Invalid request"
 // @Failure					401					{object}		utils.ApiResponses		"Unauthorized"
@@ -399,7 +399,7 @@ func (db Database) ReadLeaveCountByCompany(ctx *gin.Context) {
 
 //*************************
 
-// ReadLeaveRequests		Handles the retrieval of one LeaveRequests.
+// ReadLeaveRequests	Handles the retrieval of one LeaveRequests.
 // @Summary        		Get LeaveRequests
 // @Description    		Get one LeaveRequests.
 // @Tags				LeaveRequests

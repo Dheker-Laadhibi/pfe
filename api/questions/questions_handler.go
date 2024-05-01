@@ -13,20 +13,20 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// CreateQuestion 		Handles the creation of a new question.
+// CreateQuestion 	Handles the creation of a new question.
 // @Summary        	Create question
 // @Description    	Create a new question.
 // @Tags			Questions
 // @Accept			json
 // @Produce			json
 // @Security 		ApiKeyAuth
-// @Param			companyID		path			string				true		"Company ID"
-// @Param			request			body			questions.QuestionsIn		true		"Question query params"
+// @Param			companyID		path			string				  true		"Company ID"
+// @Param			request			body			questions.QuestionsIn true		"Question query params"
 // @Success			201				{object}		utils.ApiResponses
-// @Failure			400				{object}		utils.ApiResponses	"Invalid request"
-// @Failure			401				{object}		utils.ApiResponses	"Unauthorized"
-// @Failure			403				{object}		utils.ApiResponses	"Forbidden"
-// @Failure			500				{object}		utils.ApiResponses	"Internal Server Error"
+// @Failure			400				{object}		utils.ApiResponses	  "Invalid request"
+// @Failure			401				{object}		utils.ApiResponses	  "Unauthorized"
+// @Failure			403				{object}		utils.ApiResponses	  "Forbidden"
+// @Failure			500				{object}		utils.ApiResponses	  "Internal Server Error"
 // @Router			/questions/{companyID}	[post]
 func (db Database) CreateQuestion(ctx *gin.Context) {
 
@@ -79,7 +79,7 @@ func (db Database) CreateQuestion(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusCreated, constants.CREATED, utils.Null())
 }
 
-// ReadQuestions 		Handles the retrieval of all questions.
+// ReadQuestions 	Handles the retrieval of all questions.
 // @Summary        	Get questions
 // @Description    	Get all questions.
 // @Tags			Questions
@@ -187,7 +187,7 @@ func (db Database) ReadQuestions(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, response)
 }
 
-// ReadQuestionsList	Handles the retrieval the list of all questions.
+// ReadQuestionsList Handles the retrieval the list of all questions.
 // @Summary        	Get list of  questions
 // @Description    	Get list of all questions.
 // @Tags			Questions
@@ -295,7 +295,7 @@ func (db Database) ReadQuestionsCount(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, questionsCount)
 }
 
-// ReadQuestion 		Handles the retrieval of one question.
+// ReadQuestion 	Handles the retrieval of one question.
 // @Summary        	Get question
 // @Description    	Get one question.
 // @Tags			Questions
@@ -368,7 +368,7 @@ func (db Database) ReadQuestion(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, details)
 }
 
-// UpdateQuestion 		Handles the update of a question.
+// UpdateQuestion 	Handles the update of a question.
 // @Summary        	Update question
 // @Description    	Update one question.
 // @Tags			Questions
@@ -445,7 +445,7 @@ func (db Database) UpdateQuestion(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, utils.Null())
 }
 
-// DeleteQuestion	 	Handles the deletion of a question.
+// DeleteQuestion	Handles the deletion of a question.
 // @Summary        	Delete question
 // @Description    	Delete one question.
 // @Tags			Questions

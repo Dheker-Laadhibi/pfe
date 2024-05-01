@@ -21,24 +21,24 @@ The user ID represents the unique identifier of an employee who holds the role o
 Please ensure that appropriate permissions and access controls are in place for this user.
 */
 	// Private
-	interns := router.Group("/interns")
+	interns := router.Group("/interns/:companyID")
 	{
 
 		// POST endpoint to create a new intern
-		interns.POST("/:companyID", baseInstance.CreateIntern)
+		interns.POST("/add/:supervisorID", baseInstance.CreateIntern)
 
 		// GET endpoint to retrieve all interns for a specific company and a specific user 
-		interns.GET("all/:companyID/:SupervisorID", baseInstance.ReadInterns)
+		interns.GET("", baseInstance.ReadInterns)
 		// GET endpoint to retrieve the count of interns for a specific company
-		interns.GET("/count/:companyID", baseInstance.ReadInternsCount)
+		interns.GET("/count", baseInstance.ReadInternsCount)
 
 		// GET endpoint to retrieve details of a specific intern
-		interns.GET("/:companyID/:ID", baseInstance.ReadIntern)
+		interns.GET("/intern/:internID", baseInstance.ReadIntern)
 
 		// PUT endpoint to update details of a specific intern
-		interns.PUT("update/:companyID/:ID", baseInstance.UpdateIntern)
+		interns.PUT("/update/:internID", baseInstance.UpdateIntern)
 
 		// DELETE endpoint to delete a specific intern
-		interns.DELETE("Delete/:companyID/:SupervisorID", baseInstance.DeleteIntern)
+		interns.DELETE("/delete/:internID", baseInstance.DeleteIntern)
 	}
 }

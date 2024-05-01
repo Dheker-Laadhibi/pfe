@@ -10,8 +10,8 @@ type CondidatIn struct {
 	Lastname       string    `json:"lastName"  binding:"min=3,max=30"`  // Lastname is the last name of the user. It is required and should be between 3 and 35 characters.
 	Adress         string    `json:"adress"  binding:"min=3,max=30"`
 	Email          string    `json:"email" binding:"required,email,max=255"` // Email is the email address of the user. It is required, should be a valid email, and maximum length is 255 characters.
-	Educationlevel string    `json:"education_level"  binding:"min=3,max=30"`
-	RoleName  string    `json:"role_name"`   //  define condidat role 
+	Educationlevel string    `json:"education_level"  binding:"min=3,max=100"`
+	RoleName        string    `json:"role_name"`   //  define condidat role 
 	University     string    `json:"university"  binding:"min=3,max=30"`
 	Password       string    `json:"password" binding:"required,min=10,max=255"` // Password is the user's password. It is required, and its length should be between 10 and 255 characters.
 	             // CompanyID is the unique identifier for the company associated with the user. It is required.
@@ -30,7 +30,10 @@ type CondidatsTable struct {
 	ID        uuid.UUID `json:"id"`        // ID is the unique identifier for the  condidat.
 	Firstname string    `json:"firstname"` // Firstname is the first name of the condidat.
 	Lastname  string    `json:"lastname"`  // Lastname is the last name of the condidat.
-	Email     string    `json:"email"`     // Email is the email address of the condidat.
+	Email     string    `json:"email"` 
+	Adress         string  `json:"adress"`
+	Educationlevel string `json:"educationlevel"`
+	University     string`json:"university"`    
 } //@name CondidatsTable
 
 // @Description	CondidatsList represents a simplified version of the Condidats for listing purposes.
@@ -38,7 +41,9 @@ type CondidatsList struct {
 	ID        uuid.UUID `json:"id"`        // ID is the unique identifier for the condidat.
 	Firstname string    `json:"firstname"` // Name is the name of the condidat.
 	Lastname  string    `json:"lastname"`  // Name is the name of the condidat.
-
+	Adress         string  `json:"adress"`
+	Educationlevel string `json:"educationlevel"`
+	University     string`json:"university"`
 } //@name CondidatsList
 
 // @Description	CondidatsCount represents the count of condidats.

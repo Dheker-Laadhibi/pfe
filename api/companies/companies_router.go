@@ -16,7 +16,11 @@ func CompanyRouterInit(router *gin.RouterGroup, db *gorm.DB) {
 
 	// Private
 	companies := router.Group("/companies")
-	{
+	{ 
+		
+		// create a new company 
+		companies.POST("", baseInstance.CreateCompany)
+		
 
 		// GET endpoint to retrieve all companies
 		companies.GET("", baseInstance.ReadCompanies)

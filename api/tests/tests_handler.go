@@ -21,7 +21,6 @@ import (
 // @Security 		ApiKeyAuth
 // @Param			companyID		path			string				true		"Company ID"
 // @Param			candidatID		path			string				true		"Candidat ID"
-// @Param			nbrQuestions		query			string				false		"NbrQuestions"
 // @Success			201				{object}		utils.ApiResponses
 // @Failure			400				{object}		utils.ApiResponses	"Invalid request"
 // @Failure			401				{object}		utils.ApiResponses	"Unauthorized"
@@ -31,14 +30,6 @@ import (
 func (db Database) CreateTest(ctx *gin.Context) {
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
-
-	// Parse and validate the page from the request parameter
-	nbrQuestions, err := strconv.Atoi(ctx.DefaultQuery("nbrQuestions", strconv.Itoa(constants.DEFAULT_PAGE_PAGINATION)))
-	if err != nil {
-		// Handle invalid integer format
-		logrus.Error(ctx, http.StatusBadRequest, "Invalid number of questions", err)
-		return
-	}
 
 	// Parse and validate the company ID from the request parameter
 	companyID, err := uuid.Parse(ctx.Param("companyID"))
@@ -73,7 +64,6 @@ func (db Database) CreateTest(ctx *gin.Context) {
 		return
 	}
 	
-	//Retrive the choosen project details
 	project, err := ReadProjectDetails(db.DB, domains.Project{}, projectID)
 	if err != nil {
 		// Handle error retrieving project details
@@ -127,15 +117,7 @@ func (db Database) CreateTest(ctx *gin.Context) {
 		return
 	}
 
-	// Generate a random selection of questions
-	selectedQuestions, err := GetRandomQuestions(questions, nbrQuestions)
-	if err != nil {
-		// Handle error generating random questions
-		logrus.Error(ctx, http.StatusBadRequest, "Error generating random questions", err)
-		return
-	}
-
-	for _, selectedQuestion := range selectedQuestions {
+	for _, selectedQuestion := range questions {
 		Qest, _ := uuid.Parse(selectedQuestion)
 		question, err := ReadQuestionDetails(db.DB, domains.Questions{}, Qest)
 		if err != nil {
@@ -273,7 +255,7 @@ func (db Database) ReadTests(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, response)
 }
 
-//***************************************************
+
 
 // ReadQuestionsbyTest		Handles the retrieval of all Questions by testID.
 // @Summary        	Get Questions
@@ -284,7 +266,7 @@ func (db Database) ReadTests(ctx *gin.Context) {
 // @Param			page			query		int			false		"Page"
 // @Param			limit			query		int			false		"Limit"
 // @Param			companyID		path		string		true		"Test ID"
-// @Param			testID		path		string		true		"Test ID"
+// @Param			testID		    path		string		true		"Test ID"
 // @Success			200				{object}	tests.QuestionsPagination
 // @Failure			400				{object}	utils.ApiResponses		"Invalid request"
 // @Failure			401				{object}	utils.ApiResponses		"Unauthorized"
@@ -375,9 +357,10 @@ func (db Database) ReadQuestionsbyTest(ctx *gin.Context) {
 	for _, Question := range questions {
 
 		dataTableQuestion = append(dataTableQuestion, QuestionsTable{
-			QuestionID: Question.QuestionID,
-			Question:   Question.Question,
-			Options:    Question.Options,
+			QuestionID:           Question.QuestionID,
+			Question:             Question.Question,
+			Options:              Question.Options,
+			AssociatedTechnology: Question.AssociatedTechnology,
 		})
 	}
 	response.Items = dataTableQuestion
@@ -389,7 +372,7 @@ func (db Database) ReadQuestionsbyTest(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, response)
 }
 
-//***************************************************
+
 
 // ReadScores 		Handles the retrieval of all scores.
 // @Summary        	Get candidats scores
@@ -481,7 +464,8 @@ func (db Database) ReadScores(ctx *gin.Context) {
 	dataTableScore := []ScorsTable{}
 	for _, score := range scores {
 		// Retrieve test data from the database
-		test, err := ReadByID(db.DB, domains.Tests{}, score.TestID)
+		test, _ := ReadByID(db.DB, domains.Tests{}, score.TestID)
+
 		if err != nil {
 			logrus.Error("Error occurred while finding all test data. Error: ", err)
 			utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
@@ -489,7 +473,7 @@ func (db Database) ReadScores(ctx *gin.Context) {
 		}
 
 		// Retrieve candidat data from the database
-		candidat, err := ReadCandidatByID(db.DB, domains.Condidats{}, score.CandidatID)
+		candidat, _ := ReadCandidatByID(db.DB, domains.Condidats{}, score.CandidatID)
 		if err != nil {
 			logrus.Error("Error occurred while finding all test data. Error: ", err)
 			utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
@@ -514,19 +498,20 @@ func (db Database) ReadScores(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, response)
 }
 
-// ReadTestsList 	Handles the retrieval the list of all tests.
+// ReadTestsList 	Handles the retrieval the list of all tests for a specific candidat.
 // @Summary        	Get list of  tests
-// @Description    	Get list of all tests.
+// @Description    	Get list of all tests for a specific candidat .
 // @Tags			Tests
 // @Produce			json
 // @Security 		ApiKeyAuth
 // @Param			companyID			path			string			true	"Company ID"
+// @Param			candidatID			path			string			true	"Candidat ID"
 // @Success			200					{array}			tests.TestsList
 // @Failure			400					{object}		utils.ApiResponses		"Invalid request"
 // @Failure			401					{object}		utils.ApiResponses		"Unauthorized"
 // @Failure			403					{object}		utils.ApiResponses		"Forbidden"
 // @Failure			500					{object}		utils.ApiResponses		"Internal Server Error"
-// @Router			/tests/{companyID}/list	[get]
+// @Router			/tests/{companyID}/{candidatID}/list	[get]
 func (db Database) ReadTestsList(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -540,6 +525,14 @@ func (db Database) ReadTestsList(ctx *gin.Context) {
 		return
 	}
 
+	// Parse and validate the candidat ID from the request parameter
+	candidatID, err := uuid.Parse(ctx.Param("candidatID"))
+	if err != nil {
+		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
+		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+		return
+	}
+
 	// Check if the employee belongs to the specified company
 	if err := domains.CheckEmployeeBelonging(db.DB, companyID, session.UserID, session.CompanyID); err != nil {
 		logrus.Error("Error verifying employee belonging. Error: ", err.Error())
@@ -547,26 +540,39 @@ func (db Database) ReadTestsList(ctx *gin.Context) {
 		return
 	}
 
-	// Retrieve all test data from the database
-	tests, err := ReadAllList(db.DB, []domains.Tests{}, session.CompanyID)
+	// Retrieve all testIDs data from the database
+	testIDs, err := ReadAllList(db.DB, session.CompanyID, candidatID)
 	if err != nil {
-		logrus.Error("Error occurred while finding all test data. Error: ", err)
+		logrus.Error("Error occurred while finding all testIDs. Error: ", err)
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
 		return
 	}
 
-	// Generate a test structure as a response
-	usersList := []TestsList{}
-	for _, test := range tests {
-		usersList = append(usersList, TestsList{
-			ID:           test.ID,
-			Specialty:    test.Specialty,
-			Technologies: test.Technologies,
-		})
-	}
+	// Initialize the slice to hold the testsList
+	testsList := []TestsList{}
 
+	// Iterate over each test ID
+	for _, testID := range testIDs {
+		// Fetch the test details based on the current test ID
+		testDetails, err := ReadTestsList(db.DB, []domains.Tests{}, testID)
+		if err != nil {
+			logrus.Error("Error occurred while finding test data. Error: ", err)
+			utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
+			return
+		}
+
+		// Append the test details to the testsList
+		for _, test := range testDetails {
+			testsList = append(testsList, TestsList{
+				ID:           test.ID,
+				Specialty:    test.Specialty,
+				Title:        test.Title,
+				Technologies: test.Technologies,
+			})
+		}
+	}
 	// Respond with success
-	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, usersList)
+	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, testsList)
 }
 
 // ReadTestsCount 	Handles the retrieval the number of all tests.
@@ -619,7 +625,7 @@ func (db Database) ReadTestsCount(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, TestsCount)
 }
 
-// UpdateCandidatAnswer 		Handles the update the candidat response.
+// UpdateCandidatAnswer Handles the update the candidat response.
 // @Summary        	Update the candidat response
 // @Description    	Update the candidat response for a specific question.
 // @Tags			Tests
@@ -628,7 +634,7 @@ func (db Database) ReadTestsCount(ctx *gin.Context) {
 // @Security 		ApiKeyAuth
 // @Param			companyID			path			string				true	"Company ID"
 // @Param			candidatID			path			string				true	"Candidat ID"
-// @Param			testID			path			string				true	"Test ID"
+// @Param			testID			    path			string				true	"Test ID"
 // @Param			questionID			path			string				true	"Question ID"
 // @Param			request				body			tests.CandidatAnswerIn		true	"CandidatAnswerIn query params"
 // @Success			200					{object}		utils.ApiResponses
@@ -681,7 +687,7 @@ func (db Database) UpdateCandidatAnswer(ctx *gin.Context) {
 		return
 	}
 
-	//check if the user is a candidat by the session.role_id
+	
 
 	// Parse the incoming JSON request into a UserIn struct
 	response := new(CandidatAnswer)
@@ -765,17 +771,17 @@ func (db Database) DeleteTest(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, utils.Null())
 }
 
-// ReadTestAnswers 		Handles the retrieval of all the answers of a test by candidatID and Insert the score of the candidat into the database.
+// ReadTestAnswers 	Handles the retrieval of all the answers of a test by candidatID and Insert the score of the candidat into the database.
 // @Summary        	Get candidat Responses
 // @Description    	Get  all the answers of a test by candidatID.
 // @Tags			Tests
 // @Produce			json
 // @Security 		ApiKeyAuth
-// @Param			page			query		int			false		"Page"
-// @Param			limit			query		int			false		"Limit"
+// @Param			page			    query		    int			    false	"Page"
+// @Param			limit			    query		    int			    false	"Limit"
 // @Param			companyID			path			string			true	"Company ID"
-// @Param			candidatID					path			string			true	"Candidat ID"
-// @Param			testID					path			string			true	"Test ID"
+// @Param			candidatID			path			string			true	"Candidat ID"
+// @Param			testID				path			string			true	"Test ID"
 // @Success			200					{object}		tests.TestsDetails
 // @Failure			400					{object}		utils.ApiResponses		"Invalid request"
 // @Failure			401					{object}		utils.ApiResponses		"Unauthorized"

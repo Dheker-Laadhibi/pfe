@@ -58,7 +58,7 @@ func (db Database) Createcandidate(ctx *gin.Context) {
 	}
 	// Hash the user's password
 	hash, _ := bcrypt.GenerateFromPassword([]byte(condidat.Password), bcrypt.DefaultCost)
-	res, err := domains.GetRoleIDByName(db.DB,condidat.RoleName , session.CompanyID)
+	res, err := domains.GetRoleIDByName(db.DB, condidat.RoleName, session.CompanyID)
 	if err != nil {
 		logrus.Error("Error finding the Role. Error: ", err.Error())
 		return
@@ -72,10 +72,9 @@ func (db Database) Createcandidate(ctx *gin.Context) {
 		Password:       string(hash),
 		Adress:         condidat.Adress,
 		University:     condidat.University,
-		RoleID: res,
+		RoleID:         res,
 		Educationlevel: condidat.Educationlevel,
 		CompanyID:      companyID,
-
 	}
 	if err := domains.Create(db.DB, dbCondidat); err != nil {
 		logrus.Error("Error saving data to the database. Error: ", err.Error())
@@ -86,23 +85,6 @@ func (db Database) Createcandidate(ctx *gin.Context) {
 	// Respond with success
 	utils.BuildResponse(ctx, http.StatusCreated, constants.CREATED, utils.Null())
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // ReadCandidats 	Handles the retrieval of all Candidats .
 // @Summary        	Get Candidats
@@ -118,7 +100,7 @@ func (db Database) Createcandidate(ctx *gin.Context) {
 // @Failure			401					{object}	utils.ApiResponses			"Unauthorized"
 // @Failure			403					{object}	utils.ApiResponses			"Forbidden"
 // @Failure			500					{object}	utils.ApiResponses			"Internal Server Error"
-// @Router			/condidats/{companyID}	[get]
+// @Router			/candidats/{companyID}	[get]
 func (db Database) ReadCandidats(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -199,6 +181,9 @@ func (db Database) ReadCandidats(ctx *gin.Context) {
 			Firstname: condidat.Firstname,
 			Lastname:  condidat.Lastname,
 			Email:     condidat.Email,
+			Adress: condidat.Adress,
+			Educationlevel: condidat.Educationlevel,
+			University: condidat.University,
 		})
 	}
 	response.Items = dataTableCondidat
@@ -222,7 +207,7 @@ func (db Database) ReadCandidats(ctx *gin.Context) {
 // @Failure			401						{object}		utils.ApiResponses		"Unauthorized"
 // @Failure			403						{object}		utils.ApiResponses		"Forbidden"
 // @Failure			500						{object}		utils.ApiResponses		"Internal Server Error"
-// @Router			/condidats/{companyID}/list	[get]
+// @Router			/candidats/{companyID}/list	[get]
 func (db Database) ReadCondidatsList(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -278,7 +263,7 @@ func (db Database) ReadCondidatsList(ctx *gin.Context) {
 // @Failure			401						{object}		utils.ApiResponses		"Unauthorized"
 // @Failure			403						{object}		utils.ApiResponses		"Forbidden"
 // @Failure			500						{object}		utils.ApiResponses		"Internal Server Error"
-// @Router			/condidats/{companyID}/count	[get]
+// @Router			/candidats/{companyID}/count	[get]
 func (db Database) ReadCandidatsCount(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -329,7 +314,7 @@ func (db Database) ReadCandidatsCount(ctx *gin.Context) {
 // @Failure			401						{object}		utils.ApiResponses		"Unauthorized"
 // @Failure			403						{object}		utils.ApiResponses		"Forbidden"
 // @Failure			500						{object}		utils.ApiResponses		"Internal Server Error"
-// @Router			/condidats/{companyID}/{ID}	[get]
+// @Router			/candidats/{companyID}/{ID}	[get]
 func (db Database) Readcandidat(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -404,7 +389,7 @@ func (db Database) Readcandidat(ctx *gin.Context) {
 // @Failure			401					{object}		utils.ApiResponses				"Unauthorized"
 // @Failure			403					{object}		utils.ApiResponses				"Forbidden"
 // @Failure			500					{object}		utils.ApiResponses				"Internal Server Error"
-// @Router			/condidats/{companyID}/{ID}	[put]
+// @Router			/candidats/{companyID}/{ID}	[put]
 func (db Database) Updatecandidat(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -480,7 +465,7 @@ func (db Database) Updatecandidat(ctx *gin.Context) {
 // @Failure			401					{object}		utils.ApiResponses			"Unauthorized"
 // @Failure			403					{object}		utils.ApiResponses			"Forbidden"
 // @Failure			500					{object}		utils.ApiResponses			"Internal Server Error"
-// @Router			/condidats/{companyID}/{ID}	[delete]
+// @Router			/candidats/{companyID}/{ID}	[delete]
 func (db Database) DeleteCondidat(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -565,17 +550,17 @@ func (db Database) SigninCandidat(ctx *gin.Context) {
 		return
 	}
 
-// Generate JWT token
-token := utils.GenerateToken(data.ID, data.CompanyID, data.RoleID)
+	// Generate JWT token
+	token := utils.GenerateToken(data.ID, data.CompanyID, data.RoleID)
 
 	// Prepare the response
 	response := LoggedInResponse{
 		AccessToken: token,
 		Candidat: LoggedIn{
-			ID:        data.ID,
-			Name:      data.Firstname + " " + data.Lastname,
-			Email:     data.Email,
-			
+			ID:    data.ID,
+			Name:  data.Firstname + " " + data.Lastname,
+			Email: data.Email,
+
 			CompanyID: data.CompanyID,
 		},
 	}

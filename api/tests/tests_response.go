@@ -104,10 +104,11 @@ type QuestionsPagination struct {
 
 // @Description	TestsTable represents a single question entry in a table.
 type QuestionsTable struct {
-	QuestionID uuid.UUID      `gorm:"column:question_id; primaryKey; type:uuid; not null;"` // The questionID associated with the question
-	Question   string         `gorm:"column:question; not null;"`                           // The text of the question
-	Options    pq.StringArray `gorm:"column:options; type:text[]; not null;"`               // The options of the question
-	CreatedAt  time.Time      `json:"createdAt"`                                            // CreatedAt is the timestamp indicating when the test entry was created.
+	QuestionID           uuid.UUID      `gorm:"column:question_id; primaryKey; type:uuid; not null;"` // The questionID associated with the question
+	Question             string         `gorm:"column:question; not null;"`                           // The text of the question
+	Options              pq.StringArray `gorm:"column:options; type:text[]; not null;"`               // The options of the question
+	AssociatedTechnology string         `gorm:"column:associated_technology; not null;"`              // Associated technology or subject for the question
+	CreatedAt            time.Time      `json:"createdAt"`                                            // CreatedAt is the timestamp indicating when the test entry was created.
 } //@name QuestionsTable
 
 // @Description	ScoresTable represents a single Scores entry in a table.
@@ -130,6 +131,7 @@ type TestsCandidatsList struct {
 type TestsList struct {
 	ID           uuid.UUID      `json:"id"`                          // ID is the unique identifier for the test.
 	Specialty    string         `gorm:"column:specialty; not null;"` // The specialty of the test
+	Title        string         `gorm:"column:title; not null;"`     // The title of the test
 	Technologies pq.StringArray `gorm:"column:technologies; type:text[]; not null;"`
 } //@name TestsList
 

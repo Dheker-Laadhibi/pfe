@@ -71,6 +71,7 @@ func GenerateToken(id, companyID uuid.UUID, roleID uuid.UUID) string {
 
 	// Set JWT claims including expiration time, issued at time, user ID, company ID, and role
 	claims := jwt.MapClaims{
+		//time .now + 48 hrs
 		"exp": time.Now().Add(time.Hour * time.Duration(duration)).Unix(),
 		//creation date of jeton
 		"iat":        time.Now().Unix(),
@@ -95,12 +96,17 @@ func GenerateToken(id, companyID uuid.UUID, roleID uuid.UUID) string {
 func AuthorizeJWT() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		const BearerSchema string = "Bearer "
+		// get header of the request
 		authHeader := ctx.GetHeader("Authorization")
+		//authHeader = BearerSchema + token
 		if authHeader == "" {
 			BuildErrorResponse(ctx, http.StatusUnauthorized, constants.UNAUTHORIZED, Null())
 			return
 		}
+
+		//retourne la partie du authHeader qui se trouve après "Bearer ".
 		tokenString := authHeader[len(BearerSchema):]
+		// validate its signature
 		if token, err := validateToken(tokenString); err != nil {
 			logrus.WithFields(logrus.Fields{
 				"token": tokenString,
@@ -114,10 +120,11 @@ func AuthorizeJWT() gin.HandlerFunc {
 				return
 			} else {
 				if token.Valid {
+					//if claims are extracted th+ey will be set 
 					ctx.Set("user_id", claims["user_id"])
 					ctx.Set("company_id", claims["company_id"])
 					ctx.Set("roles", claims["roles"])
-				} else {
+				} else {   
 					BuildErrorResponse(ctx, http.StatusUnauthorized, constants.UNAUTHORIZED, Null())
 					return
 				}
@@ -164,6 +171,7 @@ func ExtractJWTValues(ctx *gin.Context) domains.UserSessionJWT {
 	tokenString := extractToken(ctx)
 
 	// Parse the JWT token and validate its signature
+	//interface{}: This represents the key or secret used to validate the token's signature. I
 	token, _ := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// Check if the signing method is HMAC
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -187,7 +195,7 @@ func ExtractJWTValues(ctx *gin.Context) domains.UserSessionJWT {
 
 	// Check if the token is valid and contains the expected claims
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		// Parse and assign user ID
+		// Parse  (convert from a string to uuid ) and assign user ID
 		userID, err := ParseUUID(claims["user_id"])
 		if err != nil {
 			logrus.Fatal("Error parsing user ID from JWT claims. Error ", err)
@@ -228,6 +236,8 @@ func extractToken(ctx *gin.Context) string {
 
 	// Check if the Authorization header is present and has the expected format
 	if len(authorizationHeader) > 0 {
+		// selects the second word from the slice,
+		// which should be the token itself. Since "Bearer" is usually the first word,
 		bearerToken := strings.Fields(authorizationHeader[0])[1]
 
 		// Return the extracted token

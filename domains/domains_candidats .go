@@ -1,31 +1,37 @@
 /*
+the struct named Condidats, which seems to represent candidates in a system. Here's a breakdown of its fields:
 
-	Package domains provides the data structures representing entities in the project.
+ID: This field is of type uuid.UUID, presumably serving as a unique identifier for the candidate. It's tagged with gorm metadata specifying that it's the primary key, of type UUID, and cannot be null.
 
-	Structures:
-	- Roles: Represents the roles defined in the system.
-		- ID (uuid.UUID): Unique identifier for the role.
-		- Name (string): The name of the role.
-		- OwningCompanyID (uuid.UUID): ID of the company to which the role belongs.
-		- CreatedByUserID (uuid.UUID): ID of the user who created the role.
-		- gorm.Model: Standard GORM model fields (ID, CreatedAt, UpdatedAt, DeletedAt).
+Firstname: This is a string field representing the candidate's first name. It cannot be null.
 
-	Functions:
-	- ReadRoleName(db *gorm.DB, roleID uuid.UUID) (string, error): Reads the name of the role based on its ID.
+Lastname: This is a string field representing the candidate's last name. It cannot be null.
 
-	Dependencies:
-	- "github.com/google/uuid": Package for working with UUIDs.
-	- "gorm.io/gorm": The GORM library for object-relational mapping in Go.
+Email: This is a string field representing the candidate's email address. It must be unique in the database.
 
-	Usage:
-	- Import this package to utilize the provided data structures and functions for handling roles in the project.
+Password: This is a string field representing the candidate's password. It cannot be null.
 
-	Note:
-	- The Roles structure represents the roles defined in the system.
-	- ReadRoleName reads the name of the role based on its ID.
+University: This is a string field representing the candidate's university. It cannot be null.
 
-	Last update :
-	01/02/2024 10:22
+Status: This is a boolean field representing the account status of the candidate. It's true for active and false for non-active, with a default value of true.
+
+Adress: This is a string field representing the candidate's address. It cannot be null.
+
+Educationlevel: This is a string field representing the candidate's education level. It cannot be null.
+
+RoleID: This is a field of type uuid.UUID representing the ID of the role associated with the candidate.
+
+CompanyID: This is a field of type uuid.UUID representing the ID of the company to which the candidate belongs. It cannot be null.
+
+gorm.Model: This is an embedded struct provided by the GORM library, which includes fields like ID, CreatedAt, UpdatedAt, and DeletedAt to track the model's lifecycle in the database.
+
+Each field is tagged with gorm metadata specifying the column name in the database and any additional constraints or properties for the database schema.
+
+
+
+
+
+
 
 */
 
@@ -43,7 +49,6 @@ type Condidats struct {
 	Lastname  string    `gorm:"column:last_name; not null;"`                 // The user's last name
 	Email     string    `gorm:"column:email; not null; unique"`              // User's email address (unique)
 	Password  string    `gorm:"column:password; not null;"`                  // User password
-
 	University     string    `gorm:"column:university; not null; not null"`      // User's university  address (unique)
 	Status         bool      `gorm:"column:status; not null; default:true;"`   // User's account status (true for active, false for non-active)
 	Adress         string    `gorm:"column:adress; not null; not null "`        // User's email address (unique)

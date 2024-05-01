@@ -17,7 +17,7 @@ type TrainingRequestIn struct {
 	//RequestDate
 	RequestDate  string   `json:"request_date" binding:"required"`
 	DecisionCompany string  `json:"decision_company" `
-	UserID uuid.UUID `json:"userID" binding:"required"` // ID is the unique identifier for the Missi
+	
 
 } //@name TrainingRequestIn
 

@@ -28,7 +28,7 @@ import (
 // @Failure			403				{object}		utils.ApiResponses			"Forbidden"
 // @Failure			500				{object}		utils.ApiResponses			"Internal Server Error"
 // @Router			/companies		[post]
-func (db Database) CreateCompany(ctx *gin.Context) {
+func (db Database) 	CreateCompany(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
@@ -52,10 +52,11 @@ func (db Database) CreateCompany(ctx *gin.Context) {
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
 		return
 	}
-
 	// Respond with success
 	utils.BuildResponse(ctx, http.StatusCreated, constants.SUCCESS, utils.Null())
 }
+
+
 
 // ReadCompanies 	Handles the retrieval of all companies.
 // @Summary        	Get companies
@@ -140,6 +141,7 @@ func (db Database) ReadCompanies(ctx *gin.Context) {
 			Name:      company.Name,
 			Email:     company.Email,
 			CreatedAt: company.CreatedAt,
+			Website: company.Website,
 		})
 	}
 	response.Items = listCompany
@@ -241,7 +243,7 @@ func (db Database) UpdateCompany(ctx *gin.Context) {
 	}
 
 	// Parse the incoming JSON request into a CompanyIn struct
-	company := new(CompanyIn)
+	company := new(CompaniesTable)
 	if err := ctx.ShouldBindJSON(company); err != nil {
 		logrus.Error("Error mapping request from frontend. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
@@ -258,6 +260,8 @@ func (db Database) UpdateCompany(ctx *gin.Context) {
 	// Update the company data in the database
 	dbCompany := &domains.Companies{
 		Name: company.Name,
+		Email: company.Email,
+		Website: company.Website,
 	}
 	if err := domains.Update(db.DB, dbCompany, objectID); err != nil {
 		logrus.Error("Error updating company data in the database. Error: ", err.Error())

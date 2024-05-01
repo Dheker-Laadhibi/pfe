@@ -24,6 +24,7 @@ type CompaniesTable struct {
 	ID        uuid.UUID `json:"id"`        // ID is the unique identifier for the company.
 	Name      string    `json:"name"`      // Name is the name of the company.
 	Email     string    `json:"email"`     // Email is the email address associated with the company.
+	Website   string    `json:"website"`   // Website is the website URL of the company.
 	CreatedAt time.Time `json:"createdAt"` // CreatedAt is the timestamp indicating when the company entry was created.
 } //@name CompaniesTable
 
