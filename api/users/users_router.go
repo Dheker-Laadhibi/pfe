@@ -38,5 +38,10 @@ func UserRouterInit(router *gin.RouterGroup, db *gorm.DB) {
 
 		// DELETE endpoint to delete a specific user
 		users.DELETE("/:ID", baseInstance.DeleteUser)
+		
+
+		users.GET("/gender", baseInstance.GenderPercentage)
 	}
+
+
 }

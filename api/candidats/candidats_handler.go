@@ -177,13 +177,14 @@ func (db Database) ReadCandidats(ctx *gin.Context) {
 	for _, condidat := range condidats {
 
 		dataTableCondidat = append(dataTableCondidat, CondidatsTable{
-			ID:        condidat.ID,
-			Firstname: condidat.Firstname,
-			Lastname:  condidat.Lastname,
-			Email:     condidat.Email,
-			Adress: condidat.Adress,
+			ID:             condidat.ID,
+			Firstname:      condidat.Firstname,
+			Lastname:       condidat.Lastname,
+			Email:          condidat.Email,
+			Adress:         condidat.Adress,
 			Educationlevel: condidat.Educationlevel,
-			University: condidat.University,
+			University:     condidat.University,
+			Status: condidat.Status,
 		})
 	}
 	response.Items = dataTableCondidat
@@ -383,7 +384,7 @@ func (db Database) Readcandidat(ctx *gin.Context) {
 // @Security 		ApiKeyAuth
 // @Param			companyID			path			string				true		"Company ID"
 // @Param			ID					path			string				true		"candidat ID"
-// @Param			request				body			candidats.CondidatIn		true		"candidat query params"
+// @Param			request				body			candidats.UpdateCandidate		true		"candidat query params"
 // @Success			200					{object}		utils.ApiResponses
 // @Failure			400					{object}		utils.ApiResponses				"Invalid request"
 // @Failure			401					{object}		utils.ApiResponses				"Unauthorized"
@@ -419,7 +420,7 @@ func (db Database) Updatecandidat(ctx *gin.Context) {
 	}
 
 	// Parse the incoming JSON request into a candidatIn struct
-	condidat := new(CondidatIn)
+	condidat := new(UpdateCandidate)
 	if err := ctx.ShouldBindJSON(condidat); err != nil {
 		logrus.Error("Error mapping request from frontend. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
@@ -435,12 +436,7 @@ func (db Database) Updatecandidat(ctx *gin.Context) {
 
 	// Update the candidat data in the database
 	dbCondidat := &domains.Condidats{
-		Firstname:      condidat.Firstname,
-		Lastname:       condidat.Lastname,
-		Email:          condidat.Email,
-		Adress:         condidat.Adress,
-		University:     condidat.University,
-		Educationlevel: condidat.Educationlevel,
+	Status: condidat.Status,
 	}
 	if err = domains.Update(db.DB, dbCondidat, objectID); err != nil {
 		logrus.Error("Error updating user data in the database. Error: ", err.Error())
@@ -567,4 +563,108 @@ func (db Database) SigninCandidat(ctx *gin.Context) {
 
 	// Respond with success
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, response)
+}
+
+// AcceptancePercentage Handles the AcceptancePercentage of a Candidate.
+// @Summary        AcceptancePercentage
+// @Description    AcceptancePercentage   of all Candidates
+// @Tags           Condidats
+// @Accept         json
+// @Produce        json
+// @Security       ApiKeyAuth
+// @Param          companyID   path    string  true    "Company ID"
+// @Success        200         {object}  utils.ApiResponses
+// @Failure        400         {object}  utils.ApiResponses       "Invalid request"
+// @Failure        401         {object}  utils.ApiResponses       "Unauthorized"
+// @Failure        403         {object}  utils.ApiResponses       "Forbidden"
+// @Failure        500         {object}  utils.ApiResponses       "Internal Server Error"
+// @Router         	/candidats/{companyID}/Acceptance [get]
+func (db Database) AcceptancePercentage(ctx *gin.Context) {
+    // Extract JWT values from the context
+    session := utils.ExtractJWTValues(ctx)
+
+    // Parse and validate the company ID from the request parameter
+    companyID, err := uuid.Parse(ctx.Param("companyID"))
+    if err != nil {
+        logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
+        utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+        return
+    }
+
+    // Check if the employee belongs to the specified company
+    if err := domains.CheckEmployeeBelonging(db.DB, companyID, session.UserID, session.CompanyID); err != nil {
+        logrus.Error("Error verifying employee belonging. Error: ", err.Error())
+        utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+        return
+    }
+
+    // Calculate gender percentages from the database
+    AcceptancePercentage, RefusedPercentage, err := AcceptancePercentages(db.DB, []domains.Condidats{}, companyID)
+    if err != nil {
+        logrus.Error("Error calculating status percentages. Error: ", err.Error())
+        utils.BuildErrorResponse(ctx, http.StatusInternalServerError, constants.UNKNOWN_ERROR, utils.Null())
+        return
+    }
+
+    // Prepare the response data
+    responseData := AcceptancePercentagesResponse{
+        Acceptance_Percentage:  AcceptancePercentage,
+        Refused_Percentage: RefusedPercentage,
+    }
+
+    // Respond with success
+    utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, responseData)
+}
+
+// LevelOfEducationPercentage Handles the GenderPercentage of a user.
+// @Summary        LevelOfEducationPercentage
+// @Description    level of education  Percentage of all candidates 
+// @Tags           Condidats
+// @Accept         json
+// @Produce        json
+// @Security       ApiKeyAuth
+// @Param          companyID   path    string  true    "Company ID"
+// @Success        200         {object}  utils.ApiResponses
+// @Failure        400         {object}  utils.ApiResponses       "Invalid request"
+// @Failure        401         {object}  utils.ApiResponses       "Unauthorized"
+// @Failure        403         {object}  utils.ApiResponses       "Forbidden"
+// @Failure        500         {object}  utils.ApiResponses       "Internal Server Error"
+// @Router         /candidats/{companyID}/Percentage [get]
+func (db Database) LevelPercentage(ctx *gin.Context) {
+    // Extract JWT values from the context
+    session := utils.ExtractJWTValues(ctx)
+
+    // Parse and validate the company ID from the request parameter
+    companyID, err := uuid.Parse(ctx.Param("companyID"))
+    if err != nil {
+        logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
+        utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+        return
+    }
+
+    // Check if the employee belongs to the specified company
+    if err := domains.CheckEmployeeBelonging(db.DB, companyID, session.UserID, session.CompanyID); err != nil {
+        logrus.Error("Error verifying employee belonging. Error: ", err.Error())
+        utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+        return
+    }
+
+    // Calculate gender percentages from the database
+    bachelor, master ,other, err := levePercentages(db.DB, []domains.Condidats{}, companyID)
+    if err != nil {
+        logrus.Error("Error calculating gender percentages. Error: ", err.Error())
+        utils.BuildErrorResponse(ctx, http.StatusInternalServerError, constants.UNKNOWN_ERROR, utils.Null())
+        return
+    }
+
+    // Prepare the response data
+    responseData := levelPercentagesResponse{
+        Bachelor:   bachelor,
+        Master: master,
+		Other: other,
+    }
+
+    // Respond with success
+    utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, responseData)
+	
 }

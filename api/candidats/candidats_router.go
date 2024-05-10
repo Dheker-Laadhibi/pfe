@@ -42,5 +42,17 @@ func CandidatRouterInit(router *gin.RouterGroup, db *gorm.DB) {
 		// signin endpoint to  a specific condidat
 		candidats.POST("/signin", baseInstance.SigninCandidat)
 
+
+	// GET endpoint to retrieve details of a specific condidat
+	candidats.GET("/:companyID/Acceptance", baseInstance.AcceptancePercentage)
+
+
+	// GET endpoint to retrieve details of a specific condidat
+	candidats.GET("/:companyID/Percentage", baseInstance.LevelPercentage)
+
+
+
+
+		
 	}
 }

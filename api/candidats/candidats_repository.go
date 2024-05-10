@@ -2,6 +2,7 @@ package candidats
 
 import (
 	"labs/domains"
+	"math"
 
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
@@ -47,3 +48,77 @@ func ReadByEmailActive(db *gorm.DB, email string) (*domains.Condidats, error) {
 	err := db.Where("email = ? ", email).First(&Candidat).Error
 	return &Candidat, err
 }
+
+// GenderPercentages récupère les pourcentages d'hommes et de femmes dans la base de données.
+func AcceptancePercentages(db *gorm.DB, model[]domains.Condidats,modelID uuid.UUID) (float64, float64, error) {
+    var totalCandidates int64
+    var accepted, refused int64
+
+    // Compter le nombre total d'utilisateurs dans la société
+    if err := db.Model(&domains.Condidats{}).Where("company_id = ?", modelID).Count(&totalCandidates).Error; err != nil {
+        return 0, 0, err
+    }
+
+    // Compter le nombre d'hommes
+    if err := db.Model(&domains.Condidats{}).Where("company_id = ? AND status = ?", modelID, "true").Count(&accepted).Error; err != nil {
+        return 0, 0, err
+    }
+
+    // Compter le nombre de femmes
+    if err := db.Model(&domains.Condidats{}).Where("company_id = ? AND status = ?", modelID, "false").Count(&refused).Error; err != nil {
+        return 0, 0, err
+    }
+
+
+    // Calculer les pourcentages
+    acceptedPercentage := (float64(accepted) / float64(totalCandidates)) * 100
+    refusedPercentage := (float64(refused) / float64(totalCandidates)) * 100
+
+    // Arrondir les pourcentages à l'entier le plus proche
+    acceptedPercentage = math.Round(acceptedPercentage)
+    refusedPercentage = math.Round(refusedPercentage)
+    
+    return acceptedPercentage, refusedPercentage, nil
+}
+
+
+// GenderPercentages récupère les pourcentages d'hommes et de femmes dans la base de données.
+func levePercentages(db *gorm.DB, model[]domains.Condidats ,modelID uuid.UUID) (float64,float64 ,float64, error) {
+    var totalCandidate int64
+    var BachelorCount,  MasterCount  int64  
+    var otherCount int64
+
+    // Compter le nombre total d'utilisateurs dans la société
+    if err := db.Model(&domains.Condidats{}).Where("company_id = ?", modelID).Count(&totalCandidate).Error; err != nil {
+        return 0, 0, 0,err
+    }
+
+    // Compter le nombre bachelor
+    if err := db.Model(&domains.Condidats{}).Where("company_id = ? AND education_level LIKE ?", modelID, "%Bachelor%").Count(&BachelorCount).Error; err != nil {
+        return 0, 0, 0 , err
+    }
+
+
+    // Compter le nombre de master
+    if err := db.Model(&domains.Condidats{}).Where("company_id = ? AND education_level  LIKE ?", modelID, "%Master%").Count(&MasterCount).Error; err != nil {
+        return 0, 0, 0,err
+    }
+
+
+   // Calculer le nombre de candidats avec un niveau d'éducation autre que "Bachelor" ou "Master"
+   otherCount = totalCandidate - BachelorCount - MasterCount
+
+
+    // Calculer les pourcentages
+    Bachelor := (float64(BachelorCount) / float64(totalCandidate)) * 100
+    Master := (float64(MasterCount) / float64(totalCandidate)) * 100
+    Other := (float64(otherCount) / float64(totalCandidate)) * 100
+    // Arrondir les pourcentages à l'entier le plus proche
+    Bachelor = math.Round(Bachelor)
+    Master = math.Round(Master)
+    Other= math.Round(Other)
+    
+    return Bachelor, Master,Other, nil
+	
+}
+

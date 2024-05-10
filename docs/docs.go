@@ -869,6 +869,128 @@ const docTemplate = `{
                 }
             }
         },
+        "/candidats/{companyID}/Acceptance": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "AcceptancePercentage   of all Candidates",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Condidats"
+                ],
+                "summary": "AcceptancePercentage",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/candidats/{companyID}/Percentage": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "level of education  Percentage of all candidates",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Condidats"
+                ],
+                "summary": "LevelOfEducationPercentage",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/candidats/{companyID}/count": {
             "get": {
                 "security": [
@@ -1090,7 +1212,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/CondidatIn"
+                            "$ref": "#/definitions/UpdateCandidate"
                         }
                     }
                 ],
@@ -7731,6 +7853,67 @@ const docTemplate = `{
                 }
             }
         },
+        "/users/{companyID}/gender": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Gender Percentage of all users",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "GenderPercentage",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/users/{companyID}/list": {
             "get": {
                 "security": [
@@ -8206,6 +8389,9 @@ const docTemplate = `{
                 "role_name": {
                     "type": "string"
                 },
+                "status": {
+                    "type": "boolean"
+                },
                 "university": {
                     "type": "string"
                 }
@@ -8295,6 +8481,9 @@ const docTemplate = `{
                     "description": "Name is the name of the condidat.",
                     "type": "string"
                 },
+                "status": {
+                    "type": "boolean"
+                },
                 "university": {
                     "type": "string"
                 }
@@ -8324,6 +8513,9 @@ const docTemplate = `{
                 "lastname": {
                     "description": "Lastname is the last name of the condidat.",
                     "type": "string"
+                },
+                "status": {
+                    "type": "boolean"
                 },
                 "university": {
                     "type": "string"
@@ -9314,15 +9506,23 @@ const docTemplate = `{
             }
         },
         "QuestionsTable": {
-            "description": "TestsTable represents a single question entry in a table.",
+            "description": "QuestionsTable represents a single question entry in a table.",
             "type": "object",
             "properties": {
                 "associatedTechnology": {
                     "description": "Associated technology or subject for the question",
                     "type": "string"
                 },
+                "correctAnswer": {
+                    "description": "The correct answer to the question",
+                    "type": "string"
+                },
                 "createdAt": {
-                    "description": "CreatedAt is the timestamp indicating when the test entry was created.",
+                    "description": "CreatedAt is the timestamp indicating when the question entry was created.",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "ID is the unique identifier for the question.",
                     "type": "string"
                 },
                 "options": {
@@ -9334,10 +9534,6 @@ const docTemplate = `{
                 },
                 "question": {
                     "description": "The text of the question",
-                    "type": "string"
-                },
-                "questionID": {
-                    "description": "The questionID associated with the question",
                     "type": "string"
                 }
             }
@@ -9813,6 +10009,15 @@ const docTemplate = `{
                 }
             }
         },
+        "UpdateCandidate": {
+            "description": "UpdateCandidate represents the input structure for creating a new condidat.",
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "boolean"
+                }
+            }
+        },
         "UsersCount": {
             "description": "UsersCount represents the count of users.",
             "type": "object",
@@ -9883,6 +10088,10 @@ const docTemplate = `{
                     "maxLength": 30,
                     "minLength": 3
                 },
+                "gender": {
+                    "description": "gender",
+                    "type": "string"
+                },
                 "lastName": {
                     "description": "Lastname is the last name of the user. It is required and should be between 3 and 35 characters.",
                     "type": "string",
@@ -9941,38 +10150,28 @@ const docTemplate = `{
             }
         },
         "UsersTable": {
-            "description": "UsersTable represents a single project entry in a table.",
+            "description": "UsersTable represents a single user entry in a table.",
             "type": "object",
             "properties": {
-                "code": {
-                    "description": "code is the code of pfe project",
+                "createdAt": {
+                    "description": "CreatedAt is the timestamp indicating when the user entry was created.",
                     "type": "string"
                 },
-                "companyID": {
-                    "description": "CompanyID is the unique identifier for the company associated with the project. It is required.",
+                "email": {
+                    "description": "Email is the email address of the user.",
                     "type": "string"
                 },
-                "expdate": {
-                    "description": "expdate is the timestamp indicating when the project entry will ends.",
+                "firstname": {
+                    "description": "Firstname is the first name of the user.",
                     "type": "string"
                 },
                 "id": {
-                    "description": "ID is the unique identifier for the project.",
+                    "description": "ID is the unique identifier for the user.",
                     "type": "string"
                 },
-                "projectname": {
-                    "description": "projectname is the  name of the project. It is required .",
+                "lastname": {
+                    "description": "Lastname is the last name of the user.",
                     "type": "string"
-                },
-                "speciality": {
-                    "type": "string"
-                },
-                "technologies": {
-                    "description": "technologies required to develop the project",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
                 }
             }
         },

@@ -428,6 +428,8 @@ func (db Database) UpdateUser(ctx *gin.Context) {
 		Firstname: user.Firstname,
 		Lastname:  user.Lastname,
 		Email:     user.Email,
+		Gender: user.Gender,
+		
 	}
 	if err = domains.Update(db.DB, dbUser, objectID); err != nil {
 		logrus.Error("Error updating user data in the database. Error: ", err.Error())
@@ -497,4 +499,56 @@ func (db Database) DeleteUser(ctx *gin.Context) {
 
 	// Respond with success
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, utils.Null())
+}
+
+
+// GenderPercentage Handles the GenderPercentage of a user.
+// @Summary        GenderPercentage
+// @Description    Gender Percentage of all users
+// @Tags           Users
+// @Accept         json
+// @Produce        json
+// @Security       ApiKeyAuth
+// @Param          companyID   path    string  true    "Company ID"
+// @Success        200         {object}  utils.ApiResponses
+// @Failure        400         {object}  utils.ApiResponses       "Invalid request"
+// @Failure        401         {object}  utils.ApiResponses       "Unauthorized"
+// @Failure        403         {object}  utils.ApiResponses       "Forbidden"
+// @Failure        500         {object}  utils.ApiResponses       "Internal Server Error"
+// @Router         /users/{companyID}/gender [get]
+func (db Database) GenderPercentage(ctx *gin.Context) {
+    // Extract JWT values from the context
+    session := utils.ExtractJWTValues(ctx)
+
+    // Parse and validate the company ID from the request parameter
+    companyID, err := uuid.Parse(ctx.Param("companyID"))
+    if err != nil {
+        logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
+        utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+        return
+    }
+
+    // Check if the employee belongs to the specified company
+    if err := domains.CheckEmployeeBelonging(db.DB, companyID, session.UserID, session.CompanyID); err != nil {
+        logrus.Error("Error verifying employee belonging. Error: ", err.Error())
+        utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+        return
+    }
+
+    // Calculate gender percentages from the database
+    malePercentage, femalePercentage, err := GenderPercentages(db.DB, []domains.Users{}, companyID)
+    if err != nil {
+        logrus.Error("Error calculating gender percentages. Error: ", err.Error())
+        utils.BuildErrorResponse(ctx, http.StatusInternalServerError, constants.UNKNOWN_ERROR, utils.Null())
+        return
+    }
+
+    // Prepare the response data
+    responseData := GenderPercentagesResponse{
+        MalePercentage:   malePercentage,
+        FemalePercentage: femalePercentage,
+    }
+
+    // Respond with success
+    utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, responseData)
 }

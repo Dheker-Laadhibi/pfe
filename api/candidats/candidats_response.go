@@ -14,7 +14,7 @@ type CondidatIn struct {
 	RoleName        string    `json:"role_name"`   //  define condidat role 
 	University     string    `json:"university"  binding:"min=3,max=30"`
 	Password       string    `json:"password" binding:"required,min=10,max=255"` // Password is the user's password. It is required, and its length should be between 10 and 255 characters.
-	             // CompanyID is the unique identifier for the company associated with the user. It is required.
+
 } //@name CondidatIn
 
 // @Description	CondidtasPagination represents the paginated list of Condidats.
@@ -33,7 +33,8 @@ type CondidatsTable struct {
 	Email     string    `json:"email"` 
 	Adress         string  `json:"adress"`
 	Educationlevel string `json:"educationlevel"`
-	University     string`json:"university"`    
+	University     string`json:"university"`  
+	Status   bool       `json:"status"`
 } //@name CondidatsTable
 
 // @Description	CondidatsList represents a simplified version of the Condidats for listing purposes.
@@ -43,7 +44,8 @@ type CondidatsList struct {
 	Lastname  string    `json:"lastname"`  // Name is the name of the condidat.
 	Adress         string  `json:"adress"`
 	Educationlevel string `json:"educationlevel"`
-	University     string`json:"university"`
+	University     string `json:"university"`
+	Status   bool     `json:"status"`
 } //@name CondidatsList
 
 // @Description	CondidatsCount represents the count of condidats.
@@ -60,6 +62,7 @@ type CondidatDetails struct {
 	CompanyName      string    `json:"companyName"` // CompanyName is the name of the company associated with the condidat.
 	LevelOfEducation string    `json:"educationLevel"`
 	University       string    `json:"university"`
+	Status   bool     `json:"status"`
 	RoleName  string    `json:"role_name"`  
 } //@name CondidatDetails
 
@@ -77,7 +80,11 @@ type LoggedInResponse struct {
 	Candidat        LoggedIn `json:"Candidat"`        // User is the structure containing details of the logged-in user.
 } //@name LoggedInResponse
 
+// @Description	UpdateCandidate represents the input structure for creating a new condidat.
+type UpdateCandidate struct {
 
+	Status   bool     `json:"status"`
+} //@name UpdateCandidate
 
 
 
@@ -88,3 +95,20 @@ type LoggedIn struct {
 	Email     string         `json:"email"`         // Email is the email address of the candidat.
 	CompanyID uuid.UUID `json:"workCompanyId"` // CompanyID is the unique identifier for the candidat company.
 } //@name LoggedIn
+
+
+// @Description	GenderPercentagesResponse represents porcentage of gender
+type AcceptancePercentagesResponse struct {
+    Acceptance_Percentage   float64 `json:"Acceptance_Percentage"`   // MalePercentage est le pourcentage d'hommes dans la base de données.
+    Refused_Percentage float64 `json:"Refused_Percentage"` // FemalePercentage est le pourcentage de femmes dans la base de données.
+}
+//@name GenderPercentagesResponse
+
+
+// @Description	levelPercentagesResponse represents porcentage of gender
+type levelPercentagesResponse struct {
+Bachelor   float64 `json:"bachelor"`   // MalePercentage est le pourcentage d'hommes dans la base de données.
+Master float64 `json:"master"`
+Other   float64    `json:"other"`          // FemalePercentage est le pourcentage de femmes dans la base de données.
+}
+//@name levelPercentagesResponse

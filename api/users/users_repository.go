@@ -2,6 +2,7 @@ package users
 
 import (
 	"labs/domains"
+	"math"
 
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
@@ -38,4 +39,64 @@ func ReadByID(db *gorm.DB, model domains.Users, id uuid.UUID) (domains.Users, er
 	return model, err
 }
 
+// GenderPercentages récupère les pourcentages d'hommes et de femmes dans la base de données.
+func GenderPercentages(db *gorm.DB, model[]domains.Users ,modelID uuid.UUID) (float64, float64, error) {
+    var totalUsers int64
+    var maleCount, femaleCount int64
+
+    // Compter le nombre total d'utilisateurs dans la société
+    if err := db.Model(&domains.Condidats{}).Where("company_id = ?", modelID).Count(&totalUsers).Error; err != nil {
+        return 0, 0, err
+    }
+
+    // Compter le nombre d'hommes
+    if err := db.Model(&domains.Users{}).Where("company_id = ? AND gender = ?", modelID, "male").Count(&maleCount).Error; err != nil {
+        return 0, 0, err
+    }
+
+    femaleCount=totalUsers-maleCount;
+
+
+    // Calculer les pourcentages
+    malePercentage := (float64(maleCount) / float64(totalUsers)) * 100
+    femalePercentage := (float64(femaleCount) / float64(totalUsers)) * 100
+
+    // Arrondir les pourcentages à l'entier le plus proche
+    malePercentage = math.Round(malePercentage)
+    femalePercentage = math.Round(femalePercentage)
+    
+    return malePercentage, femalePercentage, nil
+
+
+
+   
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
 

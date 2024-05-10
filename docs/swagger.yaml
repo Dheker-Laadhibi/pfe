@@ -164,6 +164,8 @@ definitions:
         type: string
       role_name:
         type: string
+      status:
+        type: boolean
       university:
         type: string
     type: object
@@ -236,6 +238,8 @@ definitions:
       lastname:
         description: Name is the name of the condidat.
         type: string
+      status:
+        type: boolean
       university:
         type: string
     type: object
@@ -257,6 +261,8 @@ definitions:
       lastname:
         description: Lastname is the last name of the condidat.
         type: string
+      status:
+        type: boolean
       university:
         type: string
     type: object
@@ -1004,14 +1010,20 @@ definitions:
         type: integer
     type: object
   QuestionsTable:
-    description: TestsTable represents a single question entry in a table.
+    description: QuestionsTable represents a single question entry in a table.
     properties:
       associatedTechnology:
         description: Associated technology or subject for the question
         type: string
+      correctAnswer:
+        description: The correct answer to the question
+        type: string
       createdAt:
-        description: CreatedAt is the timestamp indicating when the test entry was
-          created.
+        description: CreatedAt is the timestamp indicating when the question entry
+          was created.
+        type: string
+      id:
+        description: ID is the unique identifier for the question.
         type: string
       options:
         description: The options of the question
@@ -1020,9 +1032,6 @@ definitions:
         type: array
       question:
         description: The text of the question
-        type: string
-      questionID:
-        description: The questionID associated with the question
         type: string
     type: object
   RolesCount:
@@ -1390,6 +1399,13 @@ definitions:
         description: ID is the unique identifier for the Missi
         type: string
     type: object
+  UpdateCandidate:
+    description: UpdateCandidate represents the input structure for creating a new
+      condidat.
+    properties:
+      status:
+        type: boolean
+    type: object
   UsersCount:
     description: UsersCount represents the count of users.
     properties:
@@ -1440,6 +1456,9 @@ definitions:
           be between 3 and 30 characters.
         maxLength: 30
         minLength: 3
+        type: string
+      gender:
+        description: gender
         type: string
       lastName:
         description: Lastname is the last name of the user. It is required and should
@@ -1493,32 +1512,24 @@ definitions:
         type: integer
     type: object
   UsersTable:
-    description: UsersTable represents a single project entry in a table.
+    description: UsersTable represents a single user entry in a table.
     properties:
-      code:
-        description: code is the code of pfe project
+      createdAt:
+        description: CreatedAt is the timestamp indicating when the user entry was
+          created.
         type: string
-      companyID:
-        description: CompanyID is the unique identifier for the company associated
-          with the project. It is required.
+      email:
+        description: Email is the email address of the user.
         type: string
-      expdate:
-        description: expdate is the timestamp indicating when the project entry will
-          ends.
+      firstname:
+        description: Firstname is the first name of the user.
         type: string
       id:
-        description: ID is the unique identifier for the project.
+        description: ID is the unique identifier for the user.
         type: string
-      projectname:
-        description: projectname is the  name of the project. It is required .
+      lastname:
+        description: Lastname is the last name of the user.
         type: string
-      speciality:
-        type: string
-      technologies:
-        description: technologies required to develop the project
-        items:
-          type: string
-        type: array
     type: object
   codeProject:
     description: codeProject represents code project about a specific project.
@@ -2198,7 +2209,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/CondidatIn'
+          $ref: '#/definitions/UpdateCandidate'
       produces:
       - application/json
       responses:
@@ -2225,6 +2236,84 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Update candidat
+      tags:
+      - Condidats
+  /candidats/{companyID}/Acceptance:
+    get:
+      consumes:
+      - application/json
+      description: AcceptancePercentage   of all Candidates
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: AcceptancePercentage
+      tags:
+      - Condidats
+  /candidats/{companyID}/Percentage:
+    get:
+      consumes:
+      - application/json
+      description: level of education  Percentage of all candidates
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: LevelOfEducationPercentage
       tags:
       - Condidats
   /candidats/{companyID}/count:
@@ -6692,6 +6781,45 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Get number of  users
+      tags:
+      - Users
+  /users/{companyID}/gender:
+    get:
+      consumes:
+      - application/json
+      description: Gender Percentage of all users
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: GenderPercentage
       tags:
       - Users
   /users/{companyID}/list:

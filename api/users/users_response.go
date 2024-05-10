@@ -14,6 +14,8 @@ type UsersIn struct {
 	Password  string    `json:"password" binding:"required,min=10,max=255"` // Password is the user's password. It is required, and its length should be between 10 and 255 characters.
 	RoleName  string    `json:"role_name"`                                  // RoleName is the name of the role associated with the user.
 	CompanyID uuid.UUID `json:"companyID" binding:"required"`               // CompanyID is the unique identifier for the company associated with the user. It is required.
+	Gender      string    `json:"gender"`    // gender 
+
 } //@name UsersIn
 
 // @Description	UsersPagination represents the paginated list of users.
@@ -59,3 +61,10 @@ type UsersDetails struct {
 type AddTrainingUser struct {
 	ID uuid.UUID `json:"id"` // ID is the unique identifier for the user.
 }
+
+// @Description	GenderPercentagesResponse represents porcentage of gender
+type GenderPercentagesResponse struct {
+    MalePercentage   float64 `json:"malePercentage"`   // MalePercentage est le pourcentage d'hommes dans la base de données.
+    FemalePercentage float64 `json:"femalePercentage"` // FemalePercentage est le pourcentage de femmes dans la base de données.
+}
+//@name GenderPercentagesResponse
