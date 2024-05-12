@@ -6,6 +6,7 @@ import (
 	"labs/api/candidats"
 	"labs/api/companies"
 	"labs/api/exitPermission"
+	"labs/api/features"
 	"labs/api/interns"
 	"labs/api/leaveRequests"
 	"labs/api/loanRequests"
@@ -78,11 +79,12 @@ func RoutesApiInit(router *gin.Engine, db *gorm.DB) {
 		projects.ProjectRouterInit(api, db)
 		//initialize TrainingRequest
 		training_request.TrainingRequestRouterInit(api, db)
+
 	//initialize TrainingRequest
 	user_experience.ExperienceRouterInit(api, db)
+	// intitialize feature 
 
-
-
+	features.FeatureRouterInit(api,db)
 
 
 

@@ -421,6 +421,53 @@ definitions:
           binding:"required"`
         type: string
     type: object
+  FeatureCount:
+    description: FeatureCount represents the count of roles.
+    properties:
+      count:
+        description: Count is the number of roles.
+        type: integer
+    type: object
+  FeatureIn:
+    description: FeatureIn represents the input structure for creating a new role.
+    properties:
+      feature_name:
+        description: Name is the name of the role. It is required and should be between
+          2 and 40 characters.
+        maxLength: 40
+        minLength: 2
+        type: string
+    required:
+    - feature_name
+    type: object
+  FeaturePagination:
+    description: FeaturePagination represents the paginated list of roles.
+    properties:
+      items:
+        description: Items is a slice containing individual role details.
+        items:
+          $ref: '#/definitions/FeatureTable'
+        type: array
+      limit:
+        description: Limit is the maximum number of items per page in the pagination.
+        type: integer
+      page:
+        description: Page is the current page number in the pagination.
+        type: integer
+      totalCount:
+        description: TotalCount is the total number of roles in the entire list.
+        type: integer
+    type: object
+  FeatureTable:
+    description: FeatureTable represents a single role entry in a table.
+    properties:
+      feature_name:
+        description: Name is the name of the role.
+        type: string
+      id:
+        description: ID is the unique identifier for the role.
+        type: string
+    type: object
   InternsCount:
     description: InternsCount represents the count of interns.
     properties:
@@ -1512,24 +1559,32 @@ definitions:
         type: integer
     type: object
   UsersTable:
-    description: UsersTable represents a single user entry in a table.
+    description: UsersTable represents a single project entry in a table.
     properties:
-      createdAt:
-        description: CreatedAt is the timestamp indicating when the user entry was
-          created.
+      code:
+        description: code is the code of pfe project
         type: string
-      email:
-        description: Email is the email address of the user.
+      companyID:
+        description: CompanyID is the unique identifier for the company associated
+          with the project. It is required.
         type: string
-      firstname:
-        description: Firstname is the first name of the user.
+      expdate:
+        description: expdate is the timestamp indicating when the project entry will
+          ends.
         type: string
       id:
-        description: ID is the unique identifier for the user.
+        description: ID is the unique identifier for the project.
         type: string
-      lastname:
-        description: Lastname is the last name of the user.
+      projectname:
+        description: projectname is the  name of the project. It is required .
         type: string
+      speciality:
+        type: string
+      technologies:
+        description: technologies required to develop the project
+        items:
+          type: string
+        type: array
     type: object
   codeProject:
     description: codeProject represents code project about a specific project.
@@ -3278,6 +3333,303 @@ paths:
       summary: Get list of  Experiences
       tags:
       - UserExperience
+  /features/{companyID}:
+    get:
+      description: Get all features.
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/FeaturePagination'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get features
+      tags:
+      - Feature
+    post:
+      consumes:
+      - application/json
+      description: Create a new feature.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      - description: Feature query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/FeatureIn'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create feature
+      tags:
+      - Feature
+  /features/{companyID}/{ID}:
+    delete:
+      description: Delete one feature.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      - description: feature ID
+        in: path
+        name: ID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete feature
+      tags:
+      - Feature
+    get:
+      description: Get one feature.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      - description: feature ID
+        in: path
+        name: ID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/FeatureTable'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get feature
+      tags:
+      - Feature
+    put:
+      consumes:
+      - application/json
+      description: Update one feature.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      - description: feature ID
+        in: path
+        name: ID
+        required: true
+        type: string
+      - description: feature query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/FeatureIn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update feature
+      tags:
+      - Feature
+  /features/{companyID}/count:
+    get:
+      description: Get number of all features.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/FeatureCount'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get number of  features
+      tags:
+      - Feature
+  /features/{companyID}/list:
+    get:
+      description: Get list of all features.
+      parameters:
+      - description: Company ID
+        in: path
+        name: companyID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/FeatureTable'
+            type: array
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ApiResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get list of  features
+      tags:
+      - Feature
   /interns/{companyID}:
     get:
       description: Get all interns.

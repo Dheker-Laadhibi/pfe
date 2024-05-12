@@ -65,38 +65,7 @@ func GenderPercentages(db *gorm.DB, model[]domains.Users ,modelID uuid.UUID) (fl
     malePercentage = math.Round(malePercentage)
     femalePercentage = math.Round(femalePercentage)
     
-    return malePercentage, femalePercentage, nil
-
-
-
-   
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
+    return malePercentage , femalePercentage, nil
 
 }
 

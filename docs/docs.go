@@ -2630,6 +2630,466 @@ const docTemplate = `{
                 }
             }
         },
+        "/features/{companyID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all features.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Feature"
+                ],
+                "summary": "Get features",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/FeaturePagination"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create a new feature.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Feature"
+                ],
+                "summary": "Create feature",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Feature query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/FeatureIn"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/features/{companyID}/count": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get number of all features.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Feature"
+                ],
+                "summary": "Get number of  features",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/FeatureCount"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/features/{companyID}/list": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get list of all features.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Feature"
+                ],
+                "summary": "Get list of  features",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/FeatureTable"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/features/{companyID}/{ID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get one feature.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Feature"
+                ],
+                "summary": "Get feature",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "feature ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/FeatureTable"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update one feature.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Feature"
+                ],
+                "summary": "Update feature",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "feature ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "feature query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/FeatureIn"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete one feature.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Feature"
+                ],
+                "summary": "Delete feature",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "feature ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/interns/{companyID}": {
             "get": {
                 "security": [
@@ -8726,6 +9186,70 @@ const docTemplate = `{
                 }
             }
         },
+        "FeatureCount": {
+            "description": "FeatureCount represents the count of roles.",
+            "type": "object",
+            "properties": {
+                "count": {
+                    "description": "Count is the number of roles.",
+                    "type": "integer"
+                }
+            }
+        },
+        "FeatureIn": {
+            "description": "FeatureIn represents the input structure for creating a new role.",
+            "type": "object",
+            "required": [
+                "feature_name"
+            ],
+            "properties": {
+                "feature_name": {
+                    "description": "Name is the name of the role. It is required and should be between 2 and 40 characters.",
+                    "type": "string",
+                    "maxLength": 40,
+                    "minLength": 2
+                }
+            }
+        },
+        "FeaturePagination": {
+            "description": "FeaturePagination represents the paginated list of roles.",
+            "type": "object",
+            "properties": {
+                "items": {
+                    "description": "Items is a slice containing individual role details.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/FeatureTable"
+                    }
+                },
+                "limit": {
+                    "description": "Limit is the maximum number of items per page in the pagination.",
+                    "type": "integer"
+                },
+                "page": {
+                    "description": "Page is the current page number in the pagination.",
+                    "type": "integer"
+                },
+                "totalCount": {
+                    "description": "TotalCount is the total number of roles in the entire list.",
+                    "type": "integer"
+                }
+            }
+        },
+        "FeatureTable": {
+            "description": "FeatureTable represents a single role entry in a table.",
+            "type": "object",
+            "properties": {
+                "feature_name": {
+                    "description": "Name is the name of the role.",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "ID is the unique identifier for the role.",
+                    "type": "string"
+                }
+            }
+        },
         "InternsCount": {
             "description": "InternsCount represents the count of interns.",
             "type": "object",
@@ -10150,28 +10674,38 @@ const docTemplate = `{
             }
         },
         "UsersTable": {
-            "description": "UsersTable represents a single user entry in a table.",
+            "description": "UsersTable represents a single project entry in a table.",
             "type": "object",
             "properties": {
-                "createdAt": {
-                    "description": "CreatedAt is the timestamp indicating when the user entry was created.",
+                "code": {
+                    "description": "code is the code of pfe project",
                     "type": "string"
                 },
-                "email": {
-                    "description": "Email is the email address of the user.",
+                "companyID": {
+                    "description": "CompanyID is the unique identifier for the company associated with the project. It is required.",
                     "type": "string"
                 },
-                "firstname": {
-                    "description": "Firstname is the first name of the user.",
+                "expdate": {
+                    "description": "expdate is the timestamp indicating when the project entry will ends.",
                     "type": "string"
                 },
                 "id": {
-                    "description": "ID is the unique identifier for the user.",
+                    "description": "ID is the unique identifier for the project.",
                     "type": "string"
                 },
-                "lastname": {
-                    "description": "Lastname is the last name of the user.",
+                "projectname": {
+                    "description": "projectname is the  name of the project. It is required .",
                     "type": "string"
+                },
+                "speciality": {
+                    "type": "string"
+                },
+                "technologies": {
+                    "description": "technologies required to develop the project",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },

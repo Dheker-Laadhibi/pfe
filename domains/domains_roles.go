@@ -45,12 +45,14 @@ type Roles struct {
 	gorm.Model
 }
 
+
 // ReadRoleName reads the name of the role based on its ID.
 func ReadRoleName(db *gorm.DB, roleID uuid.UUID) (string, error) {
 	role := new(Roles)
 	err := db.Select("id, name").Where("id = ?", roleID).First(role).Error
 	return role.Name, err
 }
+
 
 
 
