@@ -5321,6 +5321,425 @@ const docTemplate = `{
                 }
             }
         },
+        "/permissions/{companyID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all permissions.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Permissions"
+                ],
+                "summary": "Get permissions",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "companyID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/PermissionPagination"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/permissions/{companyID}/count": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get number of all permissions.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Permissions"
+                ],
+                "summary": "Get number of  permissions",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "companyID ",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/permissionCount"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/permissions/{companyID}/delete/{permissionID}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete one permission.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Permissions"
+                ],
+                "summary": "Delete permission",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "companyID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "permissionID",
+                        "name": "permissionID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/permissions/{companyID}/permission/{permissionID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get one permission.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Permissions"
+                ],
+                "summary": "Get permission",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "company ID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "permissionID ",
+                        "name": "permissionID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/PermissionsDetails"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/permissions/{companyID}/update/{permissionID}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update permission.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Permissions"
+                ],
+                "summary": "Update permission",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "companyID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "permissionID",
+                        "name": "permissionID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "permission query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/PermissionIn"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/permissions/{companyID}/{featureID}/{roleID}": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create a new permission.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Permissions"
+                ],
+                "summary": "Create permission",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "companyID",
+                        "name": "companyID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "roleID",
+                        "name": "roleID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "featureID",
+                        "name": "featureID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "PermissionIn query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/PermissionIn"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "MissionOrdersal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/presences/All/{userID}": {
             "get": {
                 "security": [
@@ -9780,6 +10199,113 @@ const docTemplate = `{
                 }
             }
         },
+        "PermissionIn": {
+            "description": "PermissionIn represents the input structure for creating a new intern.",
+            "type": "object",
+            "properties": {
+                "create_perm": {
+                    "description": "Firstname is the first name of the intern. It is required and should be between 3 and 30 characters.",
+                    "type": "boolean"
+                },
+                "delete_perm": {
+                    "description": "intern's education level",
+                    "type": "boolean"
+                },
+                "feature_name": {
+                    "type": "string"
+                },
+                "read_perm": {
+                    "description": "Lastname is the last name of the intern. It is required and should be between 3 and 35 characters.",
+                    "type": "boolean"
+                },
+                "update_perm": {
+                    "description": "Email is the email address of the intern. It is required, should be a valid email, and maximum length is 255 characters.",
+                    "type": "boolean"
+                }
+            }
+        },
+        "PermissionPagination": {
+            "description": "PermissionPagination represents the paginated list of interns.",
+            "type": "object",
+            "properties": {
+                "items": {
+                    "description": "Items is a slice containing individual intern details.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PermissionTable"
+                    }
+                },
+                "limit": {
+                    "description": "Limit is the maximum number of items per page in the pagination.",
+                    "type": "integer"
+                },
+                "page": {
+                    "description": "Page is the current page number in the pagination.",
+                    "type": "integer"
+                },
+                "totalCount": {
+                    "description": "TotalCount is the total number of interns in the entire list.",
+                    "type": "integer"
+                }
+            }
+        },
+        "PermissionTable": {
+            "description": "PermissionTable represents a single intern entry in a table.",
+            "type": "object",
+            "properties": {
+                "create_perm": {
+                    "description": "Firstname is the first name of the intern. It is required and should be between 3 and 30 characters.",
+                    "type": "boolean"
+                },
+                "delete_perm": {
+                    "description": "intern's education level",
+                    "type": "boolean"
+                },
+                "feature_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "ID is the unique identifier for the intern.",
+                    "type": "string"
+                },
+                "read_perm": {
+                    "description": "Lastname is the last name of the intern. It is required and should be between 3 and 35 characters.",
+                    "type": "boolean"
+                },
+                "update_perm": {
+                    "description": "Email is the email address of the intern. It is required, should be a valid email, and maximum length is 255 characters.",
+                    "type": "boolean"
+                }
+            }
+        },
+        "PermissionsDetails": {
+            "description": "PermissionsDetails represents detailed information about a specific intern.",
+            "type": "object",
+            "properties": {
+                "create_perm": {
+                    "description": "Firstname is the first name of the intern. It is required and should be between 3 and 30 characters.",
+                    "type": "boolean"
+                },
+                "delete_perm": {
+                    "description": "intern's education level",
+                    "type": "boolean"
+                },
+                "feature_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "read_perm": {
+                    "description": "Lastname is the last name of the intern. It is required and should be between 3 and 35 characters.",
+                    "type": "boolean"
+                },
+                "update_perm": {
+                    "description": "Email is the email address of the intern. It is required, should be a valid email, and maximum length is 255 characters.",
+                    "type": "boolean"
+                }
+            }
+        },
         "PresencesCount": {
             "description": "PresencesCount represents the count of presences.",
             "type": "object",
@@ -10030,23 +10556,15 @@ const docTemplate = `{
             }
         },
         "QuestionsTable": {
-            "description": "QuestionsTable represents a single question entry in a table.",
+            "description": "TestsTable represents a single question entry in a table.",
             "type": "object",
             "properties": {
                 "associatedTechnology": {
                     "description": "Associated technology or subject for the question",
                     "type": "string"
                 },
-                "correctAnswer": {
-                    "description": "The correct answer to the question",
-                    "type": "string"
-                },
                 "createdAt": {
-                    "description": "CreatedAt is the timestamp indicating when the question entry was created.",
-                    "type": "string"
-                },
-                "id": {
-                    "description": "ID is the unique identifier for the question.",
+                    "description": "CreatedAt is the timestamp indicating when the test entry was created.",
                     "type": "string"
                 },
                 "options": {
@@ -10058,6 +10576,10 @@ const docTemplate = `{
                 },
                 "question": {
                     "description": "The text of the question",
+                    "type": "string"
+                },
+                "questionID": {
+                    "description": "The questionID associated with the question",
                     "type": "string"
                 }
             }
@@ -10674,38 +11196,28 @@ const docTemplate = `{
             }
         },
         "UsersTable": {
-            "description": "UsersTable represents a single project entry in a table.",
+            "description": "UsersTable represents a single user entry in a table.",
             "type": "object",
             "properties": {
-                "code": {
-                    "description": "code is the code of pfe project",
+                "createdAt": {
+                    "description": "CreatedAt is the timestamp indicating when the user entry was created.",
                     "type": "string"
                 },
-                "companyID": {
-                    "description": "CompanyID is the unique identifier for the company associated with the project. It is required.",
+                "email": {
+                    "description": "Email is the email address of the user.",
                     "type": "string"
                 },
-                "expdate": {
-                    "description": "expdate is the timestamp indicating when the project entry will ends.",
+                "firstname": {
+                    "description": "Firstname is the first name of the user.",
                     "type": "string"
                 },
                 "id": {
-                    "description": "ID is the unique identifier for the project.",
+                    "description": "ID is the unique identifier for the user.",
                     "type": "string"
                 },
-                "projectname": {
-                    "description": "projectname is the  name of the project. It is required .",
+                "lastname": {
+                    "description": "Lastname is the last name of the user.",
                     "type": "string"
-                },
-                "speciality": {
-                    "type": "string"
-                },
-                "technologies": {
-                    "description": "technologies required to develop the project",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
                 }
             }
         },
@@ -10740,6 +11252,16 @@ const docTemplate = `{
                 "status": {
                     "description": "Status of the LoanRequest request (e.g., pending, approved, rejected).",
                     "type": "string"
+                }
+            }
+        },
+        "permissionCount": {
+            "description": "permissionCount represents the count of interns.",
+            "type": "object",
+            "properties": {
+                "count": {
+                    "description": "Count is the number of interns.",
+                    "type": "integer"
                 }
             }
         },

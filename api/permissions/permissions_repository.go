@@ -1,4 +1,4 @@
-package interns
+package permissions
 
 import (
 	"labs/domains"
@@ -22,7 +22,7 @@ type Database struct {
 
 
 // NewInternRepository performs automatic migration of intern-related structures in the database.
-func NewInternRepository(db *gorm.DB) {
+func NewPermissionRepository(db *gorm.DB) {
 	if err := db.AutoMigrate(&domains.Permissions{}); err != nil {
 		logrus.Fatal("An error occurred during automatic migration of the permissions structure. Error: ", err)
 	}

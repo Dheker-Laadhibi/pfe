@@ -84,3 +84,7 @@ func CheckPermission(db *gorm.DB, companyID, roleID, featureID uuid.UUID, action
 		return false, errors.New("invalid action")
 	}
 }
+
+
+
+

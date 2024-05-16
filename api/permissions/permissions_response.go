@@ -1,18 +1,20 @@
-package interns
+package permissions
 
 import (
 
 
 	"github.com/google/uuid"
 )
-// @Description	permissionIn represents the input structure for creating a new intern.
-type permissionIn struct {
+
+// @Description	PermissionIn represents the input structure for creating a new intern.
+type PermissionIn struct {
+	
 	FeatureName     string    `json:"feature_name"`           
 	CreatePerm       bool   `json:"create_perm"` // Firstname is the first name of the intern. It is required and should be between 3 and 30 characters.
 	ReadPerm         bool  `json:"read_perm"`  // Lastname is the last name of the intern. It is required and should be between 3 and 35 characters.
 	UpdatePerm      bool `json:"update_perm"`    // Email is the email address of the intern. It is required, should be a valid email, and maximum length is 255 characters.
-	DeletePerm      bool    `json:"delete_perm"` // intern's education level        
-} //@name permissionIn
+	DeletePerm      bool    `json:"delete_perm"` // intern's education level   
+} //@name PermissionIn
 
 // @Description	PermissionPagination represents the paginated list of interns.
 type PermissionsPagination struct {
@@ -36,17 +38,18 @@ type PermissionTable struct {
 type PermissionList struct {
 	ID   uuid.UUID `json:"id"`   // ID is the unique identifier for the intern.
 	FeatureName     string    `json:"feature_name"`           
- 
 } //@name PermissionList
 
-// @Description	InternsCount represents the count of interns.
-type InternsCount struct {
+// @Description	permissionCount represents the count of interns.
+type permissionCount struct {
 	Count uint `json:"count"` // Count is the number of interns.
-} //@name InternsCount
+} //@name permissionCount
+
 
 // @Description	PermissionsDetails represents detailed information about a specific intern.
 type PermissionsDetails struct {
-	ID               uuid.UUID `json:"id"`        // ID is the unique identifier for the intern.
+	ID               uuid.UUID `json:"id"`
+	FeatureName     string    `json:"feature_name"`    
 	CreatePerm bool `json:"create_perm"` // Firstname is the first name of the intern. It is required and should be between 3 and 30 characters.
 	ReadPerm  bool `json:"read_perm"`  // Lastname is the last name of the intern. It is required and should be between 3 and 35 characters.
 	UpdatePerm     bool `json:"update_perm"`    // Email is the email address of the intern. It is required, should be a valid email, and maximum length is 255 characters.

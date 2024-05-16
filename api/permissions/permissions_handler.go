@@ -1,4 +1,4 @@
-package interns
+package permissions
 
 import (
 	"labs/constants"
@@ -14,84 +14,83 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-/**
 
-IMPORTANT:
-The user ID represents the unique identifier of an employee who holds the role of former intern groups.
 
-*/
-
-// CreatePermission Handles the creation of a new permission.
+// CreateMissionsOrders  Handles the creation of a new permission.
 // @Summary        	Create permission
 // @Description    	Create a new permission.
 // @Tags			Permissions
 // @Accept			json
 // @Produce			json
 // @Security 		ApiKeyAuth
-// @Param			companyID		path			string	 true	"companyID"
-// @Param			roleID		    path			string	  true	    "roleID"
-// @Param			FeatureID	    path		    string	  true	     "FeatureID"
-// @Param			request			body			permission.permissionIn	true	"permission query params"
+// @Param			companyID	   path			string			true	"companyID"
+// @Param			roleID		   path			string			true	 "roleID"
+// @Param			featureID	   path			string			true	"featureID"
+// @Param			request			body		permissions.PermissionIn	true "PermissionIn query params"
 // @Success			201				{object}		utils.ApiResponses
 // @Failure			400				{object}		utils.ApiResponses	"Invalid request"
 // @Failure			401				{object}		utils.ApiResponses	"Unauthorized"
 // @Failure			403				{object}		utils.ApiResponses	"Forbidden"
-// @Failure			500				{object}		utils.ApiResponses	"Internal Server Error"
-// @Router			/permissions/{companyID}/{companyID}/{roleID}/{FeatureID}/add 	[post]
+// @Failure			500				{object}		utils.ApiResponses	"MissionOrdersal Server Error"
+// @Router			/permissions/{companyID}/{featureID}/{roleID}	[post]
 func (db Database) CreatePermission(ctx *gin.Context) {
 
 	// Extract JWT values from the context
 	session := utils.ExtractJWTValues(ctx)
 
-	// Parse and validate the company ID from the request parameter
+	// Parse and validate the user ID from the request parameter
 	companyID, err := uuid.Parse(ctx.Param("companyID"))
 	if err != nil {
 		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
 		return
 	}
-	// Parse and validate the supervisorID  from the request parameter
-	roleID, err := uuid.Parse(ctx.Param("roleID"))
-	if err != nil {
-		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
-		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
-		return
-	}
+	
+		// Parse and validate the user ID from the request parameter
+		roleID, err := uuid.Parse(ctx.Param("roleID"))
+		if err != nil {
+			logrus.Error("Error  roleID mapping request from frontend . Invalid UUID format. Error: ", err.Error())
+			utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+			return
+		}
+		// Parse and validate the user ID from the request parameter
+		featureID, err := uuid.Parse(ctx.Param("featureID"))
+		if err != nil {
+			logrus.Error("Error mapping request from frontend featureID. Invalid UUID format. Error: ", err.Error())
+			utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
+			return
+		}
 
-	// Parse and validate the supervisorID  from the request parameter
-	FeatureID, err := uuid.Parse(ctx.Param("FeatureID"))
-	if err != nil {
-		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
-		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
-		return
-	}
-	// Check if the intern belongs to the specified compnay
+	// Check if the employee belongs to the specified user
 	if err := domains.CheckEmployeeBelonging(db.DB, companyID, session.UserID, session.CompanyID); err != nil {
 		logrus.Error("Error verifying employee belonging. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
 		return
 	}
 
-	// Parse the incoming JSON request into a InternIn struct
-	permission := new(permissionIn)
+	// Parse the incoming JSON request into a PresenceIn struct
+	permission := new(PermissionIn)
 	if err := ctx.ShouldBindJSON(permission); err != nil {
 		logrus.Error("Error mapping request from frontend. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
 		return
 	}
 
-	// Create a new intern in the database
+	
+
+	// Create a new MissionOrders  in the database
 	dbpermission := &domains.Permissions{
-		ID:          uuid.New(),
-		FeatureName: permission.FeatureName,
-		CreatePerm:  permission.CreatePerm,
-		ReadPerm:    permission.ReadPerm,
-		UpdatePerm:  permission.UpdatePerm,
-		DeletePerm:  permission.DeletePerm,
-		CompanyID:   companyID,
-		RoleID:      roleID,
-		FeatureID:   FeatureID,
+		ID:           uuid.New(),
+	FeatureName: permission.FeatureName,
+	ReadPerm: permission.ReadPerm,
+	CreatePerm: permission.CreatePerm,
+	UpdatePerm: permission.UpdatePerm,
+	DeletePerm: permission.DeletePerm,
+		FeatureID:    featureID,
+		RoleID:       roleID, 
+		CompanyID: companyID,
 	}
+
 	if err := domains.Create(db.DB, dbpermission); err != nil {
 		logrus.Error("Error saving data to the database. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
@@ -102,6 +101,8 @@ func (db Database) CreatePermission(ctx *gin.Context) {
 	utils.BuildResponse(ctx, http.StatusCreated, constants.CREATED, utils.Null())
 }
 
+
+
 // ReadPermissions	Handles the retrieval of all permissions.
 // @Summary        	Get permissions
 // @Description    	Get all permissions.
@@ -111,7 +112,7 @@ func (db Database) CreatePermission(ctx *gin.Context) {
 // @Param			page			query		int			false	"Page"
 // @Param			limit			query		int			false	"Limit"
 // @Param			companyID		path		string		true	"companyID"
-// @Success			200				{object}	permisssions.PermissionsPagination
+// @Success			200				{object}	permissions.PermissionsPagination
 // @Failure			400				{object}	utils.ApiResponses		"Invalid request"
 // @Failure			401				{object}	utils.ApiResponses		"Unauthorized"
 // @Failure			403				{object}	utils.ApiResponses		"Forbidden"
@@ -217,7 +218,7 @@ func (db Database) ReadPermissions(ctx *gin.Context) {
 // @Produce			json
 // @Security 		ApiKeyAuth
 // @Param			companyID				path			string		true	"companyID "
-// @Success			200						{object}		interns.InternsCount
+// @Success			200						{object}		permissions.permissionCount
 // @Failure			400						{object}		utils.ApiResponses	"Invalid request"
 // @Failure			401						{object}		utils.ApiResponses	"Unauthorized"
 // @Failure			403						{object}		utils.ApiResponses	"Forbidden"
@@ -253,7 +254,7 @@ func (db Database) ReadPermissionCount(ctx *gin.Context) {
 	}
 
 	// Generate a intern structure as a response
-	permissionCount := InternsCount{
+	permissionCount := permissionCount{
 		Count: permissions,
 	}
 
@@ -314,10 +315,11 @@ func (db Database) ReadPermission(ctx *gin.Context) {
 	// Generate a intern structure as a response
 	details := PermissionsDetails{
 		ID:         permission.ID,
+		FeatureName: permission.FeatureName,
 		CreatePerm: permission.CreatePerm,
 		ReadPerm:   permission.ReadPerm,
 		DeletePerm: permission.DeletePerm,
-		UpdatePerm: permission.UpdatePerm,
+		UpdatePerm: permission.UpdatePerm,			
 	}
 	// Respond with success
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, details)
@@ -331,8 +333,8 @@ func (db Database) ReadPermission(ctx *gin.Context) {
 // @Produce			json
 // @Security 		ApiKeyAuth
 // @Param			companyID			path			string				true	"companyID"
-// @Param			permissionID	   path		        string				true	"permissionID"
-// @Param			request				body			permission.permissionIn	true	"permission query params"
+// @Param			permissionID	    path		    string				true	"permissionID"
+// @Param			request				body			permissions.PermissionIn	true	"permission query params"
 // @Success			200					{object}		utils.ApiResponses
 // @Failure			400					{object}		utils.ApiResponses			"Invalid request"
 // @Failure			401					{object}		utils.ApiResponses			"Unauthorized"
@@ -368,7 +370,7 @@ func (db Database) UpdatePermission(ctx *gin.Context) {
 	}
 
 	// Parse the incoming JSON request into a InternIn struct
-	permission := new(permissionIn)
+	permission := new(PermissionIn)
 	if err := ctx.ShouldBindJSON(permission); err != nil {
 		logrus.Error("Error mapping request from frontend. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
@@ -384,10 +386,10 @@ func (db Database) UpdatePermission(ctx *gin.Context) {
 
 	// Update the intern data in the database
 	dbpermission := &domains.Permissions{
-
 		FeatureName: permission.FeatureName,
 		CreatePerm:  permission.CreatePerm,
 		UpdatePerm:  permission.UpdatePerm,
+		ReadPerm: permission.ReadPerm,
 		DeletePerm:  permission.DeletePerm,
 	}
 	if err = domains.Update(db.DB, dbpermission, objectID); err != nil {
@@ -399,7 +401,6 @@ func (db Database) UpdatePermission(ctx *gin.Context) {
 	// Respond with success
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, utils.Null())
 }
-
 // DeletePermission  Handles the deletion of a permission.
 // @Summary        	Delete permission
 // @Description    	Delete one permission.
@@ -413,7 +414,7 @@ func (db Database) UpdatePermission(ctx *gin.Context) {
 // @Failure			401					{object}		utils.ApiResponses		"Unauthorized"
 // @Failure			403					{object}		utils.ApiResponses		"Forbidden"
 // @Failure			500					{object}		utils.ApiResponses		"Internal Server Error"
-// @Router			/interns/{companyID}/delete/{internID}	[delete]
+// @Router			/permissions/{companyID}/delete/{permissionID}	 [delete]
 func (db Database) DeletePermission(ctx *gin.Context) {
 
 	// Extract JWT values from the context
@@ -428,7 +429,7 @@ func (db Database) DeletePermission(ctx *gin.Context) {
 	}
 
 	// Parse and validate the intern ID from the request parameter
-	internID, err := uuid.Parse(ctx.Param("internID"))
+	permissionID, err := uuid.Parse(ctx.Param("permissionID"))
 	if err != nil {
 		logrus.Error("Error mapping request from frontend. Invalid UUID format. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.INVALID_REQUEST, utils.Null())
@@ -442,15 +443,10 @@ func (db Database) DeletePermission(ctx *gin.Context) {
 		return
 	}
 
-	// Check if the intern with the specified ID exists
-	if err := domains.CheckByID(db.DB, &domains.Interns{}, internID); err != nil {
-		logrus.Error("Error checking if the intern with the specified ID exists. Error: ", err.Error())
-		utils.BuildErrorResponse(ctx, http.StatusNotFound, constants.DATA_NOT_FOUND, utils.Null())
-		return
-	}
+	
 
 	// Delete the intern data from the database
-	if err := domains.Delete(db.DB, &domains.Permissions{}, internID); err != nil {
+	if err := domains.Delete(db.DB, &domains.Permissions{}, permissionID); err != nil {
 		logrus.Error("Error deleting intern data from the database. Error: ", err.Error())
 		utils.BuildErrorResponse(ctx, http.StatusBadRequest, constants.UNKNOWN_ERROR, utils.Null())
 		return
@@ -458,5 +454,11 @@ func (db Database) DeletePermission(ctx *gin.Context) {
 
 	// Respond with success
 	utils.BuildResponse(ctx, http.StatusOK, constants.SUCCESS, utils.Null())
+
+
+
+
+
+
 
 }

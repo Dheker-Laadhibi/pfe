@@ -12,6 +12,7 @@ import (
 	"labs/api/loanRequests"
 	"labs/api/mission_orders"
 	"labs/api/notifications"
+	"labs/api/permissions"
 	"labs/api/presences"
 	"labs/api/projects"
 	"labs/api/questions"
@@ -80,12 +81,13 @@ func RoutesApiInit(router *gin.Engine, db *gorm.DB) {
 		//initialize TrainingRequest
 		training_request.TrainingRequestRouterInit(api, db)
 
-	//initialize TrainingRequest
-	user_experience.ExperienceRouterInit(api, db)
+	 //initialize TrainingRequest
+	   user_experience.ExperienceRouterInit(api, db)
 	// intitialize feature 
-
 	features.FeatureRouterInit(api,db)
-
+	
+	//permission 
+	permissions.PermissionRouterInit(api,db)
 
 
 	}
